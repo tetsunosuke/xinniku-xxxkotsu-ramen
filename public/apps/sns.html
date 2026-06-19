@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SNS — タベアルキ太郎</title>
+  <style>
+    :root {
+      --bg: #000;
+      --bg2: #111;
+      --bg3: #16181c;
+      --border: #2f3336;
+      --text: #e7e9ea;
+      --muted: #71767b;
+      --blue: #1d9bf0;
+      --hover: rgba(255,255,255,0.03);
+      --font: -apple-system, 'Noto Sans JP', 'Segoe UI', sans-serif;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body { background:var(--bg); font-family:var(--font); color:var(--text);
+           height:100vh; overflow-y:auto; overflow-x:hidden; }
+
+    /* ── Header ── */
+    .header {
+      position:sticky; top:0; z-index:10;
+      background:rgba(0,0,0,0.88);
+      backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--border);
+      padding:12px 16px;
+      display:flex; align-items:center; gap:14px;
+    }
+    .header-icon { font-size:22px; cursor:pointer; padding:4px; }
+    .header-title { font-size:19px; font-weight:700; }
+
+    /* ── Profile ── */
+    .profile-banner {
+      height:130px;
+      background:linear-gradient(135deg, #0d1b40 0%, #1a0d30 50%, #0d2030 100%);
+    }
+    .profile-row {
+      display:flex; justify-content:space-between;
+      align-items:flex-end; padding:0 16px;
+      margin-top:-44px; position:relative;
+    }
+    .profile-avatar {
+      width:84px; height:84px; border-radius:50%;
+      border:4px solid #000;
+      background:linear-gradient(135deg, #1a2a3a, #2c3e50);
+      display:flex; align-items:center; justify-content:center;
+      font-size:38px; position:relative; z-index:1; flex-shrink:0;
+    }
+    .profile-info { padding:12px 16px 0; }
+    .profile-name { font-size:20px; font-weight:800; }
+    .profile-handle { color:var(--muted); font-size:14px; margin-top:2px; }
+    .profile-bio { margin-top:12px; font-size:14px; line-height:1.6; color:var(--text); }
+    .birthday-tag {
+      display:inline-flex; align-items:center; gap:5px;
+      background:rgba(255,200,0,0.1);
+      border:1px solid rgba(255,200,0,0.3);
+      border-radius:20px; padding:4px 10px;
+      font-size:13px; color:#f0c040; margin-top:8px;
+    }
+    .profile-meta {
+      display:flex; flex-wrap:wrap; gap:6px 16px;
+      margin-top:10px; font-size:13px; color:var(--muted);
+    }
+    .profile-stats {
+      display:flex; gap:20px; margin-top:12px; font-size:14px;
+    }
+    .stat strong { color:var(--text); }
+    .stat span   { color:var(--muted); }
+
+    /* ── Tabs ── */
+    .tabs {
+      display:flex; border-bottom:1px solid var(--border);
+      margin-top:14px;
+    }
+    .tab {
+      flex:1; text-align:center; padding:14px;
+      font-size:14px; font-weight:600; color:var(--muted);
+      cursor:pointer; position:relative;
+      transition:color 0.2s, background 0.15s;
+    }
+    .tab:hover { background:var(--hover); }
+    .tab.active { color:var(--text); }
+    .tab.active::after {
+      content:''; position:absolute; bottom:0; left:50%;
+      transform:translateX(-50%);
+      width:48px; height:3px; background:var(--blue); border-radius:2px;
+    }
+
+    /* ── Post ── */
+    .post {
+      display:flex; gap:12px; padding:14px 16px;
+      border-bottom:1px solid var(--border);
+      transition:background 0.15s; cursor:default;
+    }
+    .post.clickable { cursor:pointer; }
+    .post.clickable:hover { background:var(--hover); }
+    .post-ava {
+      width:48px; height:48px; border-radius:50%; flex-shrink:0;
+      background:linear-gradient(135deg, #1a2a3a, #2c3e50);
+      display:flex; align-items:center; justify-content:center; font-size:22px;
+    }
+    .post-body { flex:1; min-width:0; }
+    .post-head {
+      display:flex; flex-wrap:wrap; align-items:baseline;
+      gap:4px 6px; margin-bottom:4px;
+    }
+    .post-name { font-weight:700; font-size:14px; }
+    .post-hdl  { color:var(--muted); font-size:13px; }
+    .post-time { color:var(--muted); font-size:13px; }
+    .post-text { font-size:14px; line-height:1.65; white-space:pre-wrap; word-break:break-word; }
+    .post-img  {
+      margin-top:12px; border-radius:14px; overflow:hidden;
+      border:1px solid var(--border);
+    }
+    .post-img img { width:100%; display:block; max-height:320px; object-fit:cover; }
+    .img-grid {
+      display:grid; grid-template-columns:1fr 1fr 1fr;
+      gap:3px; margin-top:12px; border-radius:14px; overflow:hidden;
+    }
+    .img-grid-cell {
+      aspect-ratio:1; overflow:hidden;
+      background:var(--bg3);
+      display:flex; align-items:center; justify-content:center; font-size:28px;
+    }
+    .img-grid-cell img { width:100%; height:100%; object-fit:cover; }
+    .post-actions {
+      display:flex; gap:20px; margin-top:12px;
+      color:var(--muted); font-size:13px;
+    }
+    .act { display:flex; align-items:center; gap:5px; cursor:pointer; transition:color 0.15s; }
+    .act:hover { color:var(--blue); }
+
+    /* ── Quote / リツイート ── */
+    .quote {
+      margin-top:12px; border:1px solid var(--border);
+      border-radius:14px; padding:12px; cursor:pointer;
+      transition:background 0.15s;
+    }
+    .quote:hover { background:var(--hover); }
+    .quote-head {
+      display:flex; align-items:center; gap:6px; margin-bottom:4px;
+    }
+    .quote-ava {
+      width:20px; height:20px; border-radius:50%; background:#333;
+      display:flex; align-items:center; justify-content:center; font-size:10px;
+    }
+    .quote-name { font-weight:700; font-size:13px; }
+    .quote-hdl  { color:var(--muted); font-size:12px; }
+    .quote-text { font-size:13px; color:var(--text); line-height:1.5; }
+    .quote-link { color:var(--blue); }
+
+    /* ── 警告バナー ── */
+    .notice-banner {
+      background:rgba(200,50,50,0.1);
+      border:1px solid rgba(200,50,50,0.3);
+      border-radius:10px; padding:10px 14px;
+      margin:10px 16px; font-size:12px; color:#e07070;
+      line-height:1.5;
+    }
+
+    /* Scroll indicator */
+    .scroll-hint {
+      text-align:center; padding:20px; color:var(--muted); font-size:13px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header" id="sns-header">
+  <span class="header-icon">←</span>
+  <div class="header-title">プロフィール</div>
+</div>
+
+<div class="profile-banner" id="profile-banner"></div>
+<div class="profile-row" id="profile-avatar-row">
+  <div class="profile-avatar">🍜</div>
+</div>
+<div class="profile-info" id="profile-info">
+  <div class="profile-name">タベアルキ太郎</div>
+  <div class="profile-handle">@tabearu_taro</div>
+  <div class="profile-bio">
+    全国のラーメン🍜&グルメを食べ歩くフードレポーター。
+    チャンネル登録者28万人突破！毎週火・金更新。相方は @foodhunter_ken
+    <br>
+    <span class="birthday-tag">🎂 6月13日生まれ ♊</span>
+  </div>
+  <div class="profile-meta">
+    <span>📅 2018年から利用</span>
+    <span>🎥 フード系YouTuber</span>
+    <span>📍 東京</span>
+  </div>
+  <div class="profile-stats">
+    <div class="stat"><strong>1,243</strong> <span>フォロー中</span></div>
+    <div class="stat"><strong>52.4K</strong> <span>フォロワー</span></div>
+  </div>
+</div>
+
+<div class="tabs" id="profile-tabs">
+  <div class="tab active">ポスト</div>
+  <div class="tab">返信</div>
+  <div class="tab">メディア</div>
+  <div class="tab">いいね</div>
+</div>
+
+<!-- Post 1: 最後の投稿 -->
+<div class="post">
+  <div class="post-ava">🍜</div>
+  <div class="post-body">
+    <div class="post-head">
+      <span class="post-name">タベアルキ太郎</span>
+      <span class="post-hdl">@tabearu_taro</span>
+      <span class="post-time">· 11月12日</span>
+    </div>
+    <div class="post-text">次の取材先に向かってます🍜
+久々に「あの店」への聖地巡礼。相方には内緒にしてサプライズしようかな笑
+報告待ってて！</div>
+    <div class="post-actions">
+      <span class="act">💬 23</span>
+      <span class="act">🔁 41</span>
+      <span class="act">♡ 318</span>
+    </div>
+  </div>
+</div>
+
+<!-- Noise Post A: Unrelated content -->
+<div class="post">
+  <div class="post-ava">🍜</div>
+  <div class="post-body">
+    <div class="post-head">
+      <span class="post-name">タベアルキ太郎</span>
+      <span class="post-hdl">@tabearu_taro</span>
+      <span class="post-time">· 11月9日</span>
+    </div>
+    <div class="post-text">最近寒くなってきたから、味噌ラーメンの季節だな。
+新宿のあの裏路地の味噌ラーメン屋、ひさびさに行きたい。</div>
+    <div class="post-actions">
+      <span class="act">💬 12</span>
+      <span class="act">🔁 15</span>
+      <span class="act">♡ 150</span>
+    </div>
+  </div>
+</div>
+
+<!-- Noise Post B: Unrelated content -->
+<div class="post">
+  <div class="post-ava">🍜</div>
+  <div class="post-body">
+    <div class="post-head">
+      <span class="post-name">タベアルキ太郎</span>
+      <span class="post-hdl">@tabearu_taro</span>
+      <span class="post-time">· 11月5日</span>
+    </div>
+    <div class="post-text">YouTubeの登録者数が28万人突破しました！みんな本当にありがとう！
+次の動画の編集がんばるぞ🔥</div>
+    <div class="post-actions">
+      <span class="act">💬 98</span>
+      <span class="act">🔁 45</span>
+      <span class="act">♡ 1.5K</span>
+    </div>
+  </div>
+</div>
+
+<!-- Post 2: 引用リポスト（ニュース） -->
+<div class="post clickable" id="news-post" onclick="openNews()">
+  <div class="post-ava">🍜</div>
+  <div class="post-body">
+    <div class="post-head">
+      <span class="post-name">タベアルキ太郎</span>
+      <span class="post-hdl">@tabearu_taro</span>
+      <span class="post-time">· 11月2日</span>
+    </div>
+    <div class="post-text">これ、うちが最近よく行くラーメン屋の近くで起きた事件なんだよね…
+最近あの店の前通ると変な匂いがするのずっと気になってたんだが
+偶然だとは思うけどゾワっとした</div>
+    <div class="quote" onclick="openNews()">
+      <div class="quote-head">
+        <div class="quote-ava">📰</div>
+        <span class="quote-name">東都ニュースWeb</span>
+        <span class="quote-hdl">@totonews_jp</span>
+      </div>
+      <div class="quote-text">【速報】火葬場から複数の遺体が持ち出された疑い　台東区の葬儀業者を家宅捜索　遺族の告発で発覚、警察が関係者から事情聴取
+        <span class="quote-link"> totonews.jp/article/2024...</span>
+      </div>
+    </div>
+    <div class="post-actions">
+      <span class="act">💬 187</span>
+      <span class="act">🔁 432</span>
+      <span class="act">♡ 1.2K</span>
+    </div>
+  </div>
+</div>
+
+<!-- Post 3: 5周年（妻が消えた）-->
+<div class="post">
+  <div class="post-ava">🍜</div>
+  <div class="post-body">
+    <div class="post-head">
+      <span class="post-name">タベアルキ太郎</span>
+      <span class="post-hdl">@tabearu_taro</span>
+      <span class="post-time">· 2024年8月26日</span>
+    </div>
+    <div class="post-text">毎年恒例！〇ンニク〇んこつラーメンさん5周年🎉
+今年は店主さんお一人での撮影に。奥様は体調不良だそう。
+味は健在！いつもありがとうございます。
+（あれ、手に指輪？前からつけてたっけ…）</div>
+    <div class="post-img" id="img-anniv3">
+      <div style="height:200px;background:#111;display:flex;align-items:center;justify-content:center;color:#333;font-size:32px">📷</div>
+    </div>
+    <div class="post-actions">
+      <span class="act">💬 14</span>
+      <span class="act">🔁 8</span>
+      <span class="act">♡ 203</span>
+    </div>
+  </div>
+</div>
+
+<!-- Noise Post C: Unrelated ramen review -->
+<div class="post">
+  <div class="post-ava">🍜</div>
+  <div class="post-body">
+    <div class="post-head">
+      <span class="post-name">タベアルキ太郎</span>
+      <span class="post-hdl">@tabearu_taro</span>
+      <span class="post-time">· 2023年12月15日</span>
+    </div>
+    <div class="post-text">池袋の激辛中華そば、完食！🌶️
+喉がヒリヒリするけど、この辛さの奥にある旨味がたまらん。
+辛党の人はぜひ行ってみてほしい！</div>
+    <div class="post-actions">
+      <span class="act">💬 28</span>
+      <span class="act">🔁 19</span>
+      <span class="act">♡ 410</span>
+    </div>
+  </div>
+</div>
+
+<!-- Post 4: 3周年（妻がやつれている）-->
+<div class="post">
+  <div class="post-ava">🍜</div>
+  <div class="post-body">
+    <div class="post-head">
+      <span class="post-name">タベアルキ太郎</span>
+      <span class="post-hdl">@tabearu_taro</span>
+      <span class="post-time">· 2022年8月26日</span>
+    </div>
+    <div class="post-text">〇ンニク〇んこつラーメン3周年🎂おめでとうございます！
+今年も来れました。ご夫婦でお出迎え。
+奥様ちょっとお疲れかな…？それでもいつも笑顔ありがとう😊</div>
+    <div class="post-img" id="img-anniv2">
+      <div style="height:200px;background:#111;display:flex;align-items:center;justify-content:center;color:#333;font-size:32px">📷</div>
+    </div>
+    <div class="post-actions">
+      <span class="act">💬 6</span>
+      <span class="act">🔁 5</span>
+      <span class="act">♡ 118</span>
+    </div>
+  </div>
+</div>
+
+<!-- Noise Post D: Unrelated family / vacation post -->
+<div class="post">
+  <div class="post-ava">🍜</div>
+  <div class="post-body">
+    <div class="post-head">
+      <span class="post-name">タベアルキ太郎</span>
+      <span class="post-hdl">@tabearu_taro</span>
+      <span class="post-time">· 2021年5月3日</span>
+    </div>
+    <div class="post-text">たまにはラーメン以外も。実家に帰省して母親の手料理を堪能中。
+肉じゃがが染みるなぁ。</div>
+    <div class="post-actions">
+      <span class="act">💬 40</span>
+      <span class="act">🔁 10</span>
+      <span class="act">♡ 612</span>
+    </div>
+  </div>
+</div>
+
+<!-- Post 5: 1周年（夫婦元気） -->
+<div class="post">
+  <div class="post-ava">🍜</div>
+  <div class="post-body">
+    <div class="post-head">
+      <span class="post-name">タベアルキ太郎</span>
+      <span class="post-hdl">@tabearu_taro</span>
+      <span class="post-time">· 2020年8月26日</span>
+    </div>
+    <div class="post-text">🎉〇ンニク〇んこつラーメン1周年おめでとうございます！
+ご夫婦も本当に仲良しで素敵😍これからも毎年撮らせてもらおう！
+（オープンは2019年8月26日だそうです。歴史ある秘伝スープを受け継いだお店！）</div>
+    <div class="post-img" id="img-anniv1">
+      <div style="height:200px;background:#111;display:flex;align-items:center;justify-content:center;color:#333;font-size:32px">📷</div>
+    </div>
+    <div class="post-actions">
+      <span class="act">💬 32</span>
+      <span class="act">🔁 67</span>
+      <span class="act">♡ 891</span>
+    </div>
+  </div>
+</div>
+
+<div class="scroll-hint">— 過去の投稿はありません —</div>
+
+<script>
+  // iframeチェック
+  if (window.self === window.top) { window.location.href = '../index.html'; }
+
+  // Check query parameters to toggle profile view
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('preview') === '1') {
+    // Hide navigation bar and bio stats when previewing public timeline directly on player phone
+    const header = document.getElementById('sns-header');
+    if (header) header.style.display = 'none';
+  }
+
+  // 親へ通知
+  function post(type, data) { window.parent.postMessage(Object.assign({ type }, data), '*'); }
+
+  post('SET_FLAG', { key: 'snsVisited', value: true });
+  post('ADVANCE_STEP', { step: 'news_found' });
+
+  function openNews() {
+    post('OPEN_APP', { appId: 'browser', extra: { page: 'news' } });
+  }
+
+  // 画像の読み込み
+  const imgs = {
+    'img-anniv1': '../assets/images/anniversary_1.png',
+    'img-anniv2': '../assets/images/anniversary_2.png',
+    'img-anniv3': '../assets/images/anniversary_3.png',
+  };
+  Object.entries(imgs).forEach(([id, src]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const img = new Image();
+    img.onload = () => { el.innerHTML = ''; el.appendChild(img); };
+    img.onerror = () => {}; // プレースホルダーのまま
+    img.src = src;
+    img.style.cssText = 'width:100%;display:block;max-height:320px;object-fit:cover;';
+    img.alt = '周年記念写真';
+  });
+</script>
+</body>
+</html>

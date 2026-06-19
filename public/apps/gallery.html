@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>写真</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --bg2: #111118;
+      --border: #222230;
+      --text: #dddde8;
+      --muted: #6a6a80;
+      --font: 'Noto Sans JP', -apple-system, sans-serif;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body { background:var(--bg); font-family:var(--font); color:var(--text);
+           height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+
+    /* ── Header ── */
+    #gallery-header {
+      background:rgba(10,10,18,0.95);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--border);
+      padding:12px 16px;
+      display:flex; align-items:center; justify-content:space-between;
+      flex-shrink:0; position:sticky; top:0; z-index:10;
+    }
+    .gh-title { font-size:18px; font-weight:700; }
+    .gh-sub { font-size:12px; color:var(--muted); }
+
+    /* ── Albums / Grid ── */
+    #gallery-body { flex:1; overflow-y:auto; }
+
+    .album-section { margin-bottom:4px; }
+    .album-header {
+      padding:14px 16px 8px;
+      font-size:13px; font-weight:600; color:var(--muted);
+      letter-spacing:1px; text-transform:uppercase;
+    }
+    .photo-grid {
+      display:grid; grid-template-columns:repeat(3, 1fr); gap:2px;
+    }
+    .photo-cell {
+      aspect-ratio:1; overflow:hidden; position:relative;
+      background:var(--bg2); cursor:pointer;
+      transition:opacity 0.15s;
+    }
+    .photo-cell:hover { opacity:0.85; }
+    .photo-cell img { width:100%; height:100%; object-fit:cover; display:block; }
+    .photo-cell .ph-label {
+      position:absolute; bottom:0; left:0; right:0;
+      background:linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+      font-size:10px; color:rgba(255,255,255,0.7); padding:6px 6px 4px;
+    }
+    .photo-placeholder {
+      width:100%; height:100%; display:flex;
+      align-items:center; justify-content:center;
+      font-size:32px; color:#222;
+      flex-direction:column; gap:6px;
+    }
+    .photo-placeholder span { font-size:10px; color:#333; }
+
+    /* Kitchen photo special */
+    .photo-cell.kitchen-cell {
+      border:2px solid rgba(180,50,50,0.3);
+    }
+    .photo-cell.kitchen-cell::after {
+      content:'NEW'; position:absolute; top:6px; right:6px;
+      background:rgba(220,50,50,0.9);
+      color:white; font-size:9px; font-weight:700;
+      padding:2px 5px; border-radius:3px;
+    }
+
+    /* ── Lightbox ── */
+    #lightbox {
+      position:fixed; inset:0; z-index:100;
+      background:rgba(0,0,0,0.97);
+      display:none; flex-direction:column;
+      animation:lbIn 0.25s ease;
+    }
+    #lightbox.open { display:flex; }
+    @keyframes lbIn { from { opacity:0; } to { opacity:1; } }
+
+    #lb-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 16px;
+      background:rgba(0,0,0,0.8); flex-shrink:0;
+    }
+    #lb-close {
+      font-size:22px; cursor:pointer; color:rgba(255,255,255,0.7);
+      padding:4px 10px; border-radius:6px; background:none; border:none;
+      transition:color 0.15s;
+    }
+    #lb-close:hover { color:white; }
+    #lb-filename { font-size:13px; color:rgba(255,255,255,0.6); }
+    #lb-date { font-size:12px; color:rgba(255,255,255,0.4); }
+
+    #lb-image-wrap {
+      flex:1; display:flex; align-items:center; justify-content:center;
+      overflow:hidden; position:relative;
+    }
+    #lb-img { max-width:100%; max-height:100%; object-fit:contain; display:block; }
+
+    #lb-caption {
+      background:rgba(0,0,0,0.8); padding:12px 16px;
+      font-size:13px; color:rgba(255,255,255,0.6);
+      border-top:1px solid rgba(255,255,255,0.06); flex-shrink:0; line-height:1.5;
+    }
+
+    /* ── Examine overlay (厨房写真) ── */
+    #examine-btn {
+      position:absolute; bottom:16px; left:50%; transform:translateX(-50%);
+      padding:10px 24px; background:rgba(220,80,60,0.2);
+      border:1px solid rgba(220,80,60,0.5);
+      border-radius:8px; color:#e07060; font-family:var(--font);
+      font-size:13px; cursor:pointer; white-space:nowrap;
+      transition:all 0.2s; display:none;
+    }
+    #examine-btn.show { display:block; }
+    #examine-btn:hover { background:rgba(220,80,60,0.35); }
+
+    /* ── Clue Modal (手がかりモーダル) ── */
+    #clue-modal {
+      position:fixed; inset:0; z-index:200;
+      background:rgba(0,0,0,0.96);
+      display:none; flex-direction:column;
+      overflow-y:auto;
+    }
+    #clue-modal.open { display:flex; }
+
+    .clue-header {
+      background:rgba(0,0,0,0.9); border-bottom:1px solid #333;
+      padding:14px 16px; display:flex; align-items:center; gap:14px;
+      flex-shrink:0;
+    }
+    .clue-back {
+      font-size:18px; cursor:pointer; color:rgba(255,255,255,0.6);
+      background:none; border:none; padding:4px;
+    }
+    .clue-header h2 { font-size:16px; color:#e07060; }
+
+    .clue-body { padding:20px 16px; flex:1; }
+    .clue-img-area {
+      position:relative; border-radius:10px; overflow:hidden;
+      margin-bottom:20px; background:#0d0d0d; border:1px solid #2a2a2a;
+    }
+    .clue-img-area img {
+      width:100%; display:block; filter:brightness(0.7) contrast(1.2);
+    }
+
+    /* アノテーション */
+    .annotation {
+      position:absolute; cursor:pointer;
+      animation:pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { transform:scale(1); }
+      50% { transform:scale(1.1); }
+    }
+    .ann-dot {
+      width:28px; height:28px; border-radius:50%;
+      border:2px solid #e07060; background:rgba(220,80,60,0.3);
+      display:flex; align-items:center; justify-content:center;
+      font-size:13px; font-weight:700; color:#e07060;
+    }
+    .ann-label {
+      position:absolute; left:34px; top:50%; transform:translateY(-50%);
+      background:rgba(0,0,0,0.9); border:1px solid rgba(220,80,60,0.4);
+      border-radius:6px; padding:4px 10px;
+      font-size:11px; color:#e07060; white-space:nowrap;
+      pointer-events:none;
+    }
+
+    .clue-list { display:flex; flex-direction:column; gap:14px; }
+    .clue-item {
+      background:rgba(220,80,60,0.07);
+      border:1px solid rgba(220,80,60,0.2);
+      border-radius:10px; padding:14px;
+    }
+    .clue-num {
+      font-size:10px; color:#e07060; letter-spacing:2px;
+      text-transform:uppercase; margin-bottom:6px;
+    }
+    .clue-title { font-size:15px; font-weight:700; margin-bottom:6px; }
+    .clue-desc { font-size:13px; color:rgba(200,200,210,0.8); line-height:1.7; }
+    .clue-highlight {
+      background:rgba(220,80,60,0.15); border-radius:4px;
+      padding:2px 6px; color:#e07060; font-weight:700;
+    }
+
+    .clue-conclusion {
+      margin-top:20px; background:rgba(80,200,80,0.07);
+      border:1px solid rgba(80,200,80,0.3);
+      border-radius:10px; padding:16px;
+    }
+    .clue-conclusion h3 { font-size:14px; color:#60d060; margin-bottom:8px; }
+    .clue-conclusion p { font-size:14px; color:rgba(200,220,200,0.85); line-height:1.7; }
+    .clue-addr {
+      font-size:16px; font-weight:700; color:#70e070;
+      margin-top:8px; letter-spacing:1px;
+    }
+
+    .clue-footer-btn {
+      margin:20px 0; width:100%; padding:14px;
+      background:rgba(80,200,80,0.15);
+      border:1px solid rgba(80,200,80,0.4);
+      border-radius:10px; color:#70e070;
+      font-family:var(--font); font-size:14px;
+      cursor:pointer; transition:all 0.2s;
+    }
+    .clue-footer-btn:hover { background:rgba(80,200,80,0.25); }
+  </style>
+</head>
+<body>
+
+<div id="gallery-header">
+  <div>
+    <div class="gh-title">写真</div>
+    <div class="gh-sub" id="photo-count">読み込み中...</div>
+  </div>
+</div>
+
+<div id="gallery-body">
+  <div class="album-section">
+    <div class="album-header">最近の項目</div>
+    <div class="photo-grid" id="photo-grid"></div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox">
+  <div id="lb-header">
+    <button id="lb-close" onclick="closeLightbox()" aria-label="閉じる">✕</button>
+    <div>
+      <div id="lb-filename">---</div>
+      <div id="lb-date">---</div>
+    </div>
+  </div>
+  <div id="lb-image-wrap">
+    <img id="lb-img" src="" alt="写真">
+    <button id="examine-btn" onclick="openClueModal()">🔍 詳しく調べる</button>
+  </div>
+  <div id="lb-caption"></div>
+</div>
+
+<!-- Clue Modal (厨房写真専用) -->
+<div id="clue-modal">
+  <div class="clue-header">
+    <button class="clue-back" onclick="closeClueModal()">←</button>
+    <h2>🔍 証拠を調べる</h2>
+  </div>
+  <div class="clue-body">
+    <div class="clue-img-area" id="clue-img-area">
+      <img id="clue-kitchen-img" src="../assets/images/kitchen.png" alt="厨房写真">
+      <!-- アノテーション1: 窓の外の看板 -->
+      <div class="annotation" style="top:25%; left:55%;" onclick="highlightClue('window')">
+        <div class="ann-dot">A</div>
+        <div class="ann-label">窓の外の看板</div>
+      </div>
+      <!-- アノテーション2: カレンダー -->
+      <div class="annotation" style="top:40%; left:12%;" onclick="highlightClue('calendar')">
+        <div class="ann-dot">B</div>
+        <div class="ann-label">壁のカレンダー</div>
+      </div>
+    </div>
+
+    <div class="clue-list">
+      <div class="clue-item" id="clue-window">
+        <div class="clue-num">手がかり A — 窓</div>
+        <div class="clue-title">窓の外の逆さまになった看板</div>
+        <div class="clue-desc">
+          厨房の窓越しに外の看板が見える。文字が左右反転しており、鏡文字になっている。<br>
+          反転を元に戻すと：<span class="clue-highlight">「根岸 2-14-8」</span><br>
+          これは店舗が面している通りの住所と思われる。
+        </div>
+      </div>
+      <div class="clue-item" id="clue-calendar">
+        <div class="clue-num">手がかり B — カレンダー</div>
+        <div class="clue-title">壁に貼られたカレンダーの書き込み</div>
+        <div class="clue-desc">
+          カレンダーの11月のページ。複数日に赤いバツ印がある。<br>
+          右下の余白に手書きで <span class="clue-highlight">「根岸 地下」</span> と書かれているのが見える。<br>
+          またメモには「納品 26日」という文字も確認できる。
+        </div>
+      </div>
+    </div>
+
+    <div class="clue-conclusion">
+      <h3>✅ 場所を特定</h3>
+      <p>窓とカレンダーの情報を組み合わせると、この厨房の場所は以下で特定できる：</p>
+      <div class="clue-addr">東京都台東区根岸2-14-8 地下1階</div>
+      <p style="margin-top:8px;font-size:12px;color:rgba(100,200,100,0.6)">（〇ンニク〇んこつラーメン　地下厨房）</p>
+    </div>
+
+    <button class="clue-footer-btn" onclick="confirmLocation()">
+      💬 この情報を相方に送る
+    </button>
+  </div>
+</div>
+
+<script>
+  if (window.self === window.top) { window.location.href = '../index.html'; }
+
+  function post(type, data) { window.parent.postMessage(Object.assign({ type }, data), '*'); }
+
+  const PHOTOS = [
+    { id:'kitchen', file:'../assets/images/kitchen.png', label:'IMG_0847', date:'2024年11月12日', caption:'取材先にて。厨房を撮影。（最後の撮影データ）', special:true },
+    { id:'store',   file:null, label:'IMG_0831', date:'2024年11月12日', caption:'店舗外観', emoji:'🏮' },
+    { id:'ramen1',  file:null, label:'IMG_0820', date:'2024年11月1日', caption:'ラーメン写真', emoji:'🍜' },
+    { id:'ramen2',  file:null, label:'IMG_0804', date:'2024年10月25日', caption:'取材先の料理', emoji:'🍱' },
+    { id:'selfie1', file:null, label:'IMG_0790', date:'2024年10月18日', caption:'相方と', emoji:'🤳' },
+    { id:'map',     file:null, label:'IMG_0765', date:'2024年10月3日', caption:'次の取材メモ', emoji:'🗺️' },
+  ];
+
+  let currentPhotoId = null;
+
+  function buildGrid() {
+    const grid = document.getElementById('photo-grid');
+    const count = document.getElementById('photo-count');
+    count.textContent = PHOTOS.length + '枚の写真';
+    PHOTOS.forEach(p => {
+      const cell = document.createElement('div');
+      cell.className = 'photo-cell' + (p.special ? ' kitchen-cell' : '');
+      cell.onclick = () => openPhoto(p.id);
+      if (p.file) {
+        const img = document.createElement('img');
+        img.src = p.file; img.alt = p.label;
+        img.onerror = () => {
+          cell.innerHTML = `<div class="photo-placeholder"><span style="font-size:28px">📷</span><span>${p.label}</span></div>`;
+        };
+        cell.appendChild(img);
+        if (p.special) {
+          const lbl = document.createElement('div');
+          lbl.className = 'ph-label'; lbl.textContent = p.label;
+          cell.appendChild(lbl);
+        }
+      } else {
+        cell.innerHTML = `<div class="photo-placeholder"><span>${p.emoji||'📷'}</span><span>${p.label}</span></div>`;
+      }
+      grid.appendChild(cell);
+    });
+  }
+
+  function openPhoto(id) {
+    const p = PHOTOS.find(x => x.id === id);
+    if (!p) return;
+    currentPhotoId = id;
+    document.getElementById('lb-filename').textContent = p.label;
+    document.getElementById('lb-date').textContent = p.date;
+    document.getElementById('lb-caption').textContent = p.caption;
+    const img = document.getElementById('lb-img');
+    const examBtn = document.getElementById('examine-btn');
+    if (p.file) {
+      img.src = p.file;
+      img.style.display = 'block';
+    } else {
+      img.src = '';
+      img.style.display = 'none';
+    }
+    examBtn.classList.toggle('show', p.special);
+    document.getElementById('lightbox').classList.add('open');
+
+    if (p.special) {
+      post('SET_FLAG', { key: 'kitchenPhotoViewed', value: true });
+      post('ADVANCE_STEP', { step: 'location_spec' });
+      post('SET_FLAG', { key: 'galleryOpened', value: true });
+    }
+  }
+
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+    currentPhotoId = null;
+  }
+
+  function openClueModal() {
+    document.getElementById('clue-modal').classList.add('open');
+  }
+
+  function closeClueModal() {
+    document.getElementById('clue-modal').classList.remove('open');
+  }
+
+  function highlightClue(type) {
+    document.querySelectorAll('.clue-item').forEach(el => el.style.borderColor = '');
+    const target = document.getElementById('clue-' + type);
+    if (target) {
+      target.style.borderColor = 'rgba(220,80,60,0.6)';
+      target.scrollIntoView({ behavior:'smooth', block:'center' });
+    }
+  }
+
+  function confirmLocation() {
+    closeClueModal();
+    closeLightbox();
+    post('OPEN_APP', { appId: 'chat' });
+    post('SHOW_TOAST', { icon: '💬', app: 'LIME', msg: '相方に場所を知らせよう！' });
+  }
+
+  buildGrid();
+</script>
+</body>
+</html>

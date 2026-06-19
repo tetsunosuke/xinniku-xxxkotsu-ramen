@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="description" content="澱みのスープ — 仮想OS型ARGゲーム">
+  <title>澱みのスープ</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+
+  <!-- ══════════ PRELOADER ══════════ -->
+  <div id="preloader">
+    <div class="preloader-spinner"></div>
+    <div class="preloader-text">読み込み中...</div>
+  </div>
+
+  <!-- ══════════ NOVEL INTRO SCREEN ══════════ -->
+  <div id="novel-intro" role="dialog" aria-label="プロローグ">
+    <div class="novel-box">
+      <div class="novel-text-container">
+        <p class="novel-line">――ある日、街角の雑踏の中。</p>
+        <p class="novel-line">足元に、少し奇妙なスマートフォンが落ちているのを見つけた。</p>
+        <p class="novel-line">背面には、限定デザインらしき「ラーメン店オープン記念」の刻印。</p>
+        <p class="novel-line">そういえば最近、ネットでよく見る配信者のタベアルキ太郎が失踪したという噂があったな……。</p>
+        <p class="novel-line">そしてこのスマホこそ、その「伝説の店」に繋がると噂される端末だった。</p>
+        <p class="novel-line">そんなことをぼんやりと考えていた、その時――</p>
+        <p class="novel-line">手元で、自分自身のスマートフォンが小さく震え、新着メッセージの通知を告げた。</p>
+      </div>
+      <button class="novel-next-btn" onclick="startStory()">調べる</button>
+    </div>
+  </div>
+
+  <!-- ══════════ WAVE BACKGROUND ══════════ -->
+  <div id="waves-bg" aria-hidden="true">
+    <svg class="wave wave-1" viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M0,192L48,176C96,160,192,128,288,128C384,128,480,160,576,170.7C672,181,768,171,864,144C960,117,1056,75,1152,74.7C1248,75,1344,117,1392,138.7L1440,160L1440,320L0,320Z" />
+    </svg>
+    <svg class="wave wave-2" viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M0,256L60,234.7C120,213,240,171,360,160C480,149,600,171,720,186.7C840,203,960,213,1080,197.3C1200,181,1320,139,1380,117.3L1440,96L1440,320L0,320Z" />
+    </svg>
+    <svg class="wave wave-3" viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M0,96L80,112C160,128,320,160,480,170.7C640,181,800,171,960,144C1120,117,1280,75,1360,53.3L1440,32L1440,320L0,320Z" />
+    </svg>
+  </div>
+
+  <!-- ══════════ WALLPAPER ══════════ -->
+  <div id="wallpaper"></div>
+
+  <!-- ══════════ NOTIFICATION TOAST ══════════ -->
+  <div id="notification-toast" role="alert" aria-live="polite">
+    <span class="toast-icon">🔔</span>
+    <div class="toast-body">
+      <div class="toast-app"></div>
+      <div class="toast-msg"></div>
+    </div>
+  </div>
+
+  <!-- ══════════ LOCK SCREEN ══════════ -->
+  <div id="lock-screen" role="main" aria-label="ロック画面">
+
+    <!-- 上部ダミー通知 -->
+    <div id="lock-notification" role="complementary">
+      <div class="lock-notif-icon">🍜</div>
+      <div>
+        <div class="lock-notif-app">〇ンニク〇んこつラーメン</div>
+        <div class="lock-notif-msg">【お知らせ】限定枠残り1席。今すぐご予約できます</div>
+      </div>
+    </div>
+
+    <!-- 時刻表示 -->
+    <div id="lock-time-block">
+      <div id="lock-time" aria-label="現在時刻">--:--</div>
+      <div id="lock-date" aria-label="今日の日付"></div>
+    </div>
+
+    <!-- パスコード入力 -->
+    <div id="passcode-area">
+      <div id="passcode-hint">パスコードを入力</div>
+      <div id="passcode-display" role="status" aria-label="入力中のパスコード">
+        <span class="passcode-dot" aria-hidden="true"></span>
+        <span class="passcode-dot" aria-hidden="true"></span>
+        <span class="passcode-dot" aria-hidden="true"></span>
+        <span class="passcode-dot" aria-hidden="true"></span>
+      </div>
+      <div id="number-pad" role="group" aria-label="数字キーパッド"></div>
+      <div id="passcode-error" role="alert" aria-live="assertive">パスコードが違います</div>
+
+      <!-- 拾ったスマホケースの裏を見る、または自分のスマホ画面に戻るスイッチ -->
+      <button id="device-flip-btn" onclick="flipDevice()" aria-label="端末を裏返す">
+        ⇄ 自分のスマホへ
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════ PLAYER'S OWN PHONE LAYER ══════════ -->
+  <div id="player-phone">
+    <div id="player-phone-bar">
+      <div class="phone-bar-left">
+        <span class="phone-bar-carrier">📶 Y-Mobile</span>
+        <span class="phone-bar-wifi">📶</span>
+      </div>
+      <span id="player-phone-clock">--:--</span>
+      <div class="phone-bar-right">
+        <span class="phone-bar-battery">🔋 78%</span>
+      </div>
+    </div>
+    <div id="player-phone-content">
+      <div class="chat-thread">
+        <div class="thread-header">
+          <span class="thread-back" onclick="closeThread()">←</span>
+          <span class="thread-title">メッセージ (友人)</span>
+        </div>
+        <div class="thread-messages" id="player-thread-messages">
+          <!-- Dynamically populated via js for step-by-step rendering -->
+        </div>
+      </div>
+
+    <!-- ホーム画面風のアイコングリッドレイアウト -->
+    <div class="player-home-grid" id="player-apps">
+      <div class="player-grid-item" onclick="openThread()">
+        <div class="player-app-icon chat-icon">💬</div>
+        <span class="player-app-label">メッセージ</span>
+      </div>
+      <div class="player-grid-item" onclick="openPlayerSns()">
+        <div class="player-app-icon sns-icon">🐦</div>
+        <span class="player-app-label">SNS</span>
+      </div>
+      <div class="player-grid-item" onclick="switchToPickedPhone()">
+        <div class="player-app-icon picked-phone-icon">📱</div>
+        <span class="player-app-label" style="color:#ff6b6b; font-weight:bold;">拾ったスマホ</span>
+      </div>
+    </div>
+
+      <!-- 内蔵iframeとしてのSNS閲覧画面 -->
+      <div id="player-sns-overlay">
+        <div class="sns-overlay-header">
+          <span onclick="closePlayerSns()">✕ 閉じる</span>
+          <span>タベアルキ太郎のSNS</span>
+        </div>
+        <iframe id="player-sns-iframe" src="" frameborder="0"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ DESKTOP ══════════ -->
+  <div id="desktop">
+
+    <!-- トップバー -->
+    <div id="desktop-bar">
+      <span id="desktop-clock" aria-label="時計">--:--</span>
+      <div>
+        <button id="settings-btn" onclick="openSettings()" aria-label="設定を開く" title="設定">⚙</button>
+      </div>
+    </div>
+
+    <!-- アプリアイコン -->
+    <div id="app-icons" role="list" aria-label="アプリ一覧">
+      <div class="app-icon" id="icon-sns" role="listitem" onclick="openApp('sns')" tabindex="0" aria-label="SNSアプリを開く">
+        <div class="app-icon-img icon-sns" aria-hidden="true">🐦</div>
+        <div class="app-icon-label">SNS</div>
+        <div class="app-badge" id="badge-sns" style="display:none" aria-label="新着あり">!</div>
+      </div>
+      <div class="app-icon" id="icon-browser" role="listitem" onclick="openApp('browser')" tabindex="0"
+        aria-label="ブラウザを開く">
+        <div class="app-icon-img icon-browser" aria-hidden="true">🌐</div>
+        <div class="app-icon-label">ブラウザ</div>
+        <div class="app-badge" id="badge-browser" style="display:none" aria-label="新着あり">!</div>
+      </div>
+      <div class="app-icon" id="icon-gallery" role="listitem" onclick="openApp('gallery')" tabindex="0"
+        aria-label="写真アプリを開く">
+        <div class="app-icon-img icon-gallery" aria-hidden="true">📷</div>
+        <div class="app-icon-label">写真</div>
+        <div class="app-badge" id="badge-gallery" style="display:none" aria-label="新着あり">!</div>
+      </div>
+      <div class="app-icon" id="icon-chat" role="listitem" onclick="openApp('chat')" tabindex="0" aria-label="LIMEを開く">
+        <div class="app-icon-img icon-chat" aria-hidden="true">💬</div>
+        <div class="app-icon-label">LIME</div>
+        <div class="app-badge" id="badge-chat" style="display:none" aria-label="新着あり">!</div>
+      </div>
+    </div>
+
+    <!-- PCウィンドウコンテナ -->
+    <div id="windows-container" aria-label="ウィンドウ領域"></div>
+
+    <!-- タスクバー（PCのみ） -->
+    <div id="taskbar" role="navigation" aria-label="タスクバー">
+      <div id="taskbar-apps"></div>
+    </div>
+
+    <!-- モバイルアプリオーバーレイ -->
+    <div id="mobile-app-overlay" aria-live="polite">
+      <iframe id="mobile-iframe" src="" frameborder="0" title="アプリ画面" allow="autoplay"></iframe>
+    </div>
+
+    <!-- ホームバー（モバイルのみ） -->
+    <div id="home-bar" onclick="closeMobileApp()" role="button" tabindex="0" aria-label="ホームに戻る">
+      <div id="home-bar-line" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <!-- ══════════ SETTINGS OVERLAY ══════════ -->
+  <div id="settings-overlay" role="dialog" aria-label="設定メニュー">
+    <div class="settings-panel">
+      <h3>⚙ 設定</h3>
+      <button class="settings-btn" onclick="exportState()">💾 進捗をエクスポート（JSON）</button>
+      <button class="settings-btn" onclick="importState()">📂 進捗をインポート</button>
+      <button class="settings-btn danger" onclick="resetGame()">🔄 ゲームをリセット</button>
+      <button class="settings-btn close-btn" onclick="closeSettings()">✕ 閉じる</button>
+    </div>
+  </div>
+
+  <!-- ══════════ EPILOGUE (グッドエンド) ══════════ -->
+  <div id="epilogue-overlay" role="region" aria-label="エンディング">
+    <div class="end-content">
+      <div class="end-label">E P I L O G U E</div>
+      <div class="epil-player">
+        <div class="epil-player-bar">
+          <span class="live-dot"></span>
+          ARCHIVE — タベアルキ太郎【緊急生放送】衝撃の真実…あのラーメン店の全て
+          <span style="margin-left:auto">視聴者数：48,291</span>
+        </div>
+        <div class="epil-player-body">
+          <p>警察の介入により、台東区根岸2-14-8の地下室から</p>
+          <p>火葬場より持ち出された複数の遺体が発見された。</p>
+          <p>店主は遺体損壊・食品衛生法違反ほか複数の容疑で逮捕。</p>
+          <p>&nbsp;</p>
+          <p>配信者・タベアルキ太郎は無事保護されました。</p>
+          <p>相方・フードハンターケンの通報が命を繋ぎとめました。</p>
+        </div>
+      </div>
+      <div class="epil-credit">ご協力ありがとうございました</div>
+      <button class="end-btn" onclick="resetGame()">もう一度プレイする</button>
+    </div>
+  </div>
+
+  <!-- ══════════ BAD END (バッドエンド) ══════════ -->
+  <div id="bad-end-overlay" role="region" aria-label="バッドエンド">
+    <div class="end-content">
+      <div class="bad-end-box">
+        <div class="bad-text">みいつけた</div>
+        <div class="bad-sub">— 店主</div>
+      </div>
+      <button class="end-btn" onclick="resetGame()">最初からやり直す</button>
+    </div>
+  </div>
+
+  <script src="assets/js/os-core.js"></script>
+</body>
+
+</html>

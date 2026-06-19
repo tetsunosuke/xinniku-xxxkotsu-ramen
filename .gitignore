@@ -1,0 +1,11 @@
+node_modules/
+.astro/
+dist/
+.DS_Store
+*.log
+.gemini/
+.agents/
+.system_generated/
+*.tmp
+*.rmlock
+*.lock
