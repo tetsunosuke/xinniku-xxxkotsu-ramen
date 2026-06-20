@@ -158,7 +158,10 @@
     <!-- トップバー -->
     <div id="desktop-bar">
       <span id="desktop-clock" aria-label="時計">--:--</span>
-      <div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button id="picked-device-back-btn" onclick="flipDevice()" aria-label="自分のスマホに戻る" title="自分のスマホに戻る" style="padding: 4px 10px; border-radius: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: bold; transition: background 0.2s;">
+          <span>⇄</span> <span>自分のスマホへ</span>
+        </button>
         <button id="settings-btn" onclick="openSettings()" aria-label="設定を開く" title="設定">⚙</button>
       </div>
     </div>

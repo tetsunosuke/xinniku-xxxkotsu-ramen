@@ -250,7 +250,17 @@ function doUnlock() {
   advanceStep('unlocked');
   const ls = document.getElementById('lock-screen');
   ls.classList.add('fade-out');
-  setTimeout(() => { ls.style.display = 'none'; checkTriggers(); updateBadges(); }, 900);
+  setTimeout(() => { 
+    ls.style.display = 'none'; 
+    checkTriggers(); 
+    updateBadges(); 
+    // ロックが解除されたら、自動的に自分のスマホにフリップさせて友人に報告チャットを開始する
+    flipDevice();
+    if (playerChatIndex < 10) {
+      playerChatIndex = 6; // ロック解除後の会話へジャンプ
+      renderNextPlayerMessage();
+    }
+  }, 900);
 }
 
 function updateLockTime() {
@@ -416,6 +426,19 @@ window.addEventListener('message', e => {
       break;
     case 'ADVANCE_STEP':
       advanceStep(msg.step);
+      // ニュースを発見したら、自分のスマホ画面に戻して友人と追加の対話を開始する
+      if (msg.step === 'news_found') {
+        setTimeout(() => {
+          flipDevice();
+          if (playerChatIndex < 13) {
+            // 前のメッセージ生成タイマーがあればキャンセル
+            if (playerChatTimeout) clearTimeout(playerChatTimeout);
+            // 既存のチャット画面でスクロールなどを整えつつ最新会話をレンダリング
+            playerChatIndex = 10;
+            renderNextPlayerMessage();
+          }
+        }, 1500);
+      }
       break;
     case 'GET_STATE':
       e.source?.postMessage({ type: 'STATE', state: gameState }, '*');
@@ -501,7 +524,18 @@ const PLAYER_CHAT_SCENARIO = [
   { sender: 'sent', text: 'そう、まさにそれ！でもロックかかってて開かないんだよ。パスコード8桁。' },
   { sender: 'recv', text: 'たしか、あの店はスマホケース（＝店への招待状）を持つファンだけが入れる優先予約システムがあったはず。太郎もそれで行く予定だったんだ。' },
   { sender: 'recv', text: '太郎の公開SNSを調べてみろよ。誕生日とか、お気に入りの店の情報（オープン記念日）あたりがヒントになってるんじゃないか？' },
-  { sender: 'sent', text: 'なるほど。調べてみる！' }
+  { sender: 'sent', text: 'なるほど。調べてみる！' },
+  
+  // ロック解除後（インデックス 6 以降）
+  { sender: 'sent', text: 'おい、太郎のスマホのロック解除できたぞ！' },
+  { sender: 'recv', text: 'マジかよ、すご！中身どうなってる？何か手がかりはあったか？' },
+  { sender: 'sent', text: 'まだ詳しく見てないけど、SNSアプリとかブラウザ、写真フォルダがあるみたい。ちょっと調べてみるわ。' },
+  { sender: 'recv', text: '了解、危なそうなデータとか、失踪のヒントになりそうな写真を探してみてくれ。進捗あったら教えて！' },
+
+  // ニュース発見後（インデックス 10 以降）
+  { sender: 'sent', text: 'ブラウザで太郎の見てた履歴見たら、火葬場から遺体が持ち出されたニュース記事を読んでた。しかもその容疑の葬儀業者が、太郎のよく行くあのラーメン店のすぐ近くだって。' },
+  { sender: 'recv', text: 'えっ…それってまさか、その遺体が何かに使われてるってことか…？ゾッとするな。写真フォルダとかに何か写ってないか？' },
+  { sender: 'sent', text: '最近追加された「厨房の写真」があるみたいだから、詳しく調べてみる！' }
 ];
 
 let playerChatIndex = 0;
@@ -623,6 +657,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // If locked, initialize lock screen but hide picked phone interface initially under the player phone
     initLockScreen();
     if (pp) { pp.style.display = 'flex'; pp.style.transform = 'translateY(0)'; }
+  }
+
+  // リロード時のチャット進捗の同期
+  if (gameState.currentStep === 'unlocked') {
+    playerChatIndex = 10; // 解除済みの会話まで進める
+  } else if (gameState.currentStep !== 'intro' && gameState.currentStep !== 'unlocked') {
+    playerChatIndex = PLAYER_CHAT_SCENARIO.length; // すべての会話を展開完了
+  }
+  // 進捗段階までのメッセージを一括描画
+  const container = document.getElementById('player-thread-messages');
+  if (container) {
+    container.innerHTML = '';
+    for (let i = 0; i < playerChatIndex; i++) {
+      const msgData = PLAYER_CHAT_SCENARIO[i];
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `msg ${msgData.sender}`;
+      msgDiv.innerHTML = `<div class="msg-bubble">${msgData.text}</div>`;
+      container.appendChild(msgDiv);
+    }
+    container.scrollTop = container.scrollHeight;
   }
 
   // Clock
