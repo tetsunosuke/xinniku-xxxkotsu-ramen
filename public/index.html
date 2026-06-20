@@ -63,6 +63,17 @@
 
   <!-- ══════════ LOCK SCREEN ══════════ -->
   <div id="lock-screen" role="main" aria-label="ロック画面">
+    <!-- 拾ったスマホのステータスバー -->
+    <div id="picked-phone-bar"
+      style="position: absolute; top: 0; left: 0; right: 0; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 12px; color: rgba(255,255,255,0.7); z-index: 10;">
+      <div>
+        <span>📶 圏外</span>
+      </div>
+      <span id="picked-phone-clock">--:--</span>
+      <div>
+        <span id="picked-phone-battery">🔋 98%</span>
+      </div>
+    </div>
 
     <!-- 上部ダミー通知 -->
     <div id="lock-notification" role="complementary">
@@ -96,7 +107,8 @@
       <div id="passcode-error" role="alert" aria-live="assertive">パスコードが違います</div>
 
       <!-- 自分のスマホ画面に戻るスイッチ -->
-      <button id="device-flip-btn" onclick="flipDevice()" aria-label="自分のスマホへ戻る" style="margin-top:20px; padding:10px 20px; border-radius:20px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; cursor:pointer; font-size:12px; font-weight:bold; display:inline-flex; align-items:center; gap:6px; transition:background 0.2s;">
+      <button id="device-flip-btn" onclick="flipDevice()" aria-label="自分のスマホへ戻る"
+        style="margin-top:20px; padding:10px 20px; border-radius:20px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; cursor:pointer; font-size:12px; font-weight:bold; display:inline-flex; align-items:center; gap:6px; transition:background 0.2s;">
         <span>⇄</span> <span>自分のスマホへ戻る</span>
       </button>
     </div>
@@ -106,7 +118,7 @@
   <div id="player-phone">
     <div id="player-phone-bar">
       <div class="phone-bar-left">
-        <span class="phone-bar-carrier">📶 Y-Mobile</span>
+        <span class="phone-bar-carrier">📶 MY-Mobile</span>
         <span class="phone-bar-wifi">📶</span>
       </div>
       <span id="player-phone-clock">--:--</span>
@@ -125,21 +137,21 @@
         </div>
       </div>
 
-    <!-- ホーム画面風のアイコングリッドレイアウト -->
-    <div class="player-home-grid" id="player-apps">
-      <div class="player-grid-item" onclick="openThread()">
-        <div class="player-app-icon chat-icon">💬</div>
-        <span class="player-app-label">メッセージ</span>
+      <!-- ホーム画面風のアイコングリッドレイアウト -->
+      <div class="player-home-grid" id="player-apps">
+        <div class="player-grid-item" onclick="openThread()">
+          <div class="player-app-icon chat-icon">💬</div>
+          <span class="player-app-label">メッセージ</span>
+        </div>
+        <div class="player-grid-item" onclick="openPlayerSns()">
+          <div class="player-app-icon sns-icon">🐦</div>
+          <span class="player-app-label">SNS</span>
+        </div>
+        <div class="player-grid-item" onclick="switchToPickedPhone()">
+          <div class="player-app-icon picked-phone-icon">📱</div>
+          <span class="player-app-label" style="color:#ff6b6b; font-weight:bold;">拾ったスマホ</span>
+        </div>
       </div>
-      <div class="player-grid-item" onclick="openPlayerSns()">
-        <div class="player-app-icon sns-icon">🐦</div>
-        <span class="player-app-label">SNS</span>
-      </div>
-      <div class="player-grid-item" onclick="switchToPickedPhone()">
-        <div class="player-app-icon picked-phone-icon">📱</div>
-        <span class="player-app-label" style="color:#ff6b6b; font-weight:bold;">拾ったスマホ</span>
-      </div>
-    </div>
 
       <!-- 内蔵iframeとしてのSNS閲覧画面 -->
       <div id="player-sns-overlay">
@@ -158,8 +170,12 @@
     <!-- トップバー -->
     <div id="desktop-bar">
       <span id="desktop-clock" aria-label="時計">--:--</span>
+      <span id="desktop-battery" aria-label="バッテリー残量"
+        style="font-size: 12px; color: rgba(255,255,255,0.7); display: inline-flex; align-items: center; gap: 4px;">🔋
+        42%</span>
       <div style="display:flex; align-items:center; gap:10px;">
-        <button id="picked-device-back-btn" onclick="flipDevice()" aria-label="自分のスマホに戻る" title="自分のスマホに戻る" style="padding: 4px 10px; border-radius: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: bold; transition: background 0.2s;">
+        <button id="picked-device-back-btn" onclick="flipDevice()" aria-label="自分のスマホに戻る" title="自分のスマホに戻る"
+          style="padding: 4px 10px; border-radius: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: bold; transition: background 0.2s;">
           <span>⇄</span> <span>自分のスマホへ</span>
         </button>
         <button id="settings-btn" onclick="openSettings()" aria-label="設定を開く" title="設定">⚙</button>
@@ -207,7 +223,8 @@
 
     <!-- ホームバー（モバイルのみ） -->
     <div id="home-bar" onclick="closeMobileApp()" role="button" tabindex="0" aria-label="ホームに戻る">
-      <div id="home-bar-content" style="display:flex; align-items:center; gap:6px; color:rgba(255,255,255,0.7); font-size:12px; font-weight:bold;">
+      <div id="home-bar-content"
+        style="display:flex; align-items:center; gap:6px; color:rgba(255,255,255,0.7); font-size:12px; font-weight:bold;">
         <span>🏠</span>
         <span>ホーム画面へ戻る</span>
       </div>
@@ -258,6 +275,13 @@
       </div>
       <button class="end-btn" onclick="resetGame()">最初からやり直す</button>
     </div>
+  </div>
+
+  <!-- ══════════ SHUTDOWN OVERLAY ══════════ -->
+  <div id="shutdown-overlay"
+    style="position: fixed; inset: 0; background: #000; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 20px; color: #fff; opacity: 0; transition: opacity 1.5s ease;">
+    <div class="preloader-spinner" style="border-top-color: #ff3b30;"></div>
+    <div style="font-size: 14px; letter-spacing: 2px; color: #aaa;">シャットダウンしています...</div>
   </div>
 
   <script src="assets/js/os-core.js"></script>

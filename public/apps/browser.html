@@ -75,34 +75,82 @@
 
     /* ── Page: Ramen store ── */
     .ramen-page { max-width:680px; margin:0 auto; }
+
+    /* === BEFORE REVEAL: 明るい・温かい店舗ページ === */
     .store-hero {
-      height:180px; position:relative; overflow:hidden;
-      background:linear-gradient(180deg, #1a0e0a 0%, #2a1408 100%);
+      height:200px; position:relative; overflow:hidden;
+      background:linear-gradient(160deg, #3a1a0a 0%, #7a3a10 40%, #5c2a0e 100%);
       display:flex; align-items:center; justify-content:center;
+      transition:background 2s ease;
     }
-    .store-hero-text {
-      text-align:center; z-index:1;
+    /* 温かみのある光の演出 */
+    .store-hero::before {
+      content:'';
+      position:absolute; inset:0;
+      background:radial-gradient(ellipse at 50% 60%, rgba(255,180,80,0.3) 0%, transparent 65%);
+      transition:opacity 2s ease;
     }
-    .store-logo {
-      font-size:24px; font-weight:900;
-      color:#f0a060; letter-spacing:2px;
-      text-shadow:0 0 30px rgba(240,160,90,0.5);
-      margin-bottom:6px;
-    }
-    .store-tagline { font-size:11px; color:rgba(240,160,90,0.5); letter-spacing:4px; }
-    .store-steam {
-      position:absolute; bottom:0; left:0; right:0; height:80px;
-      background:linear-gradient(0deg, rgba(40,20,10,0.8) 0%, transparent 100%);
+    .store-hero.revealed::before { opacity:0; }
+    .store-hero.revealed {
+      background:linear-gradient(180deg, #100800 0%, #1a0800 100%);
     }
 
-    .store-content { padding:24px 20px; }
+    .store-hero-text { text-align:center; z-index:1; }
+    .store-logo {
+      font-size:22px; font-weight:900;
+      color:#f0c080; letter-spacing:2px;
+      text-shadow:0 0 20px rgba(255,180,60,0.6), 0 2px 4px rgba(0,0,0,0.8);
+      margin-bottom:6px;
+      transition:color 2s ease, text-shadow 2s ease;
+    }
+    .store-logo.revealed {
+      color:#c04030;
+      text-shadow:0 0 20px rgba(200,30,20,0.5), 0 0 60px rgba(200,0,0,0.2);
+    }
+    .store-tagline {
+      font-size:11px; color:rgba(240,180,80,0.6); letter-spacing:4px;
+      transition:color 2s ease;
+    }
+    .store-tagline.revealed { color:rgba(200,50,30,0.4); }
+
+    /* 暖簾風のデコレーション（reveal前のみ） */
+    .store-noren {
+      position:absolute; top:0; left:0; right:0;
+      height:30px;
+      background:repeating-linear-gradient(
+        90deg,
+        rgba(180,80,20,0.7) 0px, rgba(180,80,20,0.7) 28px,
+        rgba(0,0,0,0) 28px, rgba(0,0,0,0) 32px
+      );
+      opacity:1; transition:opacity 2s ease;
+    }
+    .store-noren.revealed { opacity:0; }
+
+    .store-content { padding:24px 20px; transition:background 2s ease; }
     .store-section { margin-bottom:28px; }
     .store-section h3 {
       font-size:14px; font-weight:700;
-      color:#c0806080; margin-bottom:12px;
+      color:#c08060; margin-bottom:12px;
       padding-bottom:8px; border-bottom:1px solid var(--border);
+      transition:color 2s ease;
     }
+    .store-section h3.revealed { color:#c0806080; }
     .store-section p { font-size:13px; line-height:2; color:var(--text); }
+
+    /* 明るい時のお知らせボックス */
+    .store-notice-bright {
+      background:rgba(255,180,60,0.08);
+      border:1px solid rgba(255,180,60,0.25);
+      border-radius:10px; padding:14px;
+      font-size:13px; color:rgba(255,200,120,0.9);
+      line-height:1.7; margin-top:16px;
+      transition:background 2s ease, border-color 2s ease, color 2s ease;
+    }
+    .store-notice-bright.revealed {
+      background:rgba(255,100,80,0.08);
+      border-color:rgba(255,100,80,0.2);
+      color:rgba(255,150,130,0.8);
+    }
 
     /* 文字化けギミック */
     .corrupted {
@@ -117,6 +165,22 @@
       92%          { opacity:1; }
       95%          { opacity:0.6; letter-spacing:6px; }
     }
+
+    /* スープ説明の「秘伝の骨」の謎解きクリックトリガー */
+    #soup-desc {
+      font-weight: bold;
+      color: rgba(255,200,120,0.9);
+      cursor: default;
+      transition: color 0.2s;
+    }
+    #soup-desc.clickable {
+      cursor: pointer;
+      text-decoration: underline dotted rgba(255,160,60,0.7);
+    }
+    #soup-desc.clickable:hover {
+      color: var(--accent);
+    }
+    #soup-desc.revealed { color: var(--accent); }
 
     .store-notice {
       background:rgba(255,100,80,0.08);
@@ -145,20 +209,16 @@
       97% { clip-path:polygon(0 70%,100% 70%,100% 90%,0 90%); transform:skewX(3deg) translateX(-2px); }
     }
 
-    /* スープ説明の「秘伝の骨」の謎解きクリックトリガー */
-    #soup-desc {
-      font-weight: bold;
-      color: var(--text);
-      cursor: default;
-      transition: color 0.2s;
+    /* reveal後に出現する隠しメッセージ */
+    #hidden-msg {
+      display:none; margin-top:16px;
+      background:rgba(100,0,0,0.15);
+      border:1px solid rgba(180,0,0,0.3);
+      border-radius:10px; padding:14px;
+      font-size:12px; color:rgba(200,100,100,0.8);
+      line-height:1.8;
     }
-    #soup-desc.clickable {
-      cursor: pointer;
-      text-decoration: underline dotted var(--accent);
-    }
-    #soup-desc.clickable:hover {
-      color: var(--accent);
-    }
+    #hidden-msg.show { display:block; }
   </style>
 </head>
 <body>
@@ -190,27 +250,32 @@
 
   <!-- ページ: ラーメン店公式HP -->
   <div id="page-ramen" class="ramen-page">
-    <div class="store-hero">
+    <div class="store-hero" id="store-hero">
+      <div class="store-noren" id="store-noren"></div>
       <div class="store-hero-text">
         <div class="store-logo" id="store-name-logo">〇ンニク〇んこつラーメン</div>
-        <div class="store-tagline" id="store-tagline">since 2019.08.26</div>
+        <div class="store-tagline" id="store-tagline">since 2019.08.26 ｜ ようこそ</div>
       </div>
-      <div class="store-steam"></div>
     </div>
-    <div class="store-content">
+    <div class="store-content" id="store-content">
 
       <div class="store-section">
-        <h3>お知らせ</h3>
+        <h3 id="h3-notice">お知らせ</h3>
         <p>いつもご来店ありがとうございます。<br>
            現在、夜の部の予約を受け付けております。<br>
            <strong>限定枠残り1席</strong>。お早めにどうぞ。</p>
-        <div class="store-notice" id="store-notice">
+        <div class="store-notice-bright" id="store-notice">
           ※ 本日の特製スープは<span id="soup-desc" onclick="revealTrue()">秘伝の骨</span>を使用しております。
+        </div>
+        <div id="hidden-msg">
+          ⚠ この「秘伝の骨」――店名が変わった2023年6月以降、仕入れ先の記録が一切残っていない。<br>
+          近隣の「白菊ホール」との金銭的な取引履歴との照合が必要か。<br>
+          <span style="color:rgba(200,80,80,0.6);font-size:11px">調査記録より抜粋</span>
         </div>
       </div>
 
       <div class="store-section">
-        <h3>メニュー</h3>
+        <h3 id="h3-menu">メニュー</h3>
         <div class="menu-item">
           <span class="menu-name" id="menu-1">〇ンニク〇んこつラーメン（並）</span>
           <span class="menu-price">¥1,200</span>
@@ -230,7 +295,7 @@
       </div>
 
       <div class="store-section" style="position:relative;">
-        <h3>店舗情報</h3>
+        <h3 id="h3-info">店舗情報</h3>
         <p style="line-height:2.4">
           📍 東京都台東区音無町3-19-4 地下1階<br>
           🕐 11:00〜14:00 / 18:00〜23:00（火曜定休）<br>
@@ -258,7 +323,6 @@
       const s = e.data.state;
       stateNewsFound = s.currentStep !== 'intro' && s.currentStep !== 'unlocked';
       
-      // ニュースが見つかっている（推理可能な状態になった）ら、秘伝の骨をクリック可能にする
       const soupDesc = document.getElementById('soup-desc');
       if (soupDesc) {
         if (stateNewsFound) {
@@ -266,6 +330,11 @@
         } else {
           soupDesc.classList.remove('clickable');
         }
+      }
+
+      // すでにreveal済みなら即座に暗い状態へ
+      if (s.flags?.newsRead && s.currentStep !== 'intro' && s.currentStep !== 'unlocked') {
+        // ニュースを読んでいる場合はクリック可能状態を復元
       }
     }
   });
@@ -291,10 +360,25 @@
   // 文字化けギミック (隠しトリガーをクリックした時のみ発動)
   function revealTrue() {
     if (revealed) return;
-    // ニュースが見つかっている状態（またはSNS閲覧後）のステップでのみ動作するようにする
     if (!stateNewsFound) return;
     revealed = true;
-    
+
+    // スープ説明を「revealed」スタイルに
+    document.getElementById('soup-desc').classList.add('revealed');
+    document.getElementById('hidden-msg').classList.add('show');
+
+    // ページ全体を暗い雰囲気へ段階的に変貌
+    setTimeout(() => {
+      document.getElementById('store-hero').classList.add('revealed');
+      document.getElementById('store-noren').classList.add('revealed');
+      document.getElementById('store-name-logo').classList.add('revealed');
+      document.getElementById('store-tagline').classList.add('revealed');
+      document.getElementById('h3-notice').classList.add('revealed');
+      document.getElementById('h3-menu').classList.add('revealed');
+      document.getElementById('h3-info').classList.add('revealed');
+      document.getElementById('store-notice').classList.add('revealed');
+    }, 200);
+
     const corrupt = (el, orig, corrupted) => {
       el.innerHTML = `<span class="corrupted">${corrupted}</span>`;
       let tick = 0;
@@ -306,10 +390,13 @@
           `<span class="corrupted">${orig}</span>`;
       }, 200);
     };
-    corrupt(document.getElementById('store-name-logo'), '〇ンニク〇んこつラーメン', 'ジンニクじんこつラーメン');
-    corrupt(document.getElementById('menu-1'), '〇ンニク〇んこつラーメン（並）', 'ジンニクじんこつラーメン（並）');
-    corrupt(document.getElementById('menu-2'), '〇ンニク〇んこつラーメン（大）', 'ジンニクじんこつラーメン（大）');
-    corrupt(document.getElementById('soup-desc'), '秘伝の骨', '特製じんこつ');
+    setTimeout(() => {
+      corrupt(document.getElementById('store-name-logo'), '〇ンニク〇んこつラーメン', 'ジンニクじんこつラーメン');
+      corrupt(document.getElementById('menu-1'), '〇ンニク〇んこつラーメン（並）', 'ジンニクじんこつラーメン（並）');
+      corrupt(document.getElementById('menu-2'), '〇ンニク〇んこつラーメン（大）', 'ジンニクじんこつラーメン（大）');
+      corrupt(document.getElementById('soup-desc'), '秘伝の骨', '特製じんこつ');
+      document.getElementById('store-tagline').textContent = 'since 2023.06 ｜ 特別なスープをどうぞ';
+    }, 600);
   }
 </script>
 </body>

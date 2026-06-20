@@ -104,7 +104,7 @@ html, body {
 #notification-toast {
   position: fixed; top: -90px; left: 50%;
   transform: translateX(-50%);
-  z-index: 8000;
+  z-index: 910;
   background: rgba(20, 20, 32, 0.96);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);

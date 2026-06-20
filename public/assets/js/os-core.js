@@ -16,6 +16,7 @@ const DEFAULT_STATE = {
     newsRead: false,
     galleryOpened: false,
     kitchenPhotoViewed: false,
+    locationSent: false,
   },
   notifiedItems: []
 };
@@ -27,6 +28,10 @@ let gameState = (() => {
   } catch { return JSON.parse(JSON.stringify(DEFAULT_STATE)); }
 })();
 
+// バッテリー管理
+let pickedBattery = 98; // 初期値98%
+let shutdownActive = false;
+
 function saveState() {
   try { localStorage.setItem(STATE_KEY, JSON.stringify(gameState)); } catch {}
 }
@@ -37,6 +42,7 @@ function setFlag(key, value) {
   saveState();
   checkTriggers();
   updateBadges();
+  syncBatteryFromStep();
 }
 
 function advanceStep(step) {
@@ -48,7 +54,33 @@ function advanceStep(step) {
     saveState();
     checkTriggers();
     updateBadges();
+    syncBatteryFromStep();
   }
+}
+
+function syncBatteryFromStep() {
+  if (shutdownActive) return;
+  const step = gameState.currentStep;
+  if (gameState.isLocked) {
+    pickedBattery = 98;
+  } else if (step === 'unlocked') {
+    pickedBattery = 80;
+  } else if (step === 'news_found') {
+    pickedBattery = 52;
+  } else if (step === 'location_spec') {
+    pickedBattery = 24;
+  } else if (step === 'chat_sent' || step === 'clear' || step === 'bad_end') {
+    pickedBattery = 0;
+  }
+  updateBatteryDisplay();
+}
+
+function updateBatteryDisplay() {
+  const batteryStr = `🔋 ${pickedBattery}%`;
+  const pickedEl = document.getElementById('picked-phone-battery');
+  const desktopEl = document.getElementById('desktop-battery');
+  if (pickedEl) pickedEl.textContent = batteryStr;
+  if (desktopEl) desktopEl.textContent = batteryStr;
 }
 
 // ─── NOTIFICATIONS ────────────────────────────────────────────
@@ -459,8 +491,51 @@ window.addEventListener('message', e => {
     case 'SHOW_TOAST':
       showToast(msg.icon || '🔔', msg.app || '', msg.msg);
       break;
+    case 'SHUTDOWN_START':
+      triggerShutdownSequence(msg.endType);
+      break;
   }
 });
+
+// ─── SHUTDOWN SEQUENCE ────────────────────────────────────────
+function triggerShutdownSequence(endType) {
+  shutdownActive = true;
+  pickedBattery = 0;
+  updateBatteryDisplay();
+
+  showToast('⚠️', 'システム', 'バッテリー残量がありません。シャットダウンします...');
+  
+  // Close any running apps on picked phone
+  Object.keys(wins).forEach(closeWin);
+  closeMobileApp();
+
+  setTimeout(() => {
+    // Show blackout overlay
+    const overlay = document.getElementById('shutdown-overlay');
+    if (overlay) {
+      overlay.style.display = 'flex';
+      setTimeout(() => overlay.style.opacity = '1', 50);
+    }
+
+    // Play click/power down sound
+    playBeep(330, 110, 0.8, 0.2);
+
+    setTimeout(() => {
+      // Flip back to Player's phone automatically
+      flipDevice();
+      
+      // Inject battery dead notification / conversation
+      if (playerChatTimeout) clearTimeout(playerChatTimeout);
+      
+      if (endType === 'clear') {
+        playerChatIndex = 13; // グッドエンド用の充電切れメッセージへ
+      } else {
+        playerChatIndex = 17; // バッドエンド用の充電切れメッセージへ
+      }
+      renderNextPlayerMessage();
+    }, 3500);
+  }, 2000);
+}
 
 // ─── ENDINGS ──────────────────────────────────────────────────
 function triggerClear() {
@@ -535,7 +610,19 @@ const PLAYER_CHAT_SCENARIO = [
   // ニュース発見後（インデックス 10 以降）
   { sender: 'sent', text: 'ブラウザで太郎の見てた履歴見たら、火葬場から遺体が持ち出されたニュース記事を読んでた。しかもその容疑の葬儀業者が、太郎のよく行くあのラーメン店のすぐ近くだって。' },
   { sender: 'recv', text: 'えっ…それってまさか、その遺体が何かに使われてるってことか…？ゾッとするな。写真フォルダとかに何か写ってないか？' },
-  { sender: 'sent', text: '最近追加された「厨房の写真」があるみたいだから、詳しく調べてみる！' }
+  { sender: 'sent', text: '最近追加された「厨房の写真」があるみたいだから、詳しく調べてみる！' },
+
+  // グッドエンド用（充電切れ後、インデックス 13 以降）
+  { sender: 'sent', text: 'あっ、拾ったスマホの充電が切れちゃった…！' },
+  { sender: 'recv', text: 'マジか！ でも住所はさっきのメッセージでちゃんと受け取ったよ！' },
+  { sender: 'recv', text: '「台東区音無町3-19-4 地下1階」だな。今警察に連絡しながら、俺もそっちに向かってるところだ。' },
+  { sender: 'recv', text: 'お前は危ないからそこから動くなよ！ 太郎は絶対に助け出す！' },
+
+  // バッドエンド用（充電切れ後、インデックス 17 以降）
+  { sender: 'sent', text: 'あっ、拾ったスマホの充電が切れちゃった…！' },
+  { sender: 'recv', text: 'えっ、今送られてきた住所の場所に来たけど…ここ、空き地だし誰もいないぞ？' },
+  { sender: 'recv', text: 'おい、どういうことだ？ 太郎はどこにいるんだよ！？' },
+  { sender: 'recv', text: 'おい！ 返事しろよ！' }
 ];
 
 let playerChatIndex = 0;
@@ -568,6 +655,36 @@ function renderNextPlayerMessage() {
   // Set random delay for next typing feel message (1.5s - 2.5s)
   if (playerChatIndex < PLAYER_CHAT_SCENARIO.length) {
     const nextMsg = PLAYER_CHAT_SCENARIO[playerChatIndex];
+    // 特定のシナリオインデックスの終わりでフェードアウトなどを駆動させる
+    if (playerChatIndex === 13) {
+      // グッドエンド会話展開完了でクリアへ
+      return; 
+    }
+    if (playerChatIndex === 17) {
+      // グッドエンドの最後「助け出す！」を表示後、クリアシーケンス開始
+      setTimeout(triggerClear, 3500);
+      return;
+    }
+    if (playerChatIndex === 21) {
+      // バッドエンドの最後「返事しろよ！」を表示後、脅迫メッセージとバッドエンドへ
+      setTimeout(() => {
+        const div = document.createElement('div');
+        div.className = 'msg recv';
+        div.innerHTML = `
+          <div class="msg-ava" style="background:#2a0000;filter:hue-rotate(180deg)">🔪</div>
+          <div class="msg-bubble" style="background:#2a0505;color:#ff6060">
+            余計なことをするな<br><span style="font-size:11px;color:rgba(255,60,60,0.5)">— 未知の番号</span>
+          </div>
+          <div class="msg-time" style="color:#ff4040">09:31</div>
+        `;
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+
+        setTimeout(triggerBadEnd, 2500);
+      }, 2000);
+      return;
+    }
+
     const delay = nextMsg.sender === 'recv' ? 2200 : 1400; // Recv takes longer to type
     playerChatTimeout = setTimeout(renderNextPlayerMessage, delay);
   }
@@ -590,6 +707,10 @@ function closePlayerSns() {
   overlay.classList.remove('open');
 }
 function switchToPickedPhone() {
+  if (shutdownActive) {
+    showToast('⚠️', 'システム', '端末のバッテリーが切れています。');
+    return;
+  }
   const pp = document.getElementById('player-phone');
   pp.style.transform = 'translateY(-100%)';
   // Use setTimeout to change display after transition ends
@@ -651,25 +772,28 @@ document.addEventListener('DOMContentLoaded', () => {
     if (ls) ls.style.display = 'none';
     if (pp) { pp.style.display = 'none'; pp.style.transform = 'translateY(-100%)'; }
     if (intro) intro.style.display = 'none';
+    syncBatteryFromStep();
     checkTriggers();
     updateBadges();
   } else {
     // If locked, initialize lock screen but hide picked phone interface initially under the player phone
     initLockScreen();
     if (pp) { pp.style.display = 'flex'; pp.style.transform = 'translateY(0)'; }
+    syncBatteryFromStep();
   }
 
   // リロード時のチャット進捗の同期
   if (gameState.currentStep === 'unlocked') {
     playerChatIndex = 10; // 解除済みの会話まで進める
   } else if (gameState.currentStep !== 'intro' && gameState.currentStep !== 'unlocked') {
-    playerChatIndex = PLAYER_CHAT_SCENARIO.length; // すべての会話を展開完了
+    playerChatIndex = 13; // 探索完了まで会話を展開
   }
   // 進捗段階までのメッセージを一括描画
   const container = document.getElementById('player-thread-messages');
   if (container) {
     container.innerHTML = '';
-    for (let i = 0; i < playerChatIndex; i++) {
+    const maxRender = Math.min(playerChatIndex, 13); // 初期ロード時は13番目の「充電切れ」前まで描画
+    for (let i = 0; i < maxRender; i++) {
       const msgData = PLAYER_CHAT_SCENARIO[i];
       const msgDiv = document.createElement('div');
       msgDiv.className = `msg ${msgData.sender}`;
