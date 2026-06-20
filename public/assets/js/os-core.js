@@ -5,7 +5,7 @@
 
 // ─── GAME STATE ───────────────────────────────────────────────
 const STATE_KEY = 'yodomi_gameState';
-const CORRECT_PASSCODE = '1326';
+const CORRECT_PASSCODE = '19940826';
 
 const DEFAULT_STATE = {
   isLocked: true,
@@ -210,10 +210,10 @@ function initLockScreen() {
 }
 
 function addDigit(d) {
-  if (passcode.length >= 4) return;
+  if (passcode.length >= 8) return;
   passcode += d;
   renderDots();
-  if (passcode.length === 4) setTimeout(checkPasscode, 350);
+  if (passcode.length === 8) setTimeout(checkPasscode, 350);
 }
 
 function deleteDigit() {
@@ -491,7 +491,7 @@ function resetGame() {
 const PLAYER_CHAT_SCENARIO = [
   { sender: 'sent', text: 'ヤバい、変なスマホ拾った。裏面に「ラーメン店オープン記念」って書いてある。あの失踪したYouTuberタベアルキ太郎のじゃないか？' },
   { sender: 'recv', text: 'マジで！？例の限定スマホケースをつけた端末か？' },
-  { sender: 'sent', text: 'そう、まさにそれ！でもロックかかってて開かないんだよ。パスコード４桁。' },
+  { sender: 'sent', text: 'そう、まさにそれ！でもロックかかってて開かないんだよ。パスコード8桁。' },
   { sender: 'recv', text: 'たしか、あの店はスマホケース（＝店への招待状）を持つファンだけが入れる優先予約システムがあったはず。太郎もそれで行く予定だったんだ。' },
   { sender: 'recv', text: '太郎の公開SNSを調べてみろよ。誕生日とか、お気に入りの店の情報（オープン記念日）あたりがヒントになってるんじゃないか？' },
   { sender: 'sent', text: 'なるほど。調べてみる！' }
