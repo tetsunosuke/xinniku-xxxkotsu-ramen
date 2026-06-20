@@ -282,14 +282,14 @@
 <div id="choice-area">
   <div class="choice-label">📍 特定した場所を送る</div>
   <button class="choice-btn" onclick="sendAddress('correct')">
-    ✅ 東京都台東区根岸2-14-8 地下1階<br>
+    ✅ 東京都台東区音無町3-19-4 地下1階<br>
     <span style="font-size:11px;color:rgba(255,255,255,0.5)">（厨房の窓・カレンダーより特定）</span>
   </button>
   <button class="choice-btn wrong" onclick="sendAddress('wrong1')">
-    ⬜ 東京都台東区日本堤1-5-10
+    ⬜ 東京都台東区羽黒町1-5-10
   </button>
   <button class="choice-btn wrong" onclick="sendAddress('wrong2')">
-    ⬜ 東京都荒川区東日暮里4-22-1
+    ⬜ 東京都荒川区北日暮里4-22-1
   </button>
 </div>
 
@@ -382,7 +382,7 @@
     const timeStr = now.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
 
     if (type === 'correct') {
-      addMessage('sent', null, '台東区根岸2-14-8 地下1階！\n厨房の写真の手がかりから特定した。あそこに太郎がいる！今すぐ警察に！', timeStr, false);
+      addMessage('sent', null, '台東区音無町3-19-4 地下1階！\n厨房の写真の手がかりから特定した。あそこに太郎がいる！今すぐ警察に！', timeStr, false);
       post('ADVANCE_STEP', { step: 'chat_sent' });
       post('SET_FLAG', { key: 'locationSent', value: true });
 
@@ -396,7 +396,7 @@
       }, 800);
 
     } else {
-      const wrongAddrs = { wrong1: '台東区日本堤1-5-10', wrong2: '荒川区東日暮里4-22-1' };
+      const wrongAddrs = { wrong1: '台東区羽黒町1-5-10', wrong2: '荒川区北日暮里4-22-1' };
       addMessage('sent', null, wrongAddrs[type] + 'だと思う、急いで！', timeStr, false);
 
       setTimeout(() => {
