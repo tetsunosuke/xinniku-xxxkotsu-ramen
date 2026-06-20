@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LIME チャット</title>
   <style>
+    /* ─ モバイル表示時のホームバー対応 ─ */
+    @media (max-width: 768px) {
+      #message-list { padding-bottom: 70px; }
+      #quiz-area    { max-height: 60vh; }
+      #input-locked { padding-bottom: 20px; }
+    }
     :root {
       --bg: #0d0f0d;
       --bg2: #141814;
@@ -126,10 +132,10 @@
 
     /* ── Quiz area ── */
     #quiz-area {
-      padding:14px 12px; display:none;
-      flex-direction:column; gap:10px;
+      padding:8px 10px; display:none;
+      flex-direction:column; gap:6px;
       background:var(--bg2); border-top:1px solid var(--border);
-      flex-shrink:0; max-height:55vh; overflow-y:auto;
+      flex-shrink:0; max-height:75vh; overflow-y:auto;
     }
     #quiz-area.show { display:flex; }
 
@@ -149,17 +155,17 @@
     .qp-dot.active { background:rgba(0,180,0,0.35); border-color:var(--lime); box-shadow:0 0 6px rgba(0,200,0,0.5); }
 
     .quiz-question {
-      font-size:13px; font-weight:600; color:var(--text);
+      font-size:12px; font-weight:600; color:var(--text);
       background:rgba(0,180,0,0.06); border:1px solid rgba(0,180,0,0.15);
-      border-radius:10px; padding:12px 14px; line-height:1.6;
+      border-radius:10px; padding:8px 10px; line-height:1.4;
     }
 
     .quiz-btn {
-      padding:11px 16px; background:rgba(0,180,0,0.07);
+      padding:8px 12px; background:rgba(0,180,0,0.07);
       border:1px solid rgba(0,180,0,0.25);
       border-radius:10px; color:var(--text); font-family:var(--font);
-      font-size:13px; cursor:pointer; text-align:left;
-      transition:all 0.2s; line-height:1.4;
+      font-size:12px; cursor:pointer; text-align:left;
+      transition:all 0.2s; line-height:1.3;
     }
     .quiz-btn:hover { background:rgba(0,180,0,0.18); border-color:rgba(0,180,0,0.5); }
     .quiz-btn.wrong-choice {
@@ -328,7 +334,7 @@
     {
       question: '【謎1】この店はいつ、何をきっかけに業態を変えたのか？',
       choices: [
-        { text: '店主の妻が亡くなった翌月（2023年6月）に突然業態を変え、「〇ンニク〇んこつラーメン」を始めた', correct: true },
+        { text: '妻が亡くなった後、店名を「中華そば 縁」から突然「〇ンニク〇んこつラーメン」に変えた（2023年6月）', correct: true },
         { text: '開店当初（2019年）から一貫して同じ業態だった', correct: false },
         { text: 'コロナ禍（2020〜2021年）の売上不振で仕方なく業態転換した', correct: false },
       ],
@@ -475,7 +481,6 @@
 
     } else {
       // 誤答
-      wrongCount++;
       btn.classList.add('wrong-feedback');
       const sentText = btn.textContent.split('\n')[0];
       addMessage('sent', sentText, timeStr);
@@ -486,18 +491,9 @@
           addMessage('recv', data.wrongMsg, timeStr);
           scrollBottom();
 
-          // 誤答3回以上でバッドエンドへ
-          if (wrongCount >= 3) {
-            document.getElementById('quiz-area').classList.remove('show');
-            setTimeout(startBadEnd, 1500);
-          } else {
-            // 選択肢を再描画して再挑戦可能に
-            setTimeout(() => {
-              quizLocked = false;
-              renderQuiz();
-              scrollBottom();
-            }, 1500);
-          }
+          // １つでも間違えたら即座にバッドエンドへ
+          document.getElementById('quiz-area').classList.remove('show');
+          setTimeout(startBadEnd, 1500);
         });
       }, 800);
     }
@@ -556,7 +552,7 @@
           div.innerHTML = `
             <div class="msg-ava shopkeeper-ava">🍜</div>
             <div class="msg-bubble shopkeeper-bubble">${text}</div>
-            <div class="msg-time" style="color:rgba(180,0,0,0.5)">— 〇ンニク〇んこつラーメン</div>
+            <div class="msg-time" style="color:rgba(180,0,0,0.5)">— 不明</div>
           `;
           dynMsgs.appendChild(div);
           scrollBottom();

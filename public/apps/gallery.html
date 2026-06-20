@@ -210,6 +210,10 @@
       cursor:pointer; transition:all 0.2s;
     }
     .clue-footer-btn:hover { background:rgba(80,200,80,0.25); }
+    @media (max-width: 768px) {
+      #gallery-body { padding-bottom: 65px; }
+      #lightbox     { padding-bottom: 60px; }
+    }
   </style>
 </head>
 <body>
@@ -362,8 +366,7 @@
 
     if (p.special) {
       post('SET_FLAG', { key: 'kitchenPhotoViewed', value: true });
-      post('ADVANCE_STEP', { step: 'location_spec' });
-      post('SET_FLAG', { key: 'galleryOpened', value: true });
+      // location_spec への進行は「相方に送る」ボタンを押した時に行う（P-07修正）
     }
   }
 
@@ -392,6 +395,8 @@
   function confirmLocation() {
     closeClueModal();
     closeLightbox();
+    post('ADVANCE_STEP', { step: 'location_spec' }); // P-07: ここで初めてステップを進める
+    post('SET_FLAG', { key: 'galleryOpened', value: true });
     post('OPEN_APP', { appId: 'chat' });
     post('SHOW_TOAST', { icon: '💬', app: 'LIME', msg: '相方に場所を知らせよう！' });
   }

@@ -27,7 +27,7 @@
         <p class="novel-line">そういえば最近、ネットでよく見る配信者のタベアルキ太郎が失踪したという噂があったな……。</p>
         <p class="novel-line">そしてこのスマホこそ、その「伝説の店」に繋がると噂される端末だった。</p>
         <p class="novel-line">そんなことをぼんやりと考えていた、その時――</p>
-        <p class="novel-line">手元で、自分自身のスマートフォンが小さく震え、新着メッセージの通知を告げた。</p>
+        <p class="novel-line">手元で、自分自身のスマートフォンが小さく震え、友人からのメッセージの通知を告げた。</p>
       </div>
       <button class="novel-next-btn" onclick="startStory()">調べる</button>
     </div>
@@ -143,9 +143,9 @@
           <div class="player-app-icon chat-icon">💬</div>
           <span class="player-app-label">メッセージ</span>
         </div>
-        <div class="player-grid-item" onclick="openPlayerSns()">
-          <div class="player-app-icon sns-icon">🐦</div>
-          <span class="player-app-label">SNS</span>
+        <div class="player-grid-item" onclick="openPlayerBrowserSearch()">
+          <div class="player-app-icon sns-icon" style="background:linear-gradient(135deg,#2c5364,#203a43);">🔎</div>
+          <span class="player-app-label">検索</span>
         </div>
         <div class="player-grid-item" onclick="switchToPickedPhone()">
           <div class="player-app-icon picked-phone-icon">📱</div>
@@ -153,11 +153,11 @@
         </div>
       </div>
 
-      <!-- 内蔵iframeとしてのSNS閲覧画面 -->
+      <!-- 内蔵iframeとしてのSNS閲覧画面（検索ブラウザ経由） -->
       <div id="player-sns-overlay">
         <div class="sns-overlay-header">
-          <span onclick="closePlayerSns()">✕ 閉じる</span>
-          <span>タベアルキ太郎のSNS</span>
+          <span onclick="closePlayerSns()">← 戻る</span>
+          <span>🔍 タベアルキ太郎のSNS（公開タイムライン）を検索中</span>
         </div>
         <iframe id="player-sns-iframe" src="" frameborder="0"></iframe>
       </div>
@@ -223,11 +223,7 @@
 
     <!-- ホームバー（モバイルのみ） -->
     <div id="home-bar" onclick="closeMobileApp()" role="button" tabindex="0" aria-label="ホームに戻る">
-      <div id="home-bar-content"
-        style="display:flex; align-items:center; gap:6px; color:rgba(255,255,255,0.7); font-size:12px; font-weight:bold;">
-        <span>🏠</span>
-        <span>ホーム画面へ戻る</span>
-      </div>
+      <div id="home-bar-line"></div>
     </div>
   </div>
 
@@ -250,9 +246,10 @@
         <div class="epil-player-bar">
           <span class="live-dot"></span>
           ARCHIVE — タベアルキ太郎【緊急生放送】衝撃の真実…あのラーメン店の全て
-          <span style="margin-left:auto">視聴者数：48,291</span>
+          <span style="margin-left:auto">👁 312,847</span>
         </div>
         <div class="epil-player-body">
+          <p style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:12px">2024年11月19日 アーカイブ（失踪から7日後）</p>
           <p>警察の介入により、台東区音無町3-19-4の地下室から</p>
           <p>火葬場より持ち出された複数の遺体が発見された。</p>
           <p>店主は遺体損壊・食品衛生法違反ほか複数の容疑で逮捕。</p>
@@ -269,11 +266,39 @@
   <!-- ══════════ BAD END (バッドエンド) ══════════ -->
   <div id="bad-end-overlay" role="region" aria-label="バッドエンド">
     <div class="end-content">
-      <div class="bad-end-box">
-        <div class="bad-text">みいつけた</div>
-        <div class="bad-sub">— 店主</div>
+      <div class="end-label" style="color: #ff3333; text-shadow: 0 0 10px rgba(255,0,0,0.5); font-size: 13px; font-weight: bold; margin-bottom: 20px; letter-spacing: 2px;">
+        BAD END: 新たなダシ
       </div>
-      <button class="end-btn" onclick="resetGame()">最初からやり直す</button>
+      
+      <!-- ラーメン店の不気味なSNS投稿の模倣 -->
+      <div class="bad-sns-post" style="border: 1px solid rgba(255, 0, 0, 0.3); background: rgba(15, 0, 0, 0.85); padding: 18px; border-radius: 12px; max-width: 480px; margin: 0 auto 30px; text-align: left; box-shadow: 0 0 30px rgba(255, 0, 0, 0.25); font-family: var(--font);">
+        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 12px;">
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: #2a0000; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid #ff3333;">🍜</div>
+          <div>
+            <div style="font-weight: bold; color: #ff6666; font-size: 15px;">〇ンニク〇んこつラーメン</div>
+            <div style="font-size: 12px; color: #885555;">@ninniku_genkotsu · 10分前</div>
+          </div>
+        </div>
+        <div style="font-size: 14px; line-height: 1.7; color: #ffcccc; white-space: pre-wrap; margin-bottom: 14px;">
+【本日の一杯】
+本日のスープは、非常に深いコクと極上の旨味が引き出された最高の仕上がりとなっております。
+
+本日、新たな極上のダシ（2名様分）が手に入りましたので、特別にじっくりと時間をかけて煮込ませていただきました。
+
+スープが無くなり次第終了となります。
+皆様のご来店を、心よりお待ちしております。</div>
+        <div style="border-top: 1px solid rgba(255,0,0,0.15); padding-top: 10px; display: flex; justify-content: space-around; font-size: 13px; color: #885555;">
+          <span>💬 12</span>
+          <span>🔁 89</span>
+          <span>❤️ 412</span>
+        </div>
+      </div>
+
+      <div class="bad-end-box" style="padding: 10px 0 30px 0;">
+        <div class="bad-text" style="font-size: 42px; margin-bottom: 8px;">みいつけた</div>
+        <div class="bad-sub" style="margin-bottom: 20px; font-size: 14px; color: rgba(255,0,0,0.6);">— あなたも、お友達も。</div>
+      </div>
+      <button class="end-btn" onclick="resetGame()" style="background: rgba(255, 0, 0, 0.15); border-color: rgba(255, 0, 0, 0.4); box-shadow: 0 0 15px rgba(255, 0, 0, 0.2); transition: background 0.2s;">最初からやり直す</button>
     </div>
   </div>
 

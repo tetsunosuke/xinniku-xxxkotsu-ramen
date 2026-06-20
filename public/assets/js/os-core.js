@@ -58,6 +58,12 @@ function advanceStep(step) {
   }
 }
 
+// 自分のスマホのバッテリー（ゲーム進行に応じて微減）
+let playerBattery = parseInt(localStorage.getItem('playerBattery') || '78');
+function savePlayerBattery() {
+  localStorage.setItem('playerBattery', String(playerBattery));
+}
+
 function syncBatteryFromStep() {
   if (shutdownActive) return;
   const step = gameState.currentStep;
@@ -72,6 +78,10 @@ function syncBatteryFromStep() {
   } else if (step === 'chat_sent' || step === 'clear' || step === 'bad_end') {
     pickedBattery = 0;
   }
+  // 自分のスマホのバッテリーもステップに応じて変化
+  const playerBatteryByStep = { intro:78, unlocked:74, news_found:69, location_spec:63, chat_sent:61, clear:61, bad_end:61 };
+  const newPb = playerBatteryByStep[step] ?? playerBattery;
+  if (newPb < playerBattery) { playerBattery = newPb; savePlayerBattery(); }
   updateBatteryDisplay();
 }
 
@@ -81,6 +91,9 @@ function updateBatteryDisplay() {
   const desktopEl = document.getElementById('desktop-battery');
   if (pickedEl) pickedEl.textContent = batteryStr;
   if (desktopEl) desktopEl.textContent = batteryStr;
+  // 自分のスマホのバッテリー表示
+  const playerBattEl = document.querySelector('.phone-bar-battery');
+  if (playerBattEl) playerBattEl.textContent = `🔋 ${playerBattery}%`;
 }
 
 // ─── NOTIFICATIONS ────────────────────────────────────────────
@@ -97,18 +110,18 @@ const NOTIFS = [
   {
     id: 'hint_news',
     check: () => gameState.flags.snsVisited && !gameState.flags.newsRead,
-    icon: '🌐',
-    app: 'ブラウザ',
-    msg: 'ニュース詳細をブラウザで確認してください',
+    icon: '💬',
+    app: 'メッセージ (友人)',
+    msg: 'ケンが配信で「ブラウザ履歴に何か残ってるかも」って言ってた。調べてみろよ',
     delay: 1200,
     badge: 'browser'
   },
   {
     id: 'hint_gallery',
     check: () => gameState.currentStep === 'news_found' && !gameState.flags.kitchenPhotoViewed,
-    icon: '📷',
-    app: '写真',
-    msg: '写真フォルダに新しい画像が追加されました',
+    icon: '💬',
+    app: 'メッセージ (友人)',
+    msg: 'ケンの配信で「写真フォルダにも手がかりがあるかも」って言ってたよ！調べてみろ！',
     delay: 1000,
     badge: 'gallery'
   },
@@ -320,7 +333,7 @@ const APPS = {
   chat:    { title: 'LIME',    icon: '💬', src: 'apps/chat.html',    w: 400, h: 640 }
 };
 
-function isMobile() { return window.innerWidth <= 768; }
+// isMobile は初期化時に固定（下部の _isMobileFixed を参照）
 
 function openApp(appId, extra = null) {
   const cfg = APPS[appId]; if (!cfg) return;
@@ -510,11 +523,13 @@ function triggerShutdownSequence(endType) {
   closeMobileApp();
 
   setTimeout(() => {
-    // Show blackout overlay
+    // Show blackout overlay — requestAnimationFrame で iOS Safari 対応
     const overlay = document.getElementById('shutdown-overlay');
     if (overlay) {
       overlay.style.display = 'flex';
-      setTimeout(() => overlay.style.opacity = '1', 50);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => { overlay.style.opacity = '1'; });
+      });
     }
 
     // Play click/power down sound
@@ -523,6 +538,17 @@ function triggerShutdownSequence(endType) {
     setTimeout(() => {
       // Flip back to Player's phone automatically
       flipDevice();
+      
+      // Hide shutdown overlay so the player can see their phone
+      if (overlay) {
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+          overlay.style.display = 'none';
+        }, 1500);
+      }
+
+      // Automatically open the LIME chat thread on player's phone
+      openThread();
       
       // Inject battery dead notification / conversation
       if (playerChatTimeout) clearTimeout(playerChatTimeout);
@@ -594,35 +620,37 @@ function resetGame() {
 }
 
 const PLAYER_CHAT_SCENARIO = [
-  { sender: 'sent', text: 'ヤバい、変なスマホ拾った。裏面に「ラーメン店オープン記念」って書いてある。あの失踪したYouTuberタベアルキ太郎のじゃないか？' },
-  { sender: 'recv', text: 'マジで！？例の限定スマホケースをつけた端末か？' },
-  { sender: 'sent', text: 'そう、まさにそれ！でもロックかかってて開かないんだよ。パスコード8桁。' },
-  { sender: 'recv', text: 'たしか、あの店はスマホケース（＝店への招待状）を持つファンだけが入れる優先予約システムがあったはず。太郎もそれで行く予定だったんだ。' },
-  { sender: 'recv', text: '太郎の公開SNSを調べてみろよ。誕生日とか、お気に入りの店の情報（オープン記念日）あたりがヒントになってるんじゃないか？' },
-  { sender: 'sent', text: 'なるほど。調べてみる！' },
-  
-  // ロック解除後（インデックス 6 以降）
-  { sender: 'sent', text: 'おい、太郎のスマホのロック解除できたぞ！' },
-  { sender: 'recv', text: 'マジかよ、すご！中身どうなってる？何か手がかりはあったか？' },
-  { sender: 'sent', text: 'まだ詳しく見てないけど、SNSアプリとかブラウザ、写真フォルダがあるみたい。ちょっと調べてみるわ。' },
-  { sender: 'recv', text: '了解、危なそうなデータとか、失踪のヒントになりそうな写真を探してみてくれ。進捗あったら教えて！' },
+  // --- 初期会話（インデックス 0〜5）---
+  // 友人がフードハンターケンの緊急配信を見てプレイヤーに連絡してきた
+  { sender: 'recv', text: 'おい、フードハンターケンが緊急生配信してるぞ！ タベアルキ太郎が昨日から連絡取れないって、配信でずっと呼びかけてる…' },
+  { sender: 'sent', text: 'マジか！？ 実はさっき変なスマホ拾ったんだよ。裏に「ラーメン店オープン記念」のケースがついてたやつ。太郎のじゃないか？' },
+  { sender: 'recv', text: 'それ絶対太郎のスマホじゃん！ ロックとかかかってない？' },
+  { sender: 'sent', text: 'かかってる。8桁のパスコードがわからん' },
+  { sender: 'recv', text: 'ケンが配信で言ってた。「太郎のSNSにヒントがある」って。太郎の公開SNS、調べてみろよ！' },
+  { sender: 'sent', text: 'なるほど。ちょっと調べてみる！' },
 
-  // ニュース発見後（インデックス 10 以降）
-  { sender: 'sent', text: 'ブラウザで太郎の見てた履歴見たら、火葬場から遺体が持ち出されたニュース記事を読んでた。しかもその容疑の葬儀業者が、太郎のよく行くあのラーメン店のすぐ近くだって。' },
-  { sender: 'recv', text: 'えっ…それってまさか、その遺体が何かに使われてるってことか…？ゾッとするな。写真フォルダとかに何か写ってないか？' },
-  { sender: 'sent', text: '最近追加された「厨房の写真」があるみたいだから、詳しく調べてみる！' },
+  // --- ロック解除後（インデックス 6〜9）---
+  { sender: 'sent', text: 'ロック解除できたぞ！' },
+  { sender: 'recv', text: 'マジか！ 中身を確認してくれ！ ケンが配信で「太郎の行方をご存知の方はDMを」って言ってるけど、お前が直接太郎のLIMEからケンに連絡できないか？' },
+  { sender: 'sent', text: 'わかった。LIMEアプリとか、ブラウザとか、写真とか……ざっと見てみる' },
+  { sender: 'recv', text: '頼む。ケンも配信しながら自分で調べてるみたいだけど、スマホの中の情報は絶対そっちの方が詳しいはずだ' },
 
-  // グッドエンド用（充電切れ後、インデックス 13 以降）
+  // --- ニュース発見後（インデックス 10〜12）---
+  { sender: 'sent', text: '太郎のブラウザに、台東区の葬儀業者への家宅捜索ニュースがあった。しかも太郎がよく行ってたあのラーメン店のすぐ近くだって' },
+  { sender: 'recv', text: '……それって、まさかそのラーメン店のことじゃ。ゾッとするな。写真フォルダとかに何か残ってないか？ 太郎、撮影癖あるだろ' },
+  { sender: 'sent', text: 'ある。最近追加された「厨房の写真」があるみたいだから詳しく調べてみる！' },
+
+  // --- グッドエンド用：充電切れ後（インデックス 13〜16）---
   { sender: 'sent', text: 'あっ、拾ったスマホの充電が切れちゃった…！' },
-  { sender: 'recv', text: 'マジか！ でも住所はさっきのメッセージでちゃんと受け取ったよ！' },
-  { sender: 'recv', text: '「台東区音無町3-19-4 地下1階」だな。今警察に連絡しながら、俺もそっちに向かってるところだ。' },
-  { sender: 'recv', text: 'お前は危ないからそこから動くなよ！ 太郎は絶対に助け出す！' },
+  { sender: 'recv', text: 'ケンの配信見てたら「今、匿名から住所の情報が届いた！！」って言い出した！ それってお前がLIMEで送ったやつだよな！？' },
+  { sender: 'recv', text: 'ケンが「台東区音無町3-19-4、今から警察と一緒に向かう！」って叫んでる！ 視聴者もザワついてる！！' },
+  { sender: 'recv', text: 'マジでやばい。お前すごいことしたぞ……！' },
 
-  // バッドエンド用（充電切れ後、インデックス 17 以降）
+  // --- バッドエンド用：充電切れ後（インデックス 17〜19）---
   { sender: 'sent', text: 'あっ、拾ったスマホの充電が切れちゃった…！' },
-  { sender: 'recv', text: 'えっ、今送られてきた住所の場所に来たけど…ここ、空き地だし誰もいないぞ？' },
-  { sender: 'recv', text: 'おい、どういうことだ？ 太郎はどこにいるんだよ！？' },
-  { sender: 'recv', text: 'おい！ 返事しろよ！' }
+  { sender: 'recv', text: 'ケンの配信見てたら、住所に行ったら……空き地だったって言ってる。違う場所だったのか？' },
+  { sender: 'recv', text: '「情報が間違ってた……太郎どこにいるんだ」って配信で泣いてる。どういうことだよ……' },
+  { sender: 'recv', text: 'おい、どうなってるんだ！ 返事しろよ！' }
 ];
 
 let playerChatIndex = 0;
@@ -652,20 +680,21 @@ function renderNextPlayerMessage() {
   
   playerChatIndex++;
   
-  // Set random delay for next typing feel message (1.5s - 2.5s)
   if (playerChatIndex < PLAYER_CHAT_SCENARIO.length) {
     const nextMsg = PLAYER_CHAT_SCENARIO[playerChatIndex];
-    // 特定のシナリオインデックスの終わりでフェードアウトなどを駆動させる
+    // グッドエンド：インデックス13はグッドエンド充電切れの先頭なので、
+    // シャットダウン後にjumpされるまでここで停止する
     if (playerChatIndex === 13) {
-      // グッドエンド会話展開完了でクリアへ
       return; 
     }
+    // グッドエンド：インデックス16まで（0〜15まで表示）でクリアへ
     if (playerChatIndex === 17) {
       // グッドエンドの最後「助け出す！」を表示後、クリアシーケンス開始
       setTimeout(triggerClear, 3500);
       return;
     }
-    if (playerChatIndex === 21) {
+    // バッドエンド：インデックス20まで（0〜19表示）でバッドエンドへ
+    if (playerChatIndex === 20) {
       // バッドエンドの最後「返事しろよ！」を表示後、脅迫メッセージとバッドエンドへ
       setTimeout(() => {
         const div = document.createElement('div');
@@ -685,7 +714,7 @@ function renderNextPlayerMessage() {
       return;
     }
 
-    const delay = nextMsg.sender === 'recv' ? 2200 : 1400; // Recv takes longer to type
+    const delay = nextMsg.sender === 'recv' ? 2200 : 1400;
     playerChatTimeout = setTimeout(renderNextPlayerMessage, delay);
   }
 }
@@ -695,9 +724,12 @@ function closeThread() {
 }
 
 function openPlayerSns() {
+  openPlayerBrowserSearch();
+}
+function openPlayerBrowserSearch() {
   const overlay = document.getElementById('player-sns-overlay');
   const iframe = document.getElementById('player-sns-iframe');
-  iframe.src = 'apps/sns.html?preview=1'; // Add query to remove profile header if needed
+  iframe.src = 'apps/sns.html?preview=1';
   overlay.classList.add('open');
 }
 function closePlayerSns() {
@@ -757,6 +789,11 @@ function loadWallpaper() {
 }
 
 // ─── INIT ─────────────────────────────────────────────────────
+
+// P-10: ゲーム開始時の画面幅でモードを固定（リサイズ時は再判定しない）
+const _isMobileFixed = window.innerWidth <= 768;
+function isMobile() { return _isMobileFixed; }
+
 document.addEventListener('DOMContentLoaded', () => {
   loadWallpaper();
 
@@ -782,17 +819,23 @@ document.addEventListener('DOMContentLoaded', () => {
     syncBatteryFromStep();
   }
 
-  // リロード時のチャット進捗の同期
-  if (gameState.currentStep === 'unlocked') {
-    playerChatIndex = 10; // 解除済みの会話まで進める
-  } else if (gameState.currentStep !== 'intro' && gameState.currentStep !== 'unlocked') {
-    playerChatIndex = 13; // 探索完了まで会話を展開
-  }
+  // P-04: リロード時のチャット進捗の同期（正しいインデックスで復元）
+  const stepIndexMap = {
+    'intro':         0,
+    'unlocked':     10,   // 0〜9を描画
+    'news_found':   13,   // 0〜12を描画
+    'location_spec':13,
+    'chat_sent':    13,
+    'clear':        13,
+    'bad_end':      13,
+  };
+  playerChatIndex = stepIndexMap[gameState.currentStep] ?? 0;
+
   // 進捗段階までのメッセージを一括描画
   const container = document.getElementById('player-thread-messages');
   if (container) {
     container.innerHTML = '';
-    const maxRender = Math.min(playerChatIndex, 13); // 初期ロード時は13番目の「充電切れ」前まで描画
+    const maxRender = Math.min(playerChatIndex, 13); // 充電切れメッセージ前まで描画
     for (let i = 0; i < maxRender; i++) {
       const msgData = PLAYER_CHAT_SCENARIO[i];
       const msgDiv = document.createElement('div');

@@ -370,19 +370,26 @@ html, body {
 /* Home bar */
 #home-bar {
   position: fixed; bottom: 0; left: 0; right: 0;
-  height: 48px; z-index: 60;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid rgba(255,255,255,0.05);
+  height: 60px; z-index: 60;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(255,255,255,0.07);
   display: none; align-items: center; justify-content: center;
   cursor: pointer;
   transition: background 0.2s;
 }
-#home-bar:hover { background: rgba(255,255,255,0.06); }
+#home-bar:hover { background: rgba(255,255,255,0.07); }
+#home-bar:active { background: rgba(255,255,255,0.12); }
 #home-bar-line {
-  width: 110px; height: 4px;
-  background: rgba(255,255,255,0.28);
-  border-radius: 2px; pointer-events: none;
+  width: 134px; height: 5px;
+  background: rgba(255,255,255,0.35);
+  border-radius: 3px; pointer-events: none;
+  transition: background 0.2s;
+}
+#home-bar:hover #home-bar-line { background: rgba(255,255,255,0.55); }
+/* モバイルアプリがホームバーと重ならないよう底部にpaddingを確保 */
+@media (max-width: 768px) {
+  #mobile-app-overlay { padding-bottom: 60px; }
 }
 
 /* ── SETTINGS MENU ── */
@@ -693,9 +700,24 @@ html, body {
   #windows-container { display: none; }
   #taskbar { display: none; }
   #home-bar { display: flex; }
-  #lock-time { font-size: 64px; }
+  /* ロック画面の時刻表示が小さな画面で切れないよう */
+  #lock-time { font-size: 64px; letter-spacing: -2px; }
+  #lock-date { font-size: 14px; }
+  /* パスコード入力のボタンサイズ調整 */
   .passcode-btn { width: 68px; height: 68px; font-size: 22px; }
   #number-pad { width: 232px; gap: 12px; }
+  /* トースト通知の幅を画面に合わせる */
+  #notification-toast { min-width: 80vw; max-width: 92vw; }
+  /* 自分のスマホのホームグリッドが小さい画面でも剤れないよう */
+  .player-home-grid { padding: 24px 16px; gap: 14px; }
+  .player-app-icon { width: 56px; height: 56px; font-size: 24px; border-radius: 14px; }
+  .player-app-label { font-size: 11px; }
+  /* 底部のホームバー分の高さを確保してコンテンツが陰にならないよう */
+  #player-phone-content { padding-bottom: 60px; }
+  /* chat-thread内のメッセージリストも底部バー分を抿える */
+  .thread-messages { padding-bottom: 20px; }
+  /* モバイルアプリをホームバーで覆う問題を防ぐ */
+  #mobile-app-overlay { padding-bottom: 60px; }
 }
 @media (min-width: 769px) {
   #home-bar { display: none !important; }
