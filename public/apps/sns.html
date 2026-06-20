@@ -162,7 +162,7 @@
 <body>
 
 <div class="header" id="sns-header">
-  <span class="header-icon" onclick="goBackProfile()">←</span>
+  <span class="header-icon" id="sns-back-btn" onclick="goBackProfile()" style="display:none;">←</span>
   <div class="header-title" id="page-title">プロフィール</div>
 </div>
 
@@ -557,6 +557,8 @@
     document.getElementById('view-taro').style.display = 'block';
     document.getElementById('view-ken').style.display = 'none';
     document.getElementById('page-title').textContent = 'プロフィール';
+    const backBtn = document.getElementById('sns-back-btn');
+    if (backBtn) backBtn.style.display = 'none'; // 太郎の時は←を非表示
     currentProfile = 'taro';
     window.scrollTo({ top: 0 });
   }
@@ -565,6 +567,8 @@
     document.getElementById('view-taro').style.display = 'none';
     document.getElementById('view-ken').style.display = 'block';
     document.getElementById('page-title').textContent = 'ケン・プロフィール';
+    const backBtn = document.getElementById('sns-back-btn');
+    if (backBtn) backBtn.style.display = 'inline'; // 太郎に戻れるようにケン表示時は←を表示
     currentProfile = 'ken';
     window.scrollTo({ top: 0 });
   }
