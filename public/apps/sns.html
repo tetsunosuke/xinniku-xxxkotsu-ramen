@@ -573,7 +573,7 @@
     if (currentProfile === 'ken') {
       showTaro();
     } else {
-      // 親側のメッセージなどで閉じられる場合は history.back() 等か、もしくは無視
+      post('CLOSE_APP', { appId: 'sns' });
     }
   }
 

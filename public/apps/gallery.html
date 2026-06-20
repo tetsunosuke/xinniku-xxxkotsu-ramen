@@ -159,10 +159,10 @@
       50% { transform:scale(1.1); }
     }
     .ann-dot {
-      width:28px; height:28px; border-radius:50%;
+      padding: 4px 10px; border-radius:14px;
       border:2px solid #e07060; background:rgba(220,80,60,0.3);
       display:flex; align-items:center; justify-content:center;
-      font-size:13px; font-weight:700; color:#e07060;
+      font-size:11px; font-weight:700; color:#e07060;
     }
     .ann-label {
       position:absolute; left:34px; top:50%; transform:translateY(-50%);
@@ -214,7 +214,8 @@
 </head>
 <body>
 
-<div id="gallery-header">
+<div id="gallery-header" style="display:flex; align-items:center; gap:12px;">
+  <span onclick="goBackHome()" style="font-size:20px; cursor:pointer; color:rgba(255,255,255,0.6); padding:4px;">←</span>
   <div>
     <div class="gh-title">写真</div>
     <div class="gh-sub" id="photo-count">読み込み中...</div>
@@ -255,33 +256,31 @@
       <img id="clue-kitchen-img" src="../assets/images/kitchen.png" alt="厨房写真">
       <!-- アノテーション1: 窓の外の看板 -->
       <div class="annotation" style="top:25%; left:55%;" onclick="highlightClue('window')">
-        <div class="ann-dot">A</div>
-        <div class="ann-label">窓の外の看板</div>
+        <div class="ann-dot">看板</div>
+        <div class="ann-label">窓の外の看板（反転）</div>
       </div>
       <!-- アノテーション2: カレンダー -->
       <div class="annotation" style="top:40%; left:12%;" onclick="highlightClue('calendar')">
-        <div class="ann-dot">B</div>
-        <div class="ann-label">壁のカレンダー</div>
+        <div class="ann-dot">メモ</div>
+        <div class="ann-label">カレンダーのメモ（11月）</div>
       </div>
     </div>
 
     <div class="clue-list">
       <div class="clue-item" id="clue-window">
-        <div class="clue-num">手がかり A — 窓</div>
-        <div class="clue-title">窓の外の逆さまになった看板</div>
+        <div class="clue-num">手がかり 1 — 窓の外の看板</div>
+        <div class="clue-title">反転したアクリル看板の文字</div>
         <div class="clue-desc">
-          厨房の窓越しに外の看板が見える。文字が左右反転しており、鏡文字になっている。<br>
-          反転を元に戻すと：<span class="clue-highlight">「根岸 2-14-8」</span><br>
-          これは店舗が面している通りの住所と思われる。
+          厨房の窓越しに、通りに面した看板の裏側が見える。文字が左右反転（鏡文字）している。<br>
+          これを読みやすく反転させると、店舗の所在地である地番：<span class="clue-highlight">「根岸 2-14-8」</span> が浮かび上がる。
         </div>
       </div>
       <div class="clue-item" id="clue-calendar">
-        <div class="clue-num">手がかり B — カレンダー</div>
-        <div class="clue-title">壁に貼られたカレンダーの書き込み</div>
+        <div class="clue-num">手がかり 2 — カレンダーのメモ</div>
+        <div class="clue-title">11月のカレンダーに書き込まれたメモ</div>
         <div class="clue-desc">
-          カレンダーの11月のページ。複数日に赤いバツ印がある。<br>
-          右下の余白に手書きで <span class="clue-highlight">「根岸 地下」</span> と書かれているのが見える。<br>
-          またメモには「納品 26日」という文字も確認できる。
+          壁に貼られているカレンダーの11月の余白部分に、黒いペンで殴り書きされたメモがある。<br>
+          そこには、この撮影場所である階層を示す：<span class="clue-highlight">「地下」</span> という記述と、「仕込み 26日」の文字が確認できる。
         </div>
       </div>
     </div>
@@ -395,6 +394,10 @@
     closeLightbox();
     post('OPEN_APP', { appId: 'chat' });
     post('SHOW_TOAST', { icon: '💬', app: 'LIME', msg: '相方に場所を知らせよう！' });
+  }
+
+  function goBackHome() {
+    post('CLOSE_APP', { appId: 'gallery' });
   }
 
   buildGrid();

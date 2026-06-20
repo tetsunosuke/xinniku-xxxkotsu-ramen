@@ -192,7 +192,7 @@
 <body>
 
 <div id="chat-header">
-  <span class="chat-back">←</span>
+  <span class="chat-back" onclick="goBackHome()">←</span>
   <div class="chat-avatar">🎮</div>
   <div class="chat-info">
     <div class="chat-name">フードハンターケン</div>
@@ -454,6 +454,11 @@
       fd.classList.add('on');
       setTimeout(() => post('BAD_END', {}), 2000);
     }, 2500);
+  }
+
+  function goBackHome() {
+    // 親側にアプリのクローズ（モバイル用）やPC用のウィンドウクローズなどの処理をシグナルする
+    post('CLOSE_APP', { appId: 'chat' });
   }
 
   // Initial scroll

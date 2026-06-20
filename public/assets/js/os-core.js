@@ -426,6 +426,13 @@ window.addEventListener('message', e => {
     case 'BAD_END':
       triggerBadEnd();
       break;
+    case 'CLOSE_APP':
+      if (isMobile()) {
+        closeMobileApp();
+      } else {
+        closeWin(msg.appId);
+      }
+      break;
     case 'SHOW_TOAST':
       showToast(msg.icon || '🔔', msg.app || '', msg.msg);
       break;
