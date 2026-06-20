@@ -126,7 +126,15 @@
         <span class="phone-bar-battery">🔋 78%</span>
       </div>
     </div>
+    <!-- デバイス切り替え用トグルバー -->
+    <div style="padding: 10px 16px 0; display: flex; justify-content: flex-end; z-index: 5;">
+      <button id="player-device-flip-btn" onclick="switchToPickedPhone()" aria-label="拾ったスマホを見る"
+        style="padding:6px 12px; border-radius:14px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.8); cursor:pointer; font-size:11px; font-weight:bold; display:inline-flex; align-items:center; gap:4px; transition:all 0.2s; font-family: var(--font);">
+        <span>⇄</span> <span style="color:#ff8787;">拾ったスマホを見る</span>
+      </button>
+    </div>
     <div id="player-phone-content">
+
       <div class="chat-thread">
         <div class="thread-header">
           <span class="thread-back" onclick="closeThread()">←</span>
@@ -147,11 +155,8 @@
           <div class="player-app-icon sns-icon" style="background:linear-gradient(135deg,#2c5364,#203a43);">🔎</div>
           <span class="player-app-label">検索</span>
         </div>
-        <div class="player-grid-item" onclick="switchToPickedPhone()">
-          <div class="player-app-icon picked-phone-icon">📱</div>
-          <span class="player-app-label" style="color:#ff6b6b; font-weight:bold;">拾ったスマホ</span>
-        </div>
       </div>
+
 
       <!-- 内蔵iframeとしてのSNS閲覧画面（検索ブラウザ経由） -->
       <div id="player-sns-overlay">

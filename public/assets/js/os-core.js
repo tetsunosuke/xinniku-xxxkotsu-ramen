@@ -299,12 +299,12 @@ function doUnlock() {
     ls.style.display = 'none'; 
     checkTriggers(); 
     updateBadges(); 
-    // ロックが解除されたら、自動的に自分のスマホにフリップさせて友人に報告チャットを開始する
-    flipDevice();
+    // 自動的なフリップは削除。バックグラウンドで会話は進むようにする
     if (playerChatIndex < 10) {
       playerChatIndex = 6; // ロック解除後の会話へジャンプ
       renderNextPlayerMessage();
     }
+    showToast('💬', 'メッセージ (友人)', 'ロック解除できた？中身調べてみて！');
   }, 900);
 }
 
@@ -471,17 +471,15 @@ window.addEventListener('message', e => {
       break;
     case 'ADVANCE_STEP':
       advanceStep(msg.step);
-      // ニュースを発見したら、自分のスマホ画面に戻して友人と追加の対話を開始する
+      // ニュースを発見したら、自分のスマホ画面の対話をバックグラウンドで開始し、トーストで知らせる
       if (msg.step === 'news_found') {
         setTimeout(() => {
-          flipDevice();
           if (playerChatIndex < 13) {
-            // 前のメッセージ生成タイマーがあればキャンセル
             if (playerChatTimeout) clearTimeout(playerChatTimeout);
-            // 既存のチャット画面でスクロールなどを整えつつ最新会話をレンダリング
             playerChatIndex = 10;
             renderNextPlayerMessage();
           }
+          showToast('💬', 'メッセージ (友人)', '写真フォルダにも何か残ってないか？');
         }, 1500);
       }
       break;
