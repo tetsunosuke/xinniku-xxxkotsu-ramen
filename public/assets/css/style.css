@@ -499,7 +499,8 @@ html, body {
 #player-phone {
   position: fixed; inset: 0; z-index: 950;
   background-image: url('../images/player_wallpaper.png');
-  background-size: cover;
+  background-size: 100% 100%; /* Force fill the exact screen container bounds to prevent overflow/clipping */
+  background-repeat: no-repeat;
   background-position: center;
   display: flex; flex-direction: column;
   transition: transform 0.5s ease;
