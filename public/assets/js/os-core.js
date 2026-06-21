@@ -243,10 +243,10 @@ function initLockScreen() {
     const el = document.getElementById('lock-notification');
     if (el) {
       el.innerHTML = `
-        <div class="lock-notif-icon">📰</div>
+        <div class="lock-notif-icon">🍜</div>
         <div>
-          <div class="lock-notif-app">東都ニュースWeb</div>
-          <div class="lock-notif-msg">【速報】台東区の葬儀業者に家宅捜索、遺体持ち出しの疑い</div>
+          <div class="lock-notif-app">〇ンニク〇んこつラーメン</div>
+          <div class="lock-notif-msg">【ご案内】本日11/12（火）のご予約時間が近づいています。ご来店をお待ちしております。</div>
         </div>
       `;
       el.classList.add('visible');
