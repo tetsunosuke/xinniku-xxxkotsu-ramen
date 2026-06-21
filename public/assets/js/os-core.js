@@ -771,8 +771,8 @@ function startStory() {
     intro.classList.add('hidden');
     setTimeout(() => { intro.style.display = 'none'; }, 800);
   }
-  // 最初は「自分のスマホ」を見せるため、フリップや切り替えは行いません。
-  // (自分のスマホが前面に表示され、友人とのメッセージ通知からゲームが始まります)
+  // 最初は「拾ったスマホのロック画面」を前面に表示します。
+  switchToPickedPhone();
 }
 window.startStory = startStory;
 window.openThread = openThread;
