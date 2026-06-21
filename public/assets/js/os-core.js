@@ -876,16 +876,18 @@ function flipDevice() {
   
   setTimeout(() => {
     // 初めて自分のスマホに戻ったとき（会話未開始）は
-    // ホーム画面を見せて、通知トーストで友人からのメッセージを知らせるだけにする
+    // チャットスレッドを自動で開き、通知トーストで友人からのメッセージを知らせる
     if (playerChatIndex === 0) {
+      openThread();
       setTimeout(() => {
         showToast('💬', 'メッセージ (友人)', 'おい、フードハンター ケンが緊急生配信してるぞ！');
       }, 800);
       return;
     }
 
-    // 2回目以降はチャットスレッドを自動で開く
-    openThread();
+    // 2回目以降は、アプリを自動で開かない（ホーム画面を表示する）。
+    // ただし、アプリ（スレッド）が既に開いている場合は閉じる。
+    closePlayerApp();
 
     // 自分のスマホへ戻ったことを記録（ギャラリーバッジ等の解禁に使う）
     if (!gameState.flags.returnedToPlayerPhone && !gameState.isLocked) {
@@ -917,6 +919,10 @@ function startStory() {
   switchToPickedPhone();
   triggerFirstNotification();
 }
+function closePlayerApp() {
+  closeThread();
+  closePlayerSns();
+}
 window.startStory = startStory;
 window.openThread = openThread;
 window.closeThread = closeThread;
@@ -924,6 +930,8 @@ window.openPlayerSns = openPlayerSns;
 window.closePlayerSns = closePlayerSns;
 window.switchToPickedPhone = switchToPickedPhone;
 window.flipDevice = flipDevice;
+window.closePlayerApp = closePlayerApp;
+window.showToast = showToast;
 
 // ─── WALLPAPER ────────────────────────────────────────────────
 function loadWallpaper() {

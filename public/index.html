@@ -65,13 +65,19 @@
   <div id="lock-screen" role="main" aria-label="ロック画面">
     <!-- 拾ったスマホのステータスバー -->
     <div id="picked-phone-bar"
-      style="position: absolute; top: 0; left: 0; right: 0; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 12px; color: rgba(255,255,255,0.7); z-index: 10;">
+      style="position: absolute; top: 0; left: 0; right: 0; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 12px; color: rgba(255,255,255,0.7); z-index: 10000; background: rgba(0,0,0,0.45); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05);">
       <div>
         <span>📶 MY-Mobile 4G</span>
       </div>
       <span id="picked-phone-clock">--:--</span>
-      <div>
+      <div style="display:flex; align-items:center; gap:10px;">
         <span id="picked-phone-battery">🔋 98%</span>
+        <button id="device-flip-btn-mini" onclick="flipDevice()" aria-label="自分のスマホへ" title="自分のスマホへ"
+          style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; cursor:pointer; font-size:11px; padding:2px 8px; border-radius:12px; font-weight:bold; display:inline-flex; align-items:center; transition:background 0.2s;">
+          <span>⇄ 自分のスマホへ</span>
+        </button>
+        <button onclick="openSettings()" aria-label="設定を開く" title="設定"
+          style="background:none; border:none; color:rgba(255,255,255,0.5); font-size:15px; cursor:pointer; padding:2px; transition:color 0.2s; line-height:1;">⚙</button>
       </div>
     </div>
 
@@ -105,35 +111,31 @@
       </div>
       <div id="number-pad" role="group" aria-label="数字キーパッド"></div>
       <div id="passcode-error" role="alert" aria-live="assertive">パスコードが違います</div>
-
-      <!-- 自分のスマホ画面に戻るスイッチ -->
-      <button id="device-flip-btn" onclick="flipDevice()" aria-label="自分のスマホへ"
-        style="margin-top:20px; padding:10px 20px; border-radius:20px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; cursor:pointer; font-size:12px; font-weight:bold; display:inline-flex; align-items:center; gap:6px; transition:background 0.2s;">
-        <span>⇄</span> <span>自分のスマホへ</span>
-      </button>
     </div>
   </div>
 
   <!-- ══════════ PLAYER'S OWN PHONE LAYER ══════════ -->
   <div id="player-phone">
-    <div id="player-phone-bar">
-      <div class="phone-bar-left">
-        <span class="phone-bar-carrier">📶 MY-Mobile</span>
-        <span class="phone-bar-wifi">📶</span>
-      </div>
-      <span id="player-phone-clock">--:--</span>
-      <div class="phone-bar-right" style="display:flex; align-items:center; gap:8px;">
-        <span class="phone-bar-battery">🔋 78%</span>
-        <button onclick="openSettings()" aria-label="設定を開く" title="設定"
-          style="background:none; border:none; color:rgba(255,255,255,0.5); font-size:13px; cursor:pointer; padding:2px; transition:color 0.2s;">⚙</button>
-      </div>
+    <!-- 自分のスマホ専用のアニメーション波背景 -->
+    <div id="player-waves-bg" class="phone-waves-bg" aria-hidden="true">
+      <svg class="wave wave-1" viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,192L48,176C96,160,192,128,288,128C384,128,480,160,576,170.7C672,181,768,171,864,144C960,117,1056,75,1152,74.7C1248,75,1344,117,1392,138.7L1440,160L1440,320L0,320Z" fill="var(--player-wave1)" />
+      </svg>
+      <svg class="wave wave-2" viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,256L60,234.7C120,213,240,171,360,160C480,149,600,171,720,186.7C840,203,960,213,1080,197.3C1200,181,1320,139,1380,117.3L1440,96L1440,320L0,320Z" fill="var(--player-wave2)" />
+      </svg>
+      <svg class="wave wave-3" viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,96L80,112C160,128,320,160,480,170.7C640,181,800,171,960,144C1120,117,1280,75,1360,53.3L1440,32L1440,320L0,320Z" fill="var(--player-wave3)" />
+      </svg>
     </div>
-    <!-- デバイス切り替え用トグルバー -->
-    <div style="padding: 10px 16px 0; display: flex; justify-content: flex-end; z-index: 5;">
-      <button id="player-device-flip-btn" onclick="switchToPickedPhone()" aria-label="拾ったスマホを見る"
-        style="padding:6px 12px; border-radius:14px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.8); cursor:pointer; font-size:11px; font-weight:bold; display:inline-flex; align-items:center; gap:4px; transition:all 0.2s; font-family: var(--font);">
-        <span>⇄</span> <span style="color:#ff8787;">拾ったスマホを見る</span>
-      </button>
+    <div id="player-phone-bar" class="global-status-bar">
+      <div class="bar-left">📶 MY-Mobile</div>
+      <div class="bar-center" id="player-phone-clock">--:--</div>
+      <div class="bar-right">
+        <span class="phone-bar-battery">🔋 78%</span>
+        <button class="bar-flip-btn" onclick="switchToPickedPhone()" aria-label="拾ったスマホを見る" style="color: #ff8787; border-color: rgba(255,135,135,0.25); background: rgba(255,135,135,0.08);">⇄ 拾ったスマホを見る</button>
+        <button class="bar-settings-btn" onclick="openSettings()" aria-label="設定">⚙</button>
+      </div>
     </div>
     <div id="player-phone-content">
 
@@ -148,14 +150,22 @@
       </div>
 
       <!-- ホーム画面風のアイコングリッドレイアウト -->
-      <div class="player-home-grid" id="player-apps">
-        <div class="player-grid-item" onclick="openThread()">
-          <div class="player-app-icon chat-icon">💬</div>
-          <span class="player-app-label">メッセージ</span>
+      <div id="player-apps" class="player-home-grid" style="position: relative; z-index: 5;">
+        <div class="app-icon" onclick="showToast('🐦', 'SNS', 'ログイン画面：アカウントを紐付けてください。')">
+          <div class="app-icon-img icon-sns">🐦</div>
+          <div class="app-icon-label">SNS</div>
         </div>
-        <div class="player-grid-item" onclick="openPlayerBrowserSearch()">
-          <div class="player-app-icon sns-icon" style="background:linear-gradient(135deg,#2c5364,#203a43);">🔎</div>
-          <span class="player-app-label">検索</span>
+        <div class="app-icon" onclick="openPlayerBrowserSearch()">
+          <div class="app-icon-img icon-browser">🌐</div>
+          <div class="app-icon-label">ブラウザ</div>
+        </div>
+        <div class="app-icon" onclick="showToast('📷', '写真', '写真はありません。')">
+          <div class="app-icon-img icon-gallery">📷</div>
+          <div class="app-icon-label">写真</div>
+        </div>
+        <div class="app-icon" onclick="openThread()">
+          <div class="app-icon-img icon-chat">💬</div>
+          <div class="app-icon-label">LIME</div>
         </div>
       </div>
 
@@ -169,23 +179,23 @@
         <iframe id="player-sns-iframe" src="" frameborder="0"></iframe>
       </div>
     </div>
+    <!-- 自分のスマホのホームバー -->
+    <div id="player-home-bar" onclick="closePlayerApp()" role="button" aria-label="ホームに戻る" style="position: absolute; bottom: 0; left: 0; right: 0; height: 50px; z-index: 100; background: rgba(0,0,0,0.55); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+      <div style="width: 134px; height: 5px; background: rgba(255,255,255,0.35); border-radius: 3px; pointer-events: none;"></div>
+    </div>
   </div>
 
   <!-- ══════════ DESKTOP ══════════ -->
   <div id="desktop">
 
     <!-- トップバー -->
-    <div id="desktop-bar">
-      <span id="desktop-clock" aria-label="時計">--:--</span>
-      <span id="desktop-battery" aria-label="バッテリー残量"
-        style="font-size: 12px; color: rgba(255,255,255,0.7); display: inline-flex; align-items: center; gap: 4px;">🔋
-        42%</span>
-      <div style="display:flex; align-items:center; gap:10px;">
-        <button id="picked-device-back-btn" onclick="flipDevice()" aria-label="自分のスマホに戻る" title="自分のスマホに戻る"
-          style="padding: 4px 10px; border-radius: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: bold; transition: background 0.2s;">
-          <span>⇄</span> <span>自分のスマホへ</span>
-        </button>
-        <button id="settings-btn" onclick="openSettings()" aria-label="設定を開く" title="設定">⚙</button>
+    <div id="desktop-bar" class="global-status-bar">
+      <div class="bar-left">📶 MY-Mobile 4G</div>
+      <div class="bar-center" id="desktop-clock">--:--</div>
+      <div class="bar-right">
+        <span id="desktop-battery">🔋 98%</span>
+        <button class="bar-flip-btn" onclick="flipDevice()" aria-label="自分のスマホへ">⇄ 自分のスマホへ</button>
+        <button class="bar-settings-btn" onclick="openSettings()" aria-label="設定">⚙</button>
       </div>
     </div>
 

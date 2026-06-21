@@ -11,6 +11,9 @@
   --wave1: rgba(5, 35, 18, 0.75);
   --wave2: rgba(3, 22, 12, 0.65);
   --wave3: rgba(8, 42, 22, 0.55);
+  --player-wave1: rgba(10, 28, 45, 0.85);
+  --player-wave2: rgba(5, 18, 32, 0.75);
+  --player-wave3: rgba(15, 35, 55, 0.65);
   --text-primary: #dddde8;
   --text-secondary: #6a6a80;
   --accent: #c0392b;
@@ -104,7 +107,7 @@ html, body {
 #notification-toast {
   position: fixed; top: -90px; left: 50%;
   transform: translateX(-50%);
-  z-index: 910;
+  z-index: 20000;
   background: rgba(20, 20, 32, 0.96);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -243,7 +246,7 @@ html, body {
 /* App icons grid */
 #app-icons {
   display: flex; flex-wrap: wrap;
-  gap: 24px; padding: 36px 28px;
+  gap: 24px; padding: 74px 28px 36px 28px;
   position: relative; z-index: 2;
 }
 .app-icon {
@@ -358,7 +361,9 @@ html, body {
 
 /* ── MOBILE OVERLAY ── */
 #mobile-app-overlay {
-  position: fixed; inset: 0; z-index: 50;
+  position: fixed;
+  top: 38px; left: 0; right: 0; bottom: 0;
+  z-index: 8;
   background: #08080f;
   transform: translateY(102%);
   transition: transform 0.38s cubic-bezier(0.4,0,0.2,1);
@@ -499,15 +504,22 @@ html, body {
 }
 .bad-sub { color: rgba(255,0,0,0.5); font-size: 13px; letter-spacing: 2px; margin-bottom: 36px; }
 
-/* ── PLAYER'S OWN PHONE UI ── */
 #player-phone {
   position: fixed; inset: 0; z-index: 950;
-  background-image: url('../images/player_wallpaper.png');
-  background-size: cover; /* Back to cover since the image itself is now clean wallpaper */
-  background-position: center;
+  background: #0a0d14;
   display: flex; flex-direction: column;
   transition: transform 0.5s ease;
+  overflow: hidden;
 }
+.phone-waves-bg {
+  position: absolute; bottom: 0; left: 0;
+  width: 100%; height: 55%;
+  z-index: 0; pointer-events: none; overflow: hidden;
+  opacity: 0.9;
+}
+.phone-waves-bg .wave-1 { fill: var(--player-wave1); }
+.phone-waves-bg .wave-2 { fill: var(--player-wave2); }
+.phone-waves-bg .wave-3 { fill: var(--player-wave3); }
 #player-phone-bar {
   height: 44px; background: rgba(0,0,0,0.3);
   display: flex; justify-content: space-between; align-items: center;
@@ -596,11 +608,10 @@ html, body {
 
 /* ── PLAYER PHONE HOME GRID ── */
 .player-home-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  padding: 40px 24px;
-  justify-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 36px 28px;
 }
 .player-grid-item {
   display: flex;
@@ -699,9 +710,10 @@ html, body {
 /* #home-bar は既にdisplay:flexで定義済み */
 
 /* 底部のホームバー分の高さを確保してコンテンツが陰にならないよう */
-#player-phone-content { padding-bottom: 60px; }
+#player-phone-content { padding-bottom: 50px; }
 /* chat-thread内のメッセージリストも底部バー分を確保 */
-.thread-messages { padding-bottom: 20px; }
+.thread-messages { padding-bottom: 60px; }
+#player-sns-overlay { padding-bottom: 50px; }
 
 /* トースト通知の幅を画面に合わせる（狭い画面対策） */
 @media (max-width: 480px) {
@@ -712,9 +724,6 @@ html, body {
   #lock-date { font-size: 14px; }
   .passcode-btn { width: 68px; height: 68px; font-size: 22px; }
   #number-pad { width: 232px; gap: 12px; }
-  .player-home-grid { padding: 24px 16px; gap: 14px; }
-  .player-app-icon { width: 56px; height: 56px; font-size: 24px; border-radius: 14px; }
-  .player-app-label { font-size: 11px; }
 }
 /* PC/スマホ統一：PC版の左右分割レイアウトは廃止。常にフルスクリーンのモバイルUI方式で動作する。 */
 
@@ -746,6 +755,82 @@ html, body {
   0% { transform: translateX(-50%) scale(0.85) translateY(-10px); }
   70% { transform: translateX(-50%) scale(1.03) translateY(3px); }
   100% { transform: translateX(-50%) scale(1) translateY(0); }
+}
+
+/* ── 統一グローバルステータスバー ── */
+.global-status-bar {
+  height: 38px;
+  background: rgba(10, 10, 15, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  font-family: var(--font);
+  box-sizing: border-box;
+  z-index: 10000;
+}
+#desktop-bar {
+  position: absolute; top: 0; left: 0; right: 0;
+  z-index: 9000;
+}
+#picked-phone-bar {
+  position: absolute; top: 0; left: 0; right: 0;
+}
+#player-phone-bar {
+  position: relative;
+  height: 38px;
+  flex-shrink: 0;
+}
+
+.global-status-bar .bar-left {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; opacity: 0.85;
+}
+.global-status-bar .bar-center {
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+.global-status-bar .bar-right {
+  display: flex; align-items: center; gap: 10px;
+}
+.global-status-bar .bar-flip-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 2.5px 10px;
+  font-size: 10.5px;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s;
+  font-family: var(--font);
+}
+.global-status-bar .bar-flip-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.global-status-bar .bar-settings-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 15px;
+  cursor: pointer;
+  padding: 2px;
+  transition: color 0.2s;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.global-status-bar .bar-settings-btn:hover {
+  color: #ffffff;
 }
 
 
