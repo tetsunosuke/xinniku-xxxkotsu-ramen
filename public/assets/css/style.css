@@ -722,4 +722,51 @@ html, body {
 @media (min-width: 769px) {
   #home-bar { display: none !important; }
   #mobile-app-overlay { display: none !important; }
+  
+  /* PC版：自分のスマホと拾ったスマホ（デスクトップ）を左右に並べて表示 */
+  body {
+    display: flex !important;
+    flex-direction: row !important;
+    background: #04040a;
+  }
+  
+  /* 自分のスマホ（左側） */
+  #player-phone {
+    position: relative !important;
+    inset: auto !important;
+    width: 375px !important;
+    min-width: 375px !important;
+    height: 100vh !important;
+    border-right: 2px solid rgba(255,255,255,0.08) !important;
+    transform: none !important;
+    display: flex !important;
+    z-index: 950 !important;
+  }
+  
+  /* 拾ったスマホ（右側デスクトップ） */
+  #desktop {
+    position: relative !important;
+    inset: auto !important;
+    flex: 1 !important;
+    height: 100vh !important;
+    display: flex !important;
+    z-index: 1 !important;
+  }
+  
+  /* ロック画面（右側デスクトップの上に重ねる） */
+  #lock-screen {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    z-index: 900 !important;
+  }
+  
+  /* PC版では画面が並んでいるため「デバイス切り替えボタン」を非表示にする */
+  #player-device-flip-btn,
+  #picked-device-back-btn,
+  #device-flip-btn {
+    display: none !important;
+  }
 }

@@ -243,10 +243,10 @@ function initLockScreen() {
     const el = document.getElementById('lock-notification');
     if (el) {
       el.innerHTML = `
-        <div class="lock-notif-icon">🍜</div>
+        <div class="lock-notif-icon">📰</div>
         <div>
-          <div class="lock-notif-app">〇ンニク〇んこつラーメン</div>
-          <div class="lock-notif-msg">【お知らせ】本日はタベアルキ太郎様ご予約の特別仕込み日です。限定枠残り1席、今すぐご予約できます。</div>
+          <div class="lock-notif-app">東都ニュースWeb</div>
+          <div class="lock-notif-msg">【速報】台東区の葬儀業者に家宅捜索、遺体持ち出しの疑い</div>
         </div>
       `;
       el.classList.add('visible');
@@ -299,12 +299,9 @@ function doUnlock() {
     ls.style.display = 'none'; 
     checkTriggers(); 
     updateBadges(); 
-    // 自動的なフリップは削除。バックグラウンドで会話は進むようにする
-    if (playerChatIndex < 10) {
-      playerChatIndex = 6; // ロック解除後の会話へジャンプ
-      renderNextPlayerMessage();
-    }
-    showToast('💬', 'メッセージ (友人)', 'ロック解除できた？中身調べてみて！');
+    // 自動的に「解除できた」と友人に送る進行は削除。
+    // ロック画面が解けたことを知らせるトーストだけ表示
+    showToast('🔑', 'システム', 'スマートフォンのロックを解除しました');
   }, 900);
 }
 
@@ -471,14 +468,9 @@ window.addEventListener('message', e => {
       break;
     case 'ADVANCE_STEP':
       advanceStep(msg.step);
-      // ニュースを発見したら、自分のスマホ画面の対話をバックグラウンドで開始し、トーストで知らせる
+      // ニュースを発見したら、トーストでチャットに新着があることを知らせるのみにする
       if (msg.step === 'news_found') {
         setTimeout(() => {
-          if (playerChatIndex < 13) {
-            if (playerChatTimeout) clearTimeout(playerChatTimeout);
-            playerChatIndex = 10;
-            renderNextPlayerMessage();
-          }
           showToast('💬', 'メッセージ (友人)', '写真フォルダにも何か残ってないか？');
         }, 1500);
       }
@@ -741,15 +733,30 @@ function switchToPickedPhone() {
     showToast('⚠️', 'システム', '端末のバッテリーが切れています。');
     return;
   }
-  const pp = document.getElementById('player-phone');
-  pp.style.transform = 'translateY(-100%)';
-  // Use setTimeout to change display after transition ends
-  setTimeout(() => { pp.style.display = 'none'; }, 500);
+  if (isMobile()) {
+    const pp = document.getElementById('player-phone');
+    pp.style.transform = 'translateY(-100%)';
+    setTimeout(() => { pp.style.display = 'none'; }, 500);
+  }
 }
 function flipDevice() {
-  const pp = document.getElementById('player-phone');
-  pp.style.display = 'flex';
-  setTimeout(() => { pp.style.transform = 'translateY(0)'; }, 20);
+  if (isMobile()) {
+    const pp = document.getElementById('player-phone');
+    pp.style.display = 'flex';
+    setTimeout(() => { pp.style.transform = 'translateY(0)'; }, 20);
+  }
+  
+  // 自分のスマホへ戻る（フリップする）とき、友人とのメッセージ画面を自動で開く
+  setTimeout(() => {
+    openThread();
+    
+    // 手動で自分のスマホに戻ってきたときに、現在のゲーム進行度に応じてチャットの会話を進める
+    if (gameState.currentStep === 'unlocked' && playerChatIndex === 6) {
+      renderNextPlayerMessage();
+    } else if (gameState.currentStep === 'news_found' && playerChatIndex === 10) {
+      renderNextPlayerMessage();
+    }
+  }, 100);
 }
 function updatePlayerClock() {
   const now = new Date();
@@ -764,8 +771,8 @@ function startStory() {
     intro.classList.add('hidden');
     setTimeout(() => { intro.style.display = 'none'; }, 800);
   }
-  // Transition directly to the picked phone's lock screen
-  switchToPickedPhone();
+  // 最初は「自分のスマホ」を見せるため、フリップや切り替えは行いません。
+  // (自分のスマホが前面に表示され、友人とのメッセージ通知からゲームが始まります)
 }
 window.startStory = startStory;
 window.openThread = openThread;
@@ -805,15 +812,19 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!gameState.isLocked) {
     const ls = document.getElementById('lock-screen');
     if (ls) ls.style.display = 'none';
-    if (pp) { pp.style.display = 'none'; pp.style.transform = 'translateY(-100%)'; }
+    if (isMobile()) {
+      if (pp) { pp.style.display = 'none'; pp.style.transform = 'translateY(-100%)'; }
+    } else {
+      if (pp) { pp.style.display = 'flex'; pp.style.transform = 'none'; }
+    }
     if (intro) intro.style.display = 'none';
     syncBatteryFromStep();
     checkTriggers();
     updateBadges();
   } else {
-    // If locked, initialize lock screen but hide picked phone interface initially under the player phone
+    // If locked, initialize lock screen but hide picked phone interface initially under the player phone on mobile
     initLockScreen();
-    if (pp) { pp.style.display = 'flex'; pp.style.transform = 'translateY(0)'; }
+    if (pp) { pp.style.display = 'flex'; pp.style.transform = 'none'; }
     syncBatteryFromStep();
   }
 
