@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
+    "dev:force": "astro dev --force",
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "clean": "node -e \"const fs = require('fs'); ['dist', '.astro', 'node_modules/.vite'].forEach(d => { if (fs.existsSync(d)) { fs.rmSync(d, { recursive: true, force: true }); console.log('Removed ' + d); } })\"",
     "astro": "astro"
   },
   "dependencies": {

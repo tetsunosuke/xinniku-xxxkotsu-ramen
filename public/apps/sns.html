@@ -247,8 +247,9 @@
         <span class="post-hdl">@tabearu_taro</span>
         <span class="post-time">· 11月9日</span>
       </div>
-      <div class="post-text">最近寒くなってきたから、味噌ラーメンの季節だな。
-新宿のあの裏路地の味噌ラーメン屋、ひさびさに行きたい。</div>
+      <div class="post-text">今週のロケ候補地をリストアップ中。
+第一候補は台東区羽黒町1-5-10にある噂の二郎系ラーメン店。
+もう一つは、最近常連になってる音無町のあの店。どっちから行こうかな🤔</div>
       <div class="post-actions">
         <span class="act">💬 12</span>
         <span class="act">🔁 15</span>
@@ -584,18 +585,61 @@
   // Check query parameters to toggle profile view
   const urlParams = new URLSearchParams(window.location.search);
   const isPreview = urlParams.get('preview') === '1';
-  if (isPreview) {
-    // Hide navigation bar when previewing public timeline directly on player phone
-    const header = document.getElementById('sns-header');
-    if (header) header.style.display = 'none';
-  }
 
   // 親へ通知
   function post(type, data) { window.parent.postMessage(Object.assign({ type }, data), '*'); }
 
-  post('SET_FLAG', { key: 'snsVisited', value: true });
-  // P-01: SNSを開いただけではnews_foundに進まない。
-  // ニュース記事をブラウザで開いた時にのみ ADVANCE_STEP する。
+  // preview=1 でない場合（= 拾ったスマホから開いた場合）はログイン画面を表示
+  if (!isPreview) {
+    // ページ全体をログイン画面に差し替え
+    document.body.innerHTML = `
+      <div style="
+        height:100vh; display:flex; flex-direction:column;
+        align-items:center; justify-content:center;
+        background:#000; font-family:-apple-system,'Noto Sans JP',sans-serif;
+        padding:32px; gap:28px;
+      ">
+        <div style="font-size:36px; font-weight:900; color:#1d9bf0; letter-spacing:-1px;">𝕏</div>
+        <div style="text-align:center;">
+          <div style="font-size:20px; font-weight:700; color:#e7e9ea; margin-bottom:8px;">アカウントにログイン</div>
+          <div style="font-size:13px; color:#71767b; line-height:1.6;">
+            このアカウントにアクセスするには<br>パスワードが必要です。
+          </div>
+        </div>
+        <div style="width:100%; max-width:320px; display:flex; flex-direction:column; gap:14px;">
+          <div style="
+            background:#111; border:1px solid #333; border-radius:8px;
+            padding:14px 16px; font-size:14px; color:#71767b;
+            display:flex; align-items:center; gap:10px;
+          ">
+            <span>🐦</span>
+            <span>@tabeAruKi_taro</span>
+          </div>
+          <div style="
+            background:#111; border:1px solid #333; border-radius:8px;
+            padding:14px 16px; font-size:14px; color:#555;
+            display:flex; align-items:center; gap:10px;
+          ">
+            <span>🔒</span>
+            <span>••••••••••••</span>
+          </div>
+          <div style="
+            background:#222; border:1px solid #444; border-radius:24px;
+            padding:12px 20px; font-size:14px; font-weight:700; color:#555;
+            text-align:center; cursor:not-allowed;
+          ">ログイン</div>
+        </div>
+        <div style="font-size:12px; color:#444; text-align:center; line-height:1.8;">
+          ※ このデバイスのアカウントは<br>ログイン保護されています。
+        </div>
+      </div>
+    `;
+  } else {
+    // preview=1 の場合：自分のスマホの検索から開いた公開タイムライン
+    // ナビゲーションバーを非表示
+    const header = document.getElementById('sns-header');
+    if (header) header.style.display = 'none';
+  }
 
   function openNews() {
     post('OPEN_APP', { appId: 'browser', extra: { page: 'news' } });

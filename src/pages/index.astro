@@ -1,15 +1,8 @@
 ---
 // src/pages/index.astro
-// Astro serves src/pages as routes. Having an empty src/pages was causing a 404 because
-// Astro's routing didn't map the root '/' to public/index.html in dev mode.
-// By creating a simple index.astro that imports and renders our HTML content or reads it,
-// we ensure Astro dev server serves it correctly!
-import fs from 'fs';
-import path from 'path';
-
-const htmlPath = path.resolve('public/index.html');
-const htmlContent = fs.readFileSync(htmlPath, 'utf-8');
-// Extract the body content or just serve it as is.
-// The cleanest way is to render the raw HTML directly.
+// Using a Vite raw import allows Astro/Vite to track public/index.html as a dependency.
+// This ensures that modifying public/index.html will trigger Hot Module Replacement (HMR)
+// and prevent the browser/dev-server from serving cached/stale content.
+import htmlContent from '../../public/index.html?raw';
 ---
 <Fragment set:html={htmlContent} />

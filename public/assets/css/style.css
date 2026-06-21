@@ -363,6 +363,7 @@ html, body {
   transform: translateY(102%);
   transition: transform 0.38s cubic-bezier(0.4,0,0.2,1);
   display: flex; flex-direction: column;
+  padding-bottom: 60px; /* ホームバー分の余白を常に確保 */
 }
 #mobile-app-overlay.visible { transform: translateY(0); }
 #mobile-iframe { flex: 1; width: 100%; border: none; background: #08080f; }
@@ -374,7 +375,7 @@ html, body {
   background: rgba(0,0,0,0.55);
   backdrop-filter: blur(14px);
   border-top: 1px solid rgba(255,255,255,0.07);
-  display: none; align-items: center; justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -387,10 +388,6 @@ html, body {
   transition: background 0.2s;
 }
 #home-bar:hover #home-bar-line { background: rgba(255,255,255,0.55); }
-/* モバイルアプリがホームバーと重ならないよう底部にpaddingを確保 */
-@media (max-width: 768px) {
-  #mobile-app-overlay { padding-bottom: 60px; }
-}
 
 /* ── SETTINGS MENU ── */
 #settings-overlay {
@@ -693,100 +690,50 @@ html, body {
   to { opacity: 1; }
 }
 
-/* ── RESPONSIVE ── */
-@media (max-width: 768px) {
+/* ── レスポンシブ（PC/スマホ統一方式） ── */
+/* PCウィンドウ/タスクバーは使用しないため常に非表示 */
+#windows-container { display: none; }
+#taskbar { display: none; }
+
+/* ホームバーは常に表示 */
+/* #home-bar は既にdisplay:flexで定義済み */
+
+/* 底部のホームバー分の高さを確保してコンテンツが陰にならないよう */
+#player-phone-content { padding-bottom: 60px; }
+/* chat-thread内のメッセージリストも底部バー分を確保 */
+.thread-messages { padding-bottom: 20px; }
+
+/* トースト通知の幅を画面に合わせる（狭い画面対策） */
+@media (max-width: 480px) {
+  #notification-toast { min-width: 80vw; max-width: 92vw; }
   #app-icons { padding: 22px 16px; gap: 18px; }
   .app-icon-img { width: 66px; height: 66px; font-size: 30px; border-radius: 16px; }
-  #windows-container { display: none; }
-  #taskbar { display: none; }
-  #home-bar { display: flex; }
-  /* ロック画面の時刻表示が小さな画面で切れないよう */
   #lock-time { font-size: 64px; letter-spacing: -2px; }
   #lock-date { font-size: 14px; }
-  /* パスコード入力のボタンサイズ調整 */
   .passcode-btn { width: 68px; height: 68px; font-size: 22px; }
   #number-pad { width: 232px; gap: 12px; }
-  /* トースト通知の幅を画面に合わせる */
-  #notification-toast { min-width: 80vw; max-width: 92vw; }
-  /* 自分のスマホのホームグリッドが小さい画面でも剤れないよう */
   .player-home-grid { padding: 24px 16px; gap: 14px; }
   .player-app-icon { width: 56px; height: 56px; font-size: 24px; border-radius: 14px; }
   .player-app-label { font-size: 11px; }
-  /* 底部のホームバー分の高さを確保してコンテンツが陰にならないよう */
-  #player-phone-content { padding-bottom: 60px; }
-  /* chat-thread内のメッセージリストも底部バー分を抿える */
-  .thread-messages { padding-bottom: 20px; }
-  /* モバイルアプリをホームバーで覆う問題を防ぐ */
-  #mobile-app-overlay { padding-bottom: 60px; }
 }
-@media (min-width: 769px) {
-  #home-bar { display: none !important; }
-  #mobile-app-overlay { display: none !important; }
-  
-  /* PC版：自分のスマホと拾ったスマホ（デスクトップ）を左右に並べて表示 */
-  body {
-    display: flex !important;
-    flex-direction: row !important;
-    background: #04040a;
-  }
-  
-  /* 自分のスマホ（左側） */
-  #player-phone {
-    position: relative !important;
-    inset: auto !important;
-    width: 375px !important;
-    min-width: 375px !important;
-    height: 100vh !important;
-    border-right: 2px solid rgba(255,255,255,0.08) !important;
-    transform: none !important;
-    display: flex !important;
-    z-index: 950 !important;
-  }
-  
-  /* 拾ったスマホ（右側デスクトップ） */
-  #desktop {
-    position: relative !important;
-    inset: auto !important;
-    flex: 1 !important;
-    height: 100vh !important;
-    display: flex !important;
-    z-index: 1 !important;
-  }
-  
-  /* ロック画面（右側デスクトップの上に重ねる） */
-  #lock-screen {
-    position: absolute !important;
-    left: 0 !important;
-    right: 0 !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    z-index: 900 !important;
-  }
-  
-  /* PC版では画面が並んでいるため「デバイス切り替えボタン」を非表示にする */
-  #player-device-flip-btn,
-  #picked-device-back-btn,
-  #device-flip-btn {
-    display: none !important;
-  }
-}
+/* PC/スマホ統一：PC版の左右分割レイアウトは廃止。常にフルスクリーンのモバイルUI方式で動作する。 */
 
 /* ── VIBRATION & SHAKE ANIMATION ── */
 .shake-device {
-  animation: deviceVibrate 0.4s ease-in-out 3;
+  animation: deviceVibrate 0.4s ease-in-out 3 !important;
 }
 
 @keyframes deviceVibrate {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  10% { transform: translate(-2px, 1px) rotate(-0.5deg); }
-  20% { transform: translate(1px, -2px) rotate(0.5deg); }
-  30% { transform: translate(-1px, 2px) rotate(-1deg); }
-  40% { transform: translate(2px, -1px) rotate(0.5deg); }
-  50% { transform: translate(-2px, 1px) rotate(-0.5deg); }
-  60% { transform: translate(1px, -2px) rotate(0.5deg); }
-  70% { transform: translate(-1px, 2px) rotate(-1deg); }
-  80% { transform: translate(2px, -1px) rotate(0.5deg); }
-  90% { transform: translate(-1px, 1px) rotate(0deg); }
+  0%, 100% { transform: translate(0, 0) rotate(0deg) !important; }
+  10% { transform: translate(-4px, 2px) rotate(-0.5deg) !important; }
+  20% { transform: translate(2px, -4px) rotate(0.5deg) !important; }
+  30% { transform: translate(-2px, 4px) rotate(-1deg) !important; }
+  40% { transform: translate(4px, -2px) rotate(0.5deg) !important; }
+  50% { transform: translate(-4px, 2px) rotate(-0.5deg) !important; }
+  60% { transform: translate(2px, -4px) rotate(0.5deg) !important; }
+  70% { transform: translate(-2px, 4px) rotate(-1deg) !important; }
+  80% { transform: translate(4px, -2px) rotate(0.5deg) !important; }
+  90% { transform: translate(-2px, 2px) rotate(0deg) !important; }
 }
 
 /* 通知トーストが出現する際の少し弾むようなアニメーションの微調整 */
@@ -800,4 +747,5 @@ html, body {
   70% { transform: translateX(-50%) scale(1.03) translateY(3px); }
   100% { transform: translateX(-50%) scale(1) translateY(0); }
 }
+
 

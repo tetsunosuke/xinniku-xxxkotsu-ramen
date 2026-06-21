@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <meta name="description" content="澱みのスープ — 仮想OS型ARGゲーム">
-  <title>澱みのスープ</title>
+  <meta name="description" content="〇ンニク〇んこつラーメン — 仮想OS型ARGゲーム">
+  <title>〇ンニク〇んこつラーメン</title>
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
@@ -107,9 +107,9 @@
       <div id="passcode-error" role="alert" aria-live="assertive">パスコードが違います</div>
 
       <!-- 自分のスマホ画面に戻るスイッチ -->
-      <button id="device-flip-btn" onclick="flipDevice()" aria-label="自分のスマホへ戻る"
+      <button id="device-flip-btn" onclick="flipDevice()" aria-label="自分のスマホへ"
         style="margin-top:20px; padding:10px 20px; border-radius:20px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; cursor:pointer; font-size:12px; font-weight:bold; display:inline-flex; align-items:center; gap:6px; transition:background 0.2s;">
-        <span>⇄</span> <span>自分のスマホへ戻る</span>
+        <span>⇄</span> <span>自分のスマホへ</span>
       </button>
     </div>
   </div>
@@ -253,18 +253,23 @@
           ARCHIVE — タベアルキ太郎【緊急生放送】衝撃の真実…あのラーメン店の全て
           <span style="margin-left:auto">👁 312,847</span>
         </div>
-        <div class="epil-player-body">
+        <div class="epil-player-body" style="font-size: 13px; line-height: 1.8; text-align: left; padding: 16px;">
           <p style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:12px">2024年11月19日 アーカイブ（失踪から7日後）</p>
-          <p>警察の介入により、台東区音無町3-19-4の地下室から</p>
-          <p>火葬場より持ち出された複数の遺体が発見された。</p>
-          <p>店主は遺体損壊・食品衛生法違反ほか複数の容疑で逮捕。</p>
+          <p>警察の介入により、台東区音無町3-19-4の地下室から、火葬場より持ち出された複数の遺体が発見された。店主は遺体損壊などの容疑で逮捕。</p>
           <p>&nbsp;</p>
-          <p>配信者・タベアルキ太郎は無事保護されました。</p>
-          <p>相方・フードハンター ケンの通報が命を繋ぎとめました。</p>
+          <p>「〇ンニク〇んこつラーメン」の真の店名は<strong>「ジンニクじんこつラーメン」</strong>であった。押収された秘伝のダシからは、昨年突然姿を消した店主の妻のDNAが検出されたという。</p>
+          <p>店主は、妻が亡くなって以来発見した禁忌のダシ「ジンニク」と「じんこつ」による病みつきになる旨味に取り憑かれ、その材料を集め続けていた……。</p>
+          <p>&nbsp;</p>
+          <p>配信者・タベアルキ太郎は無事保護されました。相方・フードハンター ケンの通報が彼の命を繋ぎとめました。</p>
         </div>
       </div>
       <div class="epil-credit">ご協力ありがとうございました</div>
-      <button class="end-btn" onclick="resetGame()">もう一度プレイする</button>
+      <div style="display: flex; flex-direction: column; gap: 10px; max-width: 220px; margin: 0 auto;">
+        <button class="end-btn" onclick="resetGame()">もう一度プレイする</button>
+        <a id="share-clear-x" href="#" target="_blank" class="end-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #000; border-color: #333; box-shadow: 0 0 10px rgba(255,255,255,0.1); color: #fff; font-size: 13px;">
+          <span>𝕏 で結果をシェア</span>
+        </a>
+      </div>
     </div>
   </div>
 
@@ -304,12 +309,79 @@
         </div>
       </div>
 
-      <div class="bad-end-box" style="padding: 10px 0 30px 0;">
+      <div class="bad-end-box" style="padding: 10px 0 20px 0;">
         <div class="bad-text" style="font-size: 42px; margin-bottom: 8px;">みいつけた</div>
         <div class="bad-sub" style="margin-bottom: 20px; font-size: 14px; color: rgba(255,0,0,0.6);">— あなたも、お友達も。</div>
       </div>
-      <button class="end-btn" onclick="resetGame()"
-        style="background: rgba(255, 0, 0, 0.15); border-color: rgba(255, 0, 0, 0.4); box-shadow: 0 0 15px rgba(255, 0, 0, 0.2); transition: background 0.2s;">最初からやり直す</button>
+      <div style="display: flex; flex-direction: column; gap: 10px; max-width: 220px; margin: 0 auto;">
+        <button class="end-btn" onclick="resetGame()"
+          style="background: rgba(255, 0, 0, 0.15); border-color: rgba(255, 0, 0, 0.4); box-shadow: 0 0 15px rgba(255, 0, 0, 0.2); transition: background 0.2s;">最初からやり直す</button>
+        <a id="share-bad-x" href="#" target="_blank" class="end-btn"
+          style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #000; border-color: #ff3333; box-shadow: 0 0 15px rgba(255, 0, 0, 0.2); color: #fff; font-size: 13px;">
+          <span>𝕏 で結果をシェア</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ HACKING VIDEO OVERLAY (ハッキング演出) ══════════ -->
+  <div id="hacking-video-overlay"
+    style="position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; font-family: monospace; color: #ff3333;">
+    <style>
+      @keyframes flashRed {
+        from { opacity: 0.3; text-shadow: 0 0 5px #ff0000; }
+        to { opacity: 1; text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000; }
+      }
+      @keyframes pulseFace {
+        0% { transform: scale(1) translate(0, 0); filter: hue-rotate(0deg) invert(0); }
+        25% { transform: scale(1.1) translate(-5px, 5px); filter: hue-rotate(90deg) invert(0.2); }
+        50% { transform: scale(1.05) translate(5px, -5px); filter: hue-rotate(180deg) invert(0.5); }
+        75% { transform: scale(1.15) translate(-3px, -3px); filter: hue-rotate(270deg) invert(0.2); }
+        100% { transform: scale(1.2) translate(3px, 3px); filter: hue-rotate(360deg) invert(0.8); }
+      }
+      .creep-eyes {
+        display: flex; gap: 60px; justify-content: center; margin-bottom: 20px;
+        animation: pulseFace 0.15s infinite;
+      }
+      .creep-eye {
+        width: 35px; height: 35px; background: #ff0000; border-radius: 50%;
+        box-shadow: 0 0 30px #ff0000, 0 0 60px #ff0000;
+      }
+    </style>
+    <!-- 警告テキスト -->
+    <div id="hacking-warning"
+      style="position: absolute; top: 10%; text-align: center; z-index: 10; font-size: 16px; font-weight: bold; animation: flashRed 0.5s infinite alternate; width: 80%; line-height: 1.6; letter-spacing: 1px;">
+      🚨 WARNING: SYSTEM SECURITY BREACHED 🚨<br>
+      IN-CAMERA CONNECTION HIJACKED BY OUTSIDE HOST
+    </div>
+    
+    <!-- ビデオ表示エリア -->
+    <div style="position: absolute; inset: 0; width: 100%; height: 100%;">
+      <!-- ダミー映像（不気味な背景＋グリッチ） -->
+      <div id="hacked-dummy" style="width: 100%; height: 100%; background: radial-gradient(circle, #250303 0%, #030000 100%); display: flex; align-items: center; justify-content: center; position: relative;">
+        <!-- 不気味な店主の人影シルエット -->
+        <div id="dummy-shadow" style="position: absolute; width: 180px; height: 320px; background: rgba(0,0,0,0.92); filter: blur(35px); bottom: 5%; left: 50%; transform: translateX(-50%); border-radius: 40% 40% 10% 10%; transition: all 1.5s ease;"></div>
+        <!-- 砂嵐グリッチ -->
+        <div class="glitch-static" style="position: absolute; inset: 0; opacity: 0.15; background: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E'); pointer-events: none;"></div>
+      </div>
+
+      <!-- 重ねる不気味な店主の顔演出（ジャンプスケア） -->
+      <div id="jumpscare-face" style="position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.65); text-align: center; z-index: 5;">
+        <div class="creep-eyes">
+          <div class="creep-eye"></div>
+          <div class="creep-eye"></div>
+        </div>
+      </div>
+      
+      <!-- 「みいつけた」テロップ -->
+      <div id="hacking-text" style="position: absolute; bottom: 15%; left: 50%; transform: translateX(-50%); font-size: 64px; font-weight: 900; color: #ff0000; text-shadow: 0 0 25px #000, 0 0 15px #ff0000; letter-spacing: 16px; display: none; z-index: 15; font-family: 'Noto Sans JP', sans-serif;">
+        みいつけた
+      </div>
+    </div>
+
+    <!-- グリッチノイズカバー -->
+    <div id="glitch-cover" style="position: absolute; inset: 0; background: #000; display: none; z-index: 100; opacity: 0.98;">
+      <div style="width: 100%; height: 100%; background: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.95%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E'); opacity: 0.85;"></div>
     </div>
   </div>
 

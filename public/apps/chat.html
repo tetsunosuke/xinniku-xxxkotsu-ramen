@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +8,19 @@
   <style>
     /* ─ モバイル表示時のホームバー対応 ─ */
     @media (max-width: 768px) {
-      #message-list { padding-bottom: 70px; }
-      #quiz-area    { max-height: 60vh; }
-      #input-locked { padding-bottom: 20px; }
+      #message-list {
+        padding-bottom: 70px;
+      }
+
+      #quiz-area {
+        max-height: 60vh;
+      }
+
+      #input-locked {
+        padding-bottom: 20px;
+      }
     }
+
     :root {
       --bg: #0d0f0d;
       --bg2: #141814;
@@ -25,569 +35,822 @@
       --input-bg: #1a201a;
       --font: 'Noto Sans JP', -apple-system, sans-serif;
     }
-    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-    body { background:var(--bg); font-family:var(--font); color:var(--text);
-           height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: var(--font);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
     /* ── Header ── */
     #chat-header {
-      background:var(--header-bg);
-      border-bottom:1px solid var(--border);
-      padding:10px 14px;
-      display:flex; align-items:center; gap:12px;
-      flex-shrink:0;
+      background: var(--header-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
     }
+
     .chat-avatar {
-      width:44px; height:44px; border-radius:50%;
-      background:linear-gradient(135deg, #1a3a1a, #2a4a2a);
-      display:flex; align-items:center; justify-content:center;
-      font-size:22px; flex-shrink:0;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a3a1a, #2a4a2a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
     }
-    .chat-info { flex:1; min-width:0; }
-    .chat-name { font-size:15px; font-weight:700; }
-    .chat-status { font-size:11px; color:var(--lime); }
+
+    .chat-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .chat-name {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .chat-status {
+      font-size: 11px;
+      color: var(--lime);
+    }
 
     /* ── Message list ── */
     #message-list {
-      flex:1; overflow-y:auto; padding:16px 14px;
-      display:flex; flex-direction:column; gap:14px;
-      scroll-behavior:smooth;
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scroll-behavior: smooth;
     }
 
     /* Date separator */
     .date-sep {
-      text-align:center; font-size:11px; color:var(--muted);
-      display:flex; align-items:center; gap:10px; margin:6px 0;
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 6px 0;
     }
-    .date-sep::before, .date-sep::after {
-      content:''; flex:1; height:1px; background:var(--border);
+
+    .date-sep::before,
+    .date-sep::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
     }
 
     /* Message bubbles */
-    .msg { display:flex; gap:8px; align-items:flex-end; }
-    .msg.sent { flex-direction:row-reverse; }
+    .msg {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .msg.sent {
+      flex-direction: row-reverse;
+    }
 
     .msg-ava {
-      width:36px; height:36px; border-radius:50%; flex-shrink:0;
-      background:linear-gradient(135deg, #1a3a1a, #2a4a2a);
-      display:flex; align-items:center; justify-content:center; font-size:18px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #1a3a1a, #2a4a2a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
     }
-    .msg.sent .msg-ava { display:none; }
+
+    .msg.sent .msg-ava {
+      display: none;
+    }
 
     .msg-bubble {
-      max-width:70%; padding:10px 14px;
-      border-radius:20px; font-size:14px; line-height:1.6;
-      white-space:pre-wrap; word-break:break-word;
-      position:relative;
+      max-width: 70%;
+      padding: 10px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+      position: relative;
     }
+
     .msg.recv .msg-bubble {
-      background:var(--recv-bubble);
-      border-radius:4px 20px 20px 20px;
-      color:var(--text);
+      background: var(--recv-bubble);
+      border-radius: 4px 20px 20px 20px;
+      color: var(--text);
     }
+
     .msg.sent .msg-bubble {
-      background:var(--lime-bubble);
-      border-radius:20px 4px 20px 20px;
-      color:white;
+      background: var(--lime-bubble);
+      border-radius: 20px 4px 20px 20px;
+      color: white;
     }
+
     .msg-time {
-      font-size:10px; color:var(--muted);
-      align-self:flex-end; flex-shrink:0; padding-bottom:2px;
+      font-size: 10px;
+      color: var(--muted);
+      align-self: flex-end;
+      flex-shrink: 0;
+      padding-bottom: 2px;
     }
-    .msg.sent .msg-time { order:-1; }
-    .msg-read { font-size:10px; color:rgba(0,200,0,0.8); padding-bottom:2px; }
+
+    .msg.sent .msg-time {
+      order: -1;
+    }
+
+    .msg-read {
+      font-size: 10px;
+      color: rgba(0, 200, 0, 0.8);
+      padding-bottom: 2px;
+    }
 
     /* Typing indicator */
-    #typing-indicator { display:none; }
-    #typing-indicator.show { display:flex; }
+    #typing-indicator {
+      display: none;
+    }
+
+    #typing-indicator.show {
+      display: flex;
+    }
+
     .typing-dots {
-      display:flex; gap:4px; align-items:center;
-      padding:12px 16px; background:var(--recv-bubble);
-      border-radius:4px 20px 20px 20px;
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--recv-bubble);
+      border-radius: 4px 20px 20px 20px;
     }
+
     .typing-dots span {
-      width:7px; height:7px; border-radius:50%; background:var(--muted);
-      animation:dot 1.4s ease-in-out infinite;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+      animation: dot 1.4s ease-in-out infinite;
     }
-    .typing-dots span:nth-child(2) { animation-delay:0.2s; }
-    .typing-dots span:nth-child(3) { animation-delay:0.4s; }
+
+    .typing-dots span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dots span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
     @keyframes dot {
-      0%,80%,100% { transform:scale(0.7); opacity:0.4; }
-      40%          { transform:scale(1.1); opacity:1; }
+
+      0%,
+      80%,
+      100% {
+        transform: scale(0.7);
+        opacity: 0.4;
+      }
+
+      40% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
     }
 
     /* System message */
     .sys-msg {
-      text-align:center; font-size:11px; color:var(--muted);
-      background:rgba(255,255,255,0.04); border-radius:20px;
-      padding:6px 14px; align-self:center;
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 20px;
+      padding: 6px 14px;
+      align-self: center;
     }
 
     /* ── Lock state ── */
     #input-locked {
-      background:var(--bg2); border-top:1px solid var(--border);
-      padding:16px; text-align:center; flex-shrink:0;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 16px;
+      text-align: center;
+      flex-shrink: 0;
     }
-    .locked-msg { font-size:13px; color:var(--muted); line-height:1.8; }
+
+    .locked-msg {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
 
     /* ── Quiz area ── */
     #quiz-area {
-      padding:8px 10px; display:none;
-      flex-direction:column; gap:6px;
-      background:var(--bg2); border-top:1px solid var(--border);
-      flex-shrink:0; max-height:75vh; overflow-y:auto;
+      padding: 8px 10px;
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+      max-height: 75vh;
+      overflow-y: auto;
     }
-    #quiz-area.show { display:flex; }
+
+    #quiz-area.show {
+      display: flex;
+    }
 
     .quiz-header {
-      font-size:12px; color:var(--muted); text-align:center;
-      padding:4px 0 2px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      padding: 4px 0 2px;
     }
+
     .quiz-progress {
-      display:flex; gap:6px; justify-content:center; margin-bottom:2px;
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-bottom: 2px;
     }
+
     .qp-dot {
-      width:10px; height:10px; border-radius:50%;
-      background:rgba(0,180,0,0.15); border:1.5px solid rgba(0,180,0,0.3);
-      transition:all 0.3s;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(0, 180, 0, 0.15);
+      border: 1.5px solid rgba(0, 180, 0, 0.3);
+      transition: all 0.3s;
     }
-    .qp-dot.done { background:rgba(0,180,0,0.6); border-color:var(--lime); }
-    .qp-dot.active { background:rgba(0,180,0,0.35); border-color:var(--lime); box-shadow:0 0 6px rgba(0,200,0,0.5); }
+
+    .qp-dot.done {
+      background: rgba(0, 180, 0, 0.6);
+      border-color: var(--lime);
+    }
+
+    .qp-dot.active {
+      background: rgba(0, 180, 0, 0.35);
+      border-color: var(--lime);
+      box-shadow: 0 0 6px rgba(0, 200, 0, 0.5);
+    }
 
     .quiz-question {
-      font-size:12px; font-weight:600; color:var(--text);
-      background:rgba(0,180,0,0.06); border:1px solid rgba(0,180,0,0.15);
-      border-radius:10px; padding:8px 10px; line-height:1.4;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      background: rgba(0, 180, 0, 0.06);
+      border: 1px solid rgba(0, 180, 0, 0.15);
+      border-radius: 10px;
+      padding: 8px 10px;
+      line-height: 1.4;
     }
 
     .quiz-btn {
-      padding:8px 12px; background:rgba(0,180,0,0.07);
-      border:1px solid rgba(0,180,0,0.25);
-      border-radius:10px; color:var(--text); font-family:var(--font);
-      font-size:12px; cursor:pointer; text-align:left;
-      transition:all 0.2s; line-height:1.3;
+      padding: 8px 12px;
+      background: rgba(0, 180, 0, 0.07);
+      border: 1px solid rgba(0, 180, 0, 0.25);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 12px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      line-height: 1.3;
     }
-    .quiz-btn:hover { background:rgba(0,180,0,0.18); border-color:rgba(0,180,0,0.5); }
-    .quiz-btn.wrong-choice {
-      border-color:rgba(180,60,60,0.35); background:rgba(180,60,60,0.05);
+
+    .quiz-btn:hover {
+      background: rgba(0, 180, 0, 0.18);
+      border-color: rgba(0, 180, 0, 0.5);
     }
-    .quiz-btn.wrong-choice:hover { background:rgba(180,60,60,0.15); }
+
     .quiz-btn:disabled {
-      opacity:0.5; cursor:not-allowed; pointer-events:none;
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
     }
+
     .quiz-btn.correct-feedback {
-      border-color:rgba(0,200,0,0.7) !important;
-      background:rgba(0,180,0,0.25) !important;
-      color:#90ff90 !important;
+      border-color: rgba(0, 200, 0, 0.7) !important;
+      background: rgba(0, 180, 0, 0.25) !important;
+      color: #90ff90 !important;
     }
+
     .quiz-btn.wrong-feedback {
-      border-color:rgba(220,50,50,0.7) !important;
-      background:rgba(180,30,30,0.25) !important;
-      color:#ff9090 !important;
+      border-color: rgba(220, 50, 50, 0.7) !important;
+      background: rgba(180, 30, 30, 0.25) !important;
+      color: #ff9090 !important;
     }
 
     /* Epilogue transition */
     #fade-out {
-      position:fixed; inset:0; background:#000; opacity:0; pointer-events:none;
-      transition:opacity 2s ease; z-index:999;
+      position: fixed;
+      inset: 0;
+      background: #000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 2s ease;
+      z-index: 999;
     }
-    #fade-out.on { opacity:1; }
+
+    #fade-out.on {
+      opacity: 1;
+    }
 
     /* Horror overlay */
     #horror-overlay {
-      position:fixed; inset:0; z-index:998;
-      background:rgba(0,0,0,0); pointer-events:none;
-      transition:background 3s ease;
+      position: fixed;
+      inset: 0;
+      z-index: 998;
+      background: rgba(0, 0, 0, 0);
+      pointer-events: none;
+      transition: background 3s ease;
     }
-    #horror-overlay.on { background:rgba(20,0,0,0.92); }
+
+    #horror-overlay.on {
+      background: rgba(20, 0, 0, 0.92);
+    }
 
     /* 店主メッセージの気気悪いスタイル */
     .shopkeeper-bubble {
-      background:#0a0000 !important;
-      border:1px solid rgba(180,0,0,0.6) !important;
-      border-radius:4px 20px 20px 20px !important;
-      color:#cc4444 !important;
-      text-shadow:0 0 8px rgba(200,0,0,0.4);
+      background: #0a0000 !important;
+      border: 1px solid rgba(180, 0, 0, 0.6) !important;
+      border-radius: 4px 20px 20px 20px !important;
+      color: #cc4444 !important;
+      text-shadow: 0 0 8px rgba(200, 0, 0, 0.4);
     }
+
     .shopkeeper-ava {
-      background:radial-gradient(circle, #1a0000, #0a0000) !important;
-      filter:saturate(0.3) brightness(0.6);
+      background: radial-gradient(circle, #1a0000, #0a0000) !important;
+      filter: saturate(0.3) brightness(0.6);
     }
+
     @keyframes redPulse {
-      0%,100% { box-shadow:0 0 0 rgba(200,0,0,0); }
-      50% { box-shadow:0 0 20px rgba(200,0,0,0.4), 0 0 60px rgba(200,0,0,0.2); }
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 rgba(200, 0, 0, 0);
+      }
+
+      50% {
+        box-shadow: 0 0 20px rgba(200, 0, 0, 0.4), 0 0 60px rgba(200, 0, 0, 0.2);
+      }
     }
-    .shopkeeper-bubble { animation:redPulse 2.5s ease-in-out infinite; }
-</style>
+
+    .shopkeeper-bubble {
+      animation: redPulse 2.5s ease-in-out infinite;
+    }
+  </style>
 </head>
+
 <body>
 
-<div id="chat-header">
-  <div class="chat-avatar">🎮</div>
-  <div class="chat-info">
-    <div class="chat-name">フードハンター ケン</div>
-    <div class="chat-status" id="chat-status">オンライン</div>
-  </div>
-</div>
-
-<div id="message-list">
-  <div class="date-sep">2024年11月8日</div>
-
-  <div class="msg recv">
-    <div class="msg-ava">🎮</div>
-    <div class="msg-bubble">太郎〜、今週の動画どうする？先週の塩ラーメン回めちゃくちゃ再生されてるよ👍</div>
-    <div class="msg-time">11:24</div>
-  </div>
-  <div class="msg sent">
-    <div class="msg-bubble">まじか笑　嬉しい！
-今週は前から気になってたあの店取材しようと思ってる</div>
-    <div class="msg-time">11:26</div>
-    <div class="msg-read">既読</div>
-  </div>
-  <div class="msg recv">
-    <div class="msg-ava">🎮</div>
-    <div class="msg-bubble">〇ンニクのとこ？前に行こうとして怖くて入れなかったやつ笑</div>
-    <div class="msg-time">11:27</div>
-  </div>
-  <div class="msg sent">
-    <div class="msg-bubble">そそ笑　店主めちゃ気まずいオーラ出してくるんだよな
-でもスープうまいらしいし一回ちゃんと取材したい</div>
-    <div class="msg-time">11:28</div>
-    <div class="msg-read">既読</div>
-  </div>
-  <div class="msg recv">
-    <div class="msg-ava">🎮</div>
-    <div class="msg-bubble">お前チャレンジャーすぎ笑　気をつけてな</div>
-    <div class="msg-time">11:29</div>
-  </div>
-
-  <div class="date-sep">2024年11月12日</div>
-
-  <div class="msg recv">
-    <div class="msg-ava">🎮</div>
-    <div class="msg-bubble">おーい！今日の取材どうだった？
-夜になっても連絡来ないから心配してるんだが</div>
-    <div class="msg-time">21:04</div>
-  </div>
-  <div class="msg recv">
-    <div class="msg-ava">🎮</div>
-    <div class="msg-bubble">太郎？</div>
-    <div class="msg-time">23:40</div>
-  </div>
-
-  <div class="date-sep">2024年11月13日</div>
-  <div class="msg recv">
-    <div class="msg-ava">🎮</div>
-    <div class="msg-bubble">電話も繋がらない。マジで何してんの…？
-警察行くべきか迷ってる</div>
-    <div class="msg-time">08:15</div>
-  </div>
-  <div class="msg recv">
-    <div class="msg-ava">🎮</div>
-    <div class="msg-bubble">SNSのあの投稿…あの店の近くで遺体盗難事件起きてたじゃん
-まさかとは思うけど頼む 無事でいてくれ</div>
-    <div class="msg-time">09:02</div>
-  </div>
-
-  <div class="sys-msg" id="locked-sys-msg">証拠を集めて、謎を解くと返信できるようになる…</div>
-
-  <!-- Dynamic messages area -->
-  <div id="dynamic-msgs"></div>
-
-  <!-- Typing indicator -->
-  <div class="msg recv" id="typing-indicator">
-    <div class="msg-ava">🎮</div>
-    <div class="typing-dots">
-      <span></span><span></span><span></span>
+  <div id="chat-header">
+    <div class="chat-avatar">🎮</div>
+    <div class="chat-info">
+      <div class="chat-name">フードハンター ケン</div>
+      <div class="chat-status" id="chat-status">オンライン</div>
     </div>
   </div>
-</div>
 
-<!-- Locked input -->
-<div id="input-locked">
-  <div class="locked-msg">🔒 まず証拠を集めよう…<br>写真フォルダとブラウザを調べてから連絡しよう</div>
-</div>
+  <div id="message-list">
+    <div class="date-sep">2024年11月8日</div>
 
-<!-- Quiz area (3段階謎解き) -->
-<div id="quiz-area">
-  <!-- Progress dots -->
-  <div class="quiz-progress">
-    <div class="qp-dot active" id="qp1"></div>
-    <div class="qp-dot" id="qp2"></div>
-    <div class="qp-dot" id="qp3"></div>
+    <div class="msg recv">
+      <div class="msg-ava">🎮</div>
+      <div class="msg-bubble">太郎〜、今週の動画どうする？先週の塩ラーメン回めちゃくちゃ再生されてるよ👍</div>
+      <div class="msg-time">11:24</div>
+    </div>
+    <div class="msg sent">
+      <div class="msg-bubble">まじか笑　嬉しい！
+        今週は前から気になってたあの店取材しようと思ってる</div>
+      <div class="msg-time">11:26</div>
+      <div class="msg-read">既読</div>
+    </div>
+    <div class="msg recv">
+      <div class="msg-ava">🎮</div>
+      <div class="msg-bubble">〇ンニクのとこ？前に行こうとして怖くて入れなかったやつ笑</div>
+      <div class="msg-time">11:27</div>
+    </div>
+    <div class="msg sent">
+      <div class="msg-bubble">そそ笑　店主めちゃ気まずいオーラ出してくるんだよな
+        でもスープうまいらしいし一回ちゃんと取材したい</div>
+      <div class="msg-time">11:28</div>
+      <div class="msg-read">既読</div>
+    </div>
+    <div class="msg recv">
+      <div class="msg-ava">🎮</div>
+      <div class="msg-bubble">お前チャレンジャーすぎ笑　気をつけてな</div>
+      <div class="msg-time">11:29</div>
+    </div>
+
+    <div class="date-sep">2024年11月12日</div>
+
+    <div class="msg recv">
+      <div class="msg-ava">🎮</div>
+      <div class="msg-bubble">おーい！今日の取材どうだった？
+        夜になっても連絡来ないから心配してるんだが</div>
+      <div class="msg-time">21:04</div>
+    </div>
+    <div class="msg recv">
+      <div class="msg-ava">🎮</div>
+      <div class="msg-bubble">太郎？</div>
+      <div class="msg-time">23:40</div>
+    </div>
+
+    <div class="date-sep">2024年11月13日</div>
+    <div class="msg recv">
+      <div class="msg-ava">🎮</div>
+      <div class="msg-bubble">電話も繋がらない。マジで何してんの…？
+        警察行くべきか迷ってる</div>
+      <div class="msg-time">08:15</div>
+    </div>
+    <div class="msg recv">
+      <div class="msg-ava">🎮</div>
+      <div class="msg-bubble">SNSのあの投稿…あの店の近くで遺体盗難事件起きてたじゃん
+        まさかとは思うけど頼む 無事でいてくれ</div>
+      <div class="msg-time">09:02</div>
+    </div>
+
+    <div class="sys-msg" id="locked-sys-msg">証拠を集めて、謎を解くと返信できるようになる…</div>
+
+    <!-- Dynamic messages area -->
+    <div id="dynamic-msgs"></div>
+
+    <!-- Typing indicator -->
+    <div class="msg recv" id="typing-indicator">
+      <div class="msg-ava">🎮</div>
+      <div class="typing-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
   </div>
-  <div class="quiz-header" id="quiz-header">❓ 謎を解いてケンに伝えよう — 問1 / 3</div>
-  <div class="quiz-question" id="quiz-question">読み込み中...</div>
-  <div id="quiz-choices"></div>
-</div>
 
-<div id="fade-out"></div>
-<div id="horror-overlay"></div>
+  <!-- Locked input -->
+  <div id="input-locked">
+    <div class="locked-msg" id="locked-msg-text">🔒 まず証拠を集めよう…<br>写真フォルダとブラウザを調べてから連絡しよう</div>
+    <div id="send-photo-container"
+      style="display:none; flex-direction:column; align-items:center; gap:10px; padding:4px 0;">
+      <div style="font-size:12px; color:var(--muted); text-align:center;">証拠が揃いました。厨房の写真をケンに送信します。</div>
+      <button onclick="sendKitchenPhoto()" class="quiz-btn"
+        style="background:var(--lime-bubble); border-color:var(--lime); color:white; font-weight:bold; display:flex; align-items:center; gap:8px; padding:10px 20px; font-size:14px; border-radius:20px; cursor:pointer; align-self:center; box-shadow: 0 4px 12px rgba(0,195,0,0.3); transition: transform 0.2s;">
+        <span>📸 写真をケンに送る</span>
+      </button>
+    </div>
+  </div>
 
-<script>
-  if (window.self === window.top) { window.location.href = '../index.html'; }
+  <!-- Quiz area (3段階謎解き) -->
+  <div id="quiz-area">
+    <!-- Progress dots -->
+    <div class="quiz-progress">
+      <div class="qp-dot active" id="qp1"></div>
+      <div class="qp-dot" id="qp2"></div>
+      <div class="qp-dot" id="qp3"></div>
+    </div>
+    <div class="quiz-header" id="quiz-header">❓ 謎を解いてケンに伝えよう — 問1 / 3</div>
+    <div class="quiz-question" id="quiz-question">読み込み中...</div>
+    <div id="quiz-choices"></div>
+  </div>
 
-  function post(type, data) { window.parent.postMessage(Object.assign({ type }, data), '*'); }
+  <div id="fade-out"></div>
+  <div id="horror-overlay"></div>
 
-  // ─── 謎解きクイズデータ ───────────────────────────────
-  const QUIZ_STEPS = [
-    {
-      question: '【謎1】この店はいつ、何をきっかけに業態を変えたのか？',
-      choices: [
-        { text: '妻が亡くなった後、店名を「中華そば 縁」から突然「〇ンニク〇んこつラーメン」に変えた（2023年6月）', correct: true },
-        { text: '開店当初（2019年）から一貫して同じ業態だった', correct: false },
-        { text: 'コロナ禍（2020〜2021年）の売上不振で仕方なく業態転換した', correct: false },
-      ],
-      correctMsg: 'やっぱりそうか…！ 奥さんが亡くなってから急に変わったんだな。そこから何かが狂い始めたのか。',
-      wrongMsg: 'う〜ん、違う気がする。もう一度よく考えてみて。SNSやブラウザを確認してみろ。',
-    },
-    {
-      question: '【謎2】スープのダシ――「秘伝の骨」の正体は何か？',
-      choices: [
-        { text: '本来ダシに使ってはいけないもの。近隣の葬儀業者との取引記録と、店名の変化がそれを示唆している', correct: true },
-        { text: '豚骨と鶏ガラの特別ブレンド。長年受け継いだ秘伝のレシピ', correct: false },
-        { text: '希少な山の動物の骨。特別ルートで仕入れているため表には出せない', correct: false },
-      ],
-      correctMsg: '…そうとしか考えられない。あの業者とのつながり、店名の変化、全部一致する。あの店のスープが……。',
-      wrongMsg: '違う気がする。ニュースと、店名の変化と、業者の場所――もう一度よく考えてみて。',
-    },
-    {
-      question: '【謎3】太郎が閉じ込められている厨房の場所はどこか？',
-      choices: [
-        { text: '東京都台東区音無町3-19-4 地下1階\n（厨房の窓の看板・カレンダーのメモより特定）', correct: true },
-        { text: '東京都台東区羽黒町1-5-10\n（SNSに記載されていた取材先候補）', correct: false },
-        { text: '東京都荒川区北日暮里4-22-1\n（ニュース記事に登場した葬儀業者の住所）', correct: false },
-      ],
-      correctMsg: '音無町3-19-4 地下1階！！ 今すぐ警察に連絡して現場に向かう！！ 太郎を助け出す！！',
-      wrongMsg: '確認してみる…… 違う！ この住所、関係ない場所だ。もう一度写真をよく調べてくれ！',
-    },
-  ];
+  <script>
+    if (window.self === window.top) { window.location.href = '../index.html'; }
 
-  let gameState = null;
-  let quizStep = 0;          // 0, 1, 2
-  let quizLocked = false;    // ボタン連打防止
-  let wrongCount = 0;        // 誤答累計
-  let quizStarted = false;
+    function post(type, data) { window.parent.postMessage(Object.assign({ type }, data), '*'); }
 
-  window.parent.postMessage({ type: 'GET_STATE' }, '*');
-  window.addEventListener('message', e => {
-    if (e.data?.type === 'STATE') {
-      gameState = e.data.state;
-      applyState();
-    }
-  });
+    // ─── 謎解きクイズデータ ───────────────────────────────
+    const QUIZ_STEPS = [
+      {
+        question: '【謎1】この店はいつ、何をきっかけに業態を変えたのか？',
+        choices: [
+          { text: '2023年6月頃、店主の妻が亡くなったタイミング', correct: true },
+          { text: '2019年の開店当初', correct: false },
+          { text: '2021年頃、コロナ禍による売上低迷期', correct: false },
+        ],
+        correctMsg: 'やっぱりそうか…！ 奥さんが亡くなってから急に変わったんだな。そこから何かが狂い始めたのか。',
+        wrongMsg: 'う〜ん、違う気がする。もう一度よく考えてみて。SNSやブラウザを確認してみてくれ。',
+      },
+      {
+        question: '【謎2】スープのダシ――「秘伝の骨」の正体は何か？',
+        choices: [
+          { text: '近隣の葬儀業者から調達された「じんこつ」', correct: true },
+          { text: '厳選された豚骨と鶏ガラのブレンド', correct: false },
+          { text: '独自ルートで仕入れた希少な猪の骨', correct: false },
+        ],
+        correctMsg: '…そうとしか考えられない。あの業者とのつながり、店名の変化、全部一致する。あの店のスープが……。',
+        wrongMsg: '違う気がする。ニュースと、店名の変化と、業者の場所――もう一度よく考えてみて。',
+      },
+      {
+        question: '【謎3】太郎が閉じ込められている厨房の場所はどこか？',
+        choices: [
+          { text: '東京都台東区音無町3-19-4 地下1階', correct: true },
+          { text: '東京都台東区羽黒町1-5-10', correct: false },
+          { text: '東京都荒川区北日暮里4-22-1', correct: false },
+        ],
+        correctMsg: '音無町3-19-4 地下1階！！ 今すぐ警察に連絡して現場に向かう！！ 太郎を助け出す！！',
+        wrongMsg: '確認してみる…… 違う！ この住所、関係ない場所だ。もう一度写真をよく調べてくれ！',
+      },
+    ];
 
-  function applyState() {
-    if (!gameState) return;
-    const step = gameState.currentStep;
-    const isLocationSpec = step === 'location_spec' || step === 'chat_sent' || step === 'clear';
-    const isSent = step === 'chat_sent' || step === 'clear';
+    let gameState = null;
+    let quizStep = 0;          // 0, 1, 2
+    let quizLocked = false;    // ボタン連打防止
+    let wrongCount = 0;        // 誤答累計
+    let quizStarted = false;
 
-    document.getElementById('input-locked').style.display = isLocationSpec ? 'none' : 'block';
-    document.getElementById('locked-sys-msg').style.display = isLocationSpec ? 'none' : 'block';
-
-    if (isLocationSpec && !isSent && !quizStarted) {
-      quizStarted = true;
-      document.getElementById('quiz-area').classList.add('show');
-      // ケンから最初のメッセージ
-      addMessage('recv', 'このスレッドを誰かが見てる。\n太郎の端末でこれを見てる人…頼む、太郎の居場所を特定するために謎を解いてくれ！', '09:30');
-      scrollBottom();
-      // クイズ描画
-      renderQuiz();
-    }
-    if (isSent) {
-      document.getElementById('quiz-area').classList.remove('show');
-    }
-  }
-
-  // ─── クイズ描画 ─────────────────────────────────────
-  function renderQuiz() {
-    const data = QUIZ_STEPS[quizStep];
-    document.getElementById('quiz-header').textContent =
-      `❓ 謎を解いてケンに伝えよう — 問${quizStep + 1} / ${QUIZ_STEPS.length}`;
-    document.getElementById('quiz-question').textContent = data.question;
-
-    // 選択肢をシャッフル（正解位置をランダムに）
-    const shuffled = [...data.choices].sort(() => Math.random() - 0.5);
-
-    const choicesEl = document.getElementById('quiz-choices');
-    choicesEl.innerHTML = '';
-    choicesEl.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
-    shuffled.forEach((choice, i) => {
-      const btn = document.createElement('button');
-      btn.className = 'quiz-btn' + (choice.correct ? '' : ' wrong-choice');
-      btn.textContent = choice.text;
-      btn.id = `qbtn-${i}`;
-      btn.onclick = () => handleAnswer(choice.correct, btn, data);
-      choicesEl.appendChild(btn);
+    window.parent.postMessage({ type: 'GET_STATE' }, '*');
+    window.addEventListener('message', e => {
+      if (e.data?.type === 'STATE') {
+        gameState = e.data.state;
+        applyState();
+      }
     });
 
-    // 進捗ドット更新
-    for (let i = 0; i < QUIZ_STEPS.length; i++) {
-      const dot = document.getElementById('qp' + (i+1));
-      if (i < quizStep) { dot.className = 'qp-dot done'; }
-      else if (i === quizStep) { dot.className = 'qp-dot active'; }
-      else { dot.className = 'qp-dot'; }
+    function applyState() {
+      if (!gameState) return;
+      const step = gameState.currentStep;
+      const isLocationSpec = step === 'location_spec' || step === 'chat_sent' || step === 'clear';
+      const isSent = step === 'chat_sent' || step === 'clear';
+
+      const hasClues = gameState.flags.newsRead && gameState.flags.kitchenPhotoViewed && gameState.flags.casePhotoViewed;
+
+      // ロック画面の全体的な表示制御
+      document.getElementById('input-locked').style.display = isLocationSpec ? 'none' : 'block';
+      document.getElementById('locked-sys-msg').style.display = isLocationSpec ? 'none' : 'block';
+
+      if (!isLocationSpec) {
+        if (hasClues) {
+          document.getElementById('locked-msg-text').style.display = 'none';
+          document.getElementById('send-photo-container').style.display = 'flex';
+        } else {
+          document.getElementById('locked-msg-text').style.display = 'block';
+          document.getElementById('send-photo-container').style.display = 'none';
+        }
+      }
+
+      if (isLocationSpec && !isSent && !quizStarted) {
+        quizStarted = true;
+        document.getElementById('quiz-area').classList.add('show');
+        // ケンから最初のメッセージ
+        addMessage('recv', '太郎の端末でこれを見てる人…頼む、太郎の居場所を特定するために謎を解いてくれ！', '09:30');
+        scrollBottom();
+        // クイズ描画
+        renderQuiz();
+      }
+      if (isSent) {
+        document.getElementById('quiz-area').classList.remove('show');
+      }
     }
-  }
 
-  function handleAnswer(isCorrect, btn, data) {
-    if (quizLocked) return;
-    quizLocked = true;
+    function sendKitchenPhoto() {
+      if (quizLocked) return;
+      quizLocked = true;
 
-    const timeStr = new Date().toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'});
-    const choicesEl = document.getElementById('quiz-choices');
+      const btn = document.querySelector('#send-photo-container button');
+      if (btn) btn.disabled = true;
 
-    // 全ボタンを無効化
-    choicesEl.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
+      const timeStr = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
 
-    if (isCorrect) {
-      btn.classList.add('correct-feedback');
-      // 送信メッセージ
-      const sentText = btn.textContent.split('\n')[0]; // 最初の行だけ表示
-      addMessage('sent', sentText, timeStr);
-      scrollBottom();
+      // 厨房写真とケース写真の2枚をチャット送信する演出
+      addPhotoMessage('sent', '../assets/images/kitchen.png', 'IMG_0847.png', timeStr);
 
       setTimeout(() => {
-        showTyping(1800, () => {
-          addMessage('recv', data.correctMsg, timeStr);
-          scrollBottom();
-
-          // 進捗ドットを完了に
-          document.getElementById('qp' + (quizStep+1)).className = 'qp-dot done';
-
-          setTimeout(() => {
-            quizStep++;
-            quizLocked = false;
-
-            if (quizStep >= QUIZ_STEPS.length) {
-              // 全問正解！ → グッドエンドへ
-              document.getElementById('quiz-area').classList.remove('show');
-              addMessage('recv', '今すぐ警察に連絡して現場に向かう！！\n絶対に太郎を助け出す！！', timeStr);
-              scrollBottom();
-              post('ADVANCE_STEP', { step: 'chat_sent' });
-              post('SET_FLAG', { key: 'locationSent', value: true });
-              setTimeout(() => {
-                post('SHUTDOWN_START', { endType: 'clear' });
-              }, 3000);
-            } else {
-              // 次の問題へ
-              renderQuiz();
-              scrollBottom();
-            }
-          }, 1500);
-        });
-      }, 600);
-
-    } else {
-      // 誤答
-      btn.classList.add('wrong-feedback');
-      const sentText = btn.textContent.split('\n')[0];
-      addMessage('sent', sentText, timeStr);
-      scrollBottom();
+        addPhotoMessage('sent', '../assets/images/case.png', 'IMG_0830.png', timeStr);
+      }, 450);
 
       setTimeout(() => {
-        showTyping(1500, () => {
-          addMessage('recv', data.wrongMsg, timeStr);
-          scrollBottom();
-
-          // １つでも間違えたら即座にバッドエンドへ
-          document.getElementById('quiz-area').classList.remove('show');
-          setTimeout(startBadEnd, 1500);
-        });
-      }, 800);
+        post('ADVANCE_STEP', { step: 'location_spec' });
+        post('SET_FLAG', { key: 'galleryOpened', value: true });
+        post('GET_STATE');
+        quizLocked = false;
+      }, 1600);
     }
-  }
 
-  // ─── メッセージ追加 ─────────────────────────────────
-  function addMessage(dir, text, time) {
-    const dynMsgs = document.getElementById('dynamic-msgs');
-    const div = document.createElement('div');
-    div.className = 'msg ' + dir;
-    if (dir === 'recv') {
+    function addPhotoMessage(dir, src, label, time) {
+      const dynMsgs = document.getElementById('dynamic-msgs');
+      const div = document.createElement('div');
+      div.className = 'msg ' + dir;
       div.innerHTML = `
+      <div class="msg-bubble" style="background:transparent; padding:0; overflow:hidden; border-radius:12px; max-width:200px; border:1px solid var(--border);">
+        <img src="${src}" alt="${label}" style="width:100%; display:block; object-fit:cover;">
+      </div>
+      <div class="msg-time">${time}</div>
+    `;
+      dynMsgs.appendChild(div);
+      scrollBottom();
+    }
+
+    // ─── クイズ描画 ─────────────────────────────────────
+    function renderQuiz() {
+      const data = QUIZ_STEPS[quizStep];
+      document.getElementById('quiz-header').textContent =
+        `❓ 謎を解いてケンに伝えよう — 問${quizStep + 1} / ${QUIZ_STEPS.length}`;
+      document.getElementById('quiz-question').textContent = data.question;
+
+      // 選択肢をシャッフル（正解位置をランダムに）
+      const shuffled = [...data.choices].sort(() => Math.random() - 0.5);
+
+      const choicesEl = document.getElementById('quiz-choices');
+      choicesEl.innerHTML = '';
+      choicesEl.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
+      shuffled.forEach((choice, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-btn';
+        btn.textContent = choice.text;
+        btn.id = `qbtn-${i}`;
+        btn.onclick = () => handleAnswer(choice.correct, btn, data);
+        choicesEl.appendChild(btn);
+      });
+
+      // 進捗ドット更新
+      for (let i = 0; i < QUIZ_STEPS.length; i++) {
+        const dot = document.getElementById('qp' + (i + 1));
+        if (i < quizStep) { dot.className = 'qp-dot done'; }
+        else if (i === quizStep) { dot.className = 'qp-dot active'; }
+        else { dot.className = 'qp-dot'; }
+      }
+    }
+
+    function handleAnswer(isCorrect, btn, data) {
+      if (quizLocked) return;
+      quizLocked = true;
+
+      const timeStr = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+      const choicesEl = document.getElementById('quiz-choices');
+
+      // 全ボタンを無効化
+      choicesEl.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
+
+      if (isCorrect) {
+        btn.classList.add('correct-feedback');
+        // 送信メッセージ
+        const sentText = btn.textContent.split('\n')[0]; // 最初の行だけ表示
+        addMessage('sent', sentText, timeStr);
+        scrollBottom();
+
+        setTimeout(() => {
+          showTyping(1800, () => {
+            addMessage('recv', data.correctMsg, timeStr);
+            scrollBottom();
+
+            // 進捗ドットを完了に
+            document.getElementById('qp' + (quizStep + 1)).className = 'qp-dot done';
+
+            setTimeout(() => {
+              quizStep++;
+              quizLocked = false;
+
+              if (quizStep >= QUIZ_STEPS.length) {
+                // 全問正解！ → グッドエンドへ
+                document.getElementById('quiz-area').classList.remove('show');
+                addMessage('recv', '今すぐ警察に連絡して現場に向かう！！\n絶対に太郎を助け出す！！', timeStr);
+                scrollBottom();
+                post('ADVANCE_STEP', { step: 'chat_sent' });
+                post('SET_FLAG', { key: 'locationSent', value: true });
+                setTimeout(() => {
+                  post('SHUTDOWN_START', { endType: 'clear' });
+                }, 3000);
+              } else {
+                // 次の問題へ
+                renderQuiz();
+                scrollBottom();
+              }
+            }, 1500);
+          });
+        }, 600);
+
+      } else {
+        // 誤答
+        btn.classList.add('wrong-feedback');
+        const sentText = btn.textContent.split('\n')[0];
+        addMessage('sent', sentText, timeStr);
+        scrollBottom();
+
+        setTimeout(() => {
+          showTyping(1500, () => {
+            addMessage('recv', data.wrongMsg, timeStr);
+            scrollBottom();
+
+            // １つでも間違えたら即座にバッドエンドへ
+            document.getElementById('quiz-area').classList.remove('show');
+            setTimeout(startBadEnd, 1500);
+          });
+        }, 800);
+      }
+    }
+
+    // ─── メッセージ追加 ─────────────────────────────────
+    function addMessage(dir, text, time) {
+      const dynMsgs = document.getElementById('dynamic-msgs');
+      const div = document.createElement('div');
+      div.className = 'msg ' + dir;
+      if (dir === 'recv') {
+        div.innerHTML = `
         <div class="msg-ava">🎮</div>
-        <div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div>
+        <div class="msg-bubble">${text.replace(/\n/g, '<br>')}</div>
         <div class="msg-time">${time}</div>
       `;
-    } else {
-      div.innerHTML = `
-        <div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div>
+      } else {
+        div.innerHTML = `
+        <div class="msg-bubble">${text.replace(/\n/g, '<br>')}</div>
         <div class="msg-time">${time}</div>
       `;
+      }
+      dynMsgs.appendChild(div);
+      scrollBottom();
     }
-    dynMsgs.appendChild(div);
-    scrollBottom();
-  }
 
-  function scrollBottom() {
-    const list = document.getElementById('message-list');
-    setTimeout(() => list.scrollTop = list.scrollHeight, 100);
-  }
+    function scrollBottom() {
+      const list = document.getElementById('message-list');
+      setTimeout(() => list.scrollTop = list.scrollHeight, 100);
+    }
 
-  function showTyping(durationMs, callback) {
-    const ind = document.getElementById('typing-indicator');
-    ind.classList.add('show');
-    scrollBottom();
-    setTimeout(() => {
-      ind.classList.remove('show');
-      if (callback) callback();
-    }, durationMs);
-  }
-
-  // ─── バッドエンド：店主が「太郎ではない」と気づく恐怖演出 ───
-  function startBadEnd() {
-    const dynMsgs = document.getElementById('dynamic-msgs');
-
-    // ステップ1: 店の予約確認システムからの通知（気味悉く見える）
-    function addShopMsg(text, delay, callback) {
+    function showTyping(durationMs, callback) {
+      const ind = document.getElementById('typing-indicator');
+      ind.classList.add('show');
+      scrollBottom();
       setTimeout(() => {
+        ind.classList.remove('show');
+        if (callback) callback();
+      }, durationMs);
+    }
+
+    // ─── バッドエンド：店主が「太郎ではない」と気づく恐怖演出 ───
+    async function startBadEnd() {
+      const dynMsgs = document.getElementById('dynamic-msgs');
+
+      const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+      async function addShopMsg(text) {
         const ind = document.getElementById('typing-indicator');
         ind.classList.add('show');
         scrollBottom();
-        setTimeout(() => {
-          ind.classList.remove('show');
-          const div = document.createElement('div');
-          div.className = 'msg recv';
-          div.innerHTML = `
-            <div class="msg-ava shopkeeper-ava">🍜</div>
-            <div class="msg-bubble shopkeeper-bubble">${text}</div>
-            <div class="msg-time" style="color:rgba(180,0,0,0.5)">— 不明</div>
-          `;
-          dynMsgs.appendChild(div);
-          scrollBottom();
-          if (callback) callback();
-        }, 2000);
-      }, delay);
-    }
 
-    // ステップ1: 普通の予約確認メッセージのように入る
-    addShopMsg('〈予約確認システム〉<br>タベアルキ太郎様、本日のお席を準備できております。お待ちしておりますか？', 0, () => {
+        await wait(2000);
+
+        ind.classList.remove('show');
+        const div = document.createElement('div');
+        div.className = 'msg recv';
+        div.innerHTML = `
+        <div class="msg-ava shopkeeper-ava">🍜</div>
+        <div class="msg-bubble shopkeeper-bubble">${text}</div>
+        <div class="msg-time" style="color:rgba(180,0,0,0.5)">— 不明</div>
+      `;
+        dynMsgs.appendChild(div);
+        scrollBottom();
+      }
+
+      // ステップ1: 普通の予約確認メッセージのように入る
+      await wait(500);
+      await addShopMsg('〈予約確認システム〉<br>タベアルキ太郎様、本日のお席を準備できております。お待ちしておりますが');
 
       // ステップ2: 間 → …おや
-      addShopMsg('…おや？', 1200, () => {
+      await wait(1500);
+      await addShopMsg('…おや？');
 
-        // ステップ3: 叫びかけ
-        addShopMsg('あなたは……<br>太郎さんではありませんね？', 1800, () => {
+      // ステップ3: 叫びかけ
+      await wait(2000);
+      await addShopMsg('あなたは……<br>太郎さんではありませんね？');
 
-          // 背景を暗轉
-          document.getElementById('horror-overlay').classList.add('on');
+      // ステップ4: 最後のメッセージ
+      await wait(3000);
+      await addShopMsg('この端末をご覧になっているのは…<br>どなたです？<br><span style="font-size:11px;color:rgba(180,0,0,0.6);letter-spacing:1px">…あのスープは、まだまだ深めることができますよ</span>');
 
-          // ステップ4: 最後のメッセージ
-          addShopMsg('この端末をご覧になっているのは…<br>どなたです？<br><span style="font-size:11px;color:rgba(180,0,0,0.6);letter-spacing:1px">…あのスープは、まだまだ深めることができますよ</span>', 2800, () => {
+      // 最後のメッセージが表示された直後に、背景を赤く染める演出を開始
+      await wait(2000);
+      document.getElementById('horror-overlay').classList.add('on');
 
-            // シャットダウンへ
-            setTimeout(() => {
-              post('SHUTDOWN_START', { endType: 'bad_end' });
-            }, 3000);
-          });
-        });
-      });
-    });
-  }
+      // 最後のメッセージをしっかり見せるためのウェイト（5秒）
+      await wait(5000);
+      post('SHUTDOWN_START', { endType: 'bad_end' });
+    }
 
-  // Initial scroll
-  scrollBottom();
-</script>
+    // Initial scroll
+    scrollBottom();
+  </script>
 </body>
+
 </html>

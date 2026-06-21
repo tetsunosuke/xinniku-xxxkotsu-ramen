@@ -12,11 +12,13 @@ const DEFAULT_STATE = {
   currentStep: 'intro',       // intro → unlocked → news_found → location_spec → chat_sent → clear | bad_end
   flags: {
     audioUnlocked: false,
-    snsVisited: false,
+    // snsVisited: SNSアプリはログイン画面になったため廃止
     newsRead: false,
     galleryOpened: false,
     kitchenPhotoViewed: false,
+    casePhotoViewed: false,
     locationSent: false,
+    returnedToPlayerPhone: false, // 拾ったスマホを解除後、一度自分のスマホへ戻ったか
   },
   notifiedItems: []
 };
@@ -27,6 +29,10 @@ let gameState = (() => {
     return s ? JSON.parse(s) : JSON.parse(JSON.stringify(DEFAULT_STATE));
   } catch { return JSON.parse(JSON.stringify(DEFAULT_STATE)); }
 })();
+
+// 現在プレイヤーが見ているデバイスを追跡（'player' = 自分のスマホ ・ 'picked' = 拾ったスマホ）
+// 初期状態は picked（ロック画面からスタート）
+let currentDevice = 'picked';
 
 // バッテリー管理
 let pickedBattery = 98; // 初期値98%
@@ -98,27 +104,14 @@ function updateBatteryDisplay() {
 
 // ─── NOTIFICATIONS ────────────────────────────────────────────
 const NOTIFS = [
-  {
-    id: 'hint_sns',
-    check: () => !gameState.isLocked && !gameState.flags.snsVisited,
-    icon: '🐦',
-    app: 'SNS',
-    msg: '【タベアルキ太郎】未読の投稿が3件あります',
-    delay: 800,
-    badge: 'sns'
-  },
-  {
-    id: 'hint_news',
-    check: () => gameState.flags.snsVisited && !gameState.flags.newsRead,
-    icon: '💬',
-    app: 'メッセージ (友人)',
-    msg: 'ケンが配信で「ブラウザ履歴に何か残ってるかも」って言ってた。調べてみろよ',
-    delay: 1200,
-    badge: 'browser'
-  },
+  // hint_sns は廃止（SNSアプリはログイン画面のため）
+  // ブラウザはロック解除直後からバッジ表示（お店の通知がきっかけ）→ NOTIFS不要
   {
     id: 'hint_gallery',
-    check: () => gameState.currentStep === 'news_found' && !gameState.flags.kitchenPhotoViewed,
+    // ニュース発見後、かつ一度自分のスマホへ戻ってから（友人がヒントを言ってくれる）
+    check: () => gameState.currentStep === 'news_found'
+                 && gameState.flags.returnedToPlayerPhone
+                 && !(gameState.flags.kitchenPhotoViewed && gameState.flags.casePhotoViewed),
     icon: '💬',
     app: 'メッセージ (友人)',
     msg: 'ケンの配信で「写真フォルダにも手がかりがあるかも」って言ってたよ！調べてみろ！',
@@ -127,10 +120,10 @@ const NOTIFS = [
   },
   {
     id: 'hint_chat',
-    check: () => gameState.currentStep === 'location_spec',
+    check: () => gameState.flags.newsRead && gameState.flags.kitchenPhotoViewed && gameState.flags.casePhotoViewed && gameState.currentStep === 'news_found',
     icon: '💬',
     app: 'LIME',
-    msg: '【フードハンター ケン】新着メッセージがあります…',
+    msg: '「写真をケンに送信する」準備ができました。LIMEを確認してください。',
     delay: 1500,
     badge: 'chat'
   }
@@ -139,6 +132,9 @@ const NOTIFS = [
 function checkTriggers() {
   NOTIFS.forEach(n => {
     if (!gameState.notifiedItems.includes(n.id) && n.check()) {
+      // 「友人からのメッセージ」は自分のスマホを見ているときのみ表示する
+      // 拾ったスマホを見ている間は notifiedItems に追加せず次回に持ち越す
+      if (n.app === 'メッセージ (友人)' && currentDevice !== 'player') return;
       gameState.notifiedItems.push(n.id);
       saveState();
       setTimeout(() => showToast(n.icon, n.app, n.msg), n.delay);
@@ -148,10 +144,15 @@ function checkTriggers() {
 
 function updateBadges() {
   const badgeMap = {
-    sns:     () => !gameState.isLocked && !gameState.flags.snsVisited,
-    browser: () => gameState.flags.snsVisited && !gameState.flags.newsRead,
-    gallery: () => gameState.currentStep === 'news_found' && !gameState.flags.kitchenPhotoViewed,
-    chat:    () => gameState.currentStep === 'location_spec' && gameState.currentStep !== 'chat_sent'
+    // SNSバッジは廃止（ログイン画面のため意味がない）
+    sns:     () => false,
+    // ブラウザバッジ：ロック解除後〜ニュース記事を読むまで
+    browser: () => !gameState.isLocked && !gameState.flags.newsRead,
+    // ギャラリーバッジ：ニュース発見後 かつ 一度自分のスマホへ戻ってから
+    gallery: () => gameState.currentStep === 'news_found'
+                   && gameState.flags.returnedToPlayerPhone
+                   && !(gameState.flags.kitchenPhotoViewed && gameState.flags.casePhotoViewed),
+    chat:    () => (gameState.flags.newsRead && gameState.flags.kitchenPhotoViewed && gameState.flags.casePhotoViewed && gameState.currentStep === 'news_found') || (gameState.currentStep === 'location_spec' && gameState.currentStep !== 'chat_sent')
   };
   Object.entries(badgeMap).forEach(([id, cond]) => {
     const el = document.getElementById('badge-' + id);
@@ -180,10 +181,23 @@ function processToast() {
   playBeep();
 
   // スマホのバイブレーション（振動）演出をクラス付与で行う
-  // 自分のスマホ（player-phone）か、デスクトップ（desktop）のうち、表示中のものを小刻みに揺らす
-  const targetDevice = (gameState.isLocked || document.getElementById('player-phone').style.display !== 'none') 
-    ? document.getElementById('player-phone') 
-    : document.getElementById('desktop');
+  let targetDevice = null;
+  if (gameState.isLocked) {
+    targetDevice = document.getElementById('lock-screen');
+  } else {
+    if (isMobile()) {
+      targetDevice = (document.getElementById('player-phone').style.display !== 'none') 
+        ? document.getElementById('player-phone') 
+        : document.getElementById('desktop');
+    } else {
+      // PC版: アプリ名が「メッセージ」なら自分のスマホ、それ以外（LIME、SNS等）なら拾ったスマホ
+      if (app === 'メッセージ') {
+        targetDevice = document.getElementById('player-phone');
+      } else {
+        targetDevice = document.getElementById('desktop');
+      }
+    }
+  }
   
   if (targetDevice) {
     targetDevice.classList.remove('shake-device');
@@ -252,7 +266,9 @@ function initLockScreen() {
 
   updateLockTime();
   setInterval(updateLockTime, 1000);
+}
 
+function triggerFirstNotification() {
   // Show dummy notification after 1.5s
   setTimeout(() => {
     const el = document.getElementById('lock-notification');
@@ -325,13 +341,13 @@ function doUnlock() {
   advanceStep('unlocked');
   const ls = document.getElementById('lock-screen');
   ls.classList.add('fade-out');
-  setTimeout(() => { 
-    ls.style.display = 'none'; 
-    checkTriggers(); 
-    updateBadges(); 
-    // 自動的に「解除できた」と友人に送る進行は削除。
-    // ロック画面が解けたことを知らせるトーストだけ表示
-    showToast('🔑', 'システム', 'スマートフォンのロックを解除しました');
+  setTimeout(() => {
+    ls.style.display = 'none';
+    updateBadges();
+    // ロック解除直後：お店の通知がきっかけなのでブラウザ（お店のサイト）を自動で開く
+    setTimeout(() => {
+      openApp('browser'); // デフォルトタブ = ramen（お店のウェブサイト）
+    }, 600);
   }, 900);
 }
 
@@ -498,12 +514,8 @@ window.addEventListener('message', e => {
       break;
     case 'ADVANCE_STEP':
       advanceStep(msg.step);
-      // ニュースを発見したら、トーストでチャットに新着があることを知らせるのみにする
-      if (msg.step === 'news_found') {
-        setTimeout(() => {
-          showToast('💬', 'メッセージ (友人)', '写真フォルダにも何か残ってないか？');
-        }, 1500);
-      }
+      // ニュース発見後の「写真を調べろ」ヒントは、プレイヤーが自分のスマホへ戻った際に
+      // チャットシナリオ（インデックス10〜12）から自然に流れるため、ここでは通知しない
       break;
     case 'GET_STATE':
       e.source?.postMessage({ type: 'STATE', state: gameState }, '*');
@@ -592,15 +604,95 @@ function triggerClear() {
   }
 }
 
-function triggerBadEnd() {
+async function triggerBadEnd() {
   gameState.currentStep = 'bad_end'; saveState();
   // Close all windows
   Object.keys(wins).forEach(closeWin);
   closeMobileApp();
-  const el = document.getElementById('bad-end-overlay');
-  if (el) setTimeout(() => el.classList.add('visible'), 300);
-  // Horror sound
-  playBeep(60, 40, 3, 0.4);
+
+  const overlay = document.getElementById('hacking-video-overlay');
+  if (!overlay) {
+    const el = document.getElementById('bad-end-overlay');
+    if (el) el.classList.add('visible');
+    playBeep(60, 40, 3, 0.4);
+    return;
+  }
+
+  // 1. ハッキングオーバーレイの表示
+  overlay.style.display = 'flex';
+  
+  // 不気味な電子ノイズ音の開始
+  let synthInterval = null;
+  if (audioCtx) {
+    try {
+      playBeep(50, 48, 5.0, 0.4);
+      synthInterval = setInterval(() => {
+        playBeep(Math.random() * 150 + 40, Math.random() * 150 + 40, 0.12, 0.12);
+      }, 250);
+    } catch(e) {}
+  }
+
+  const dummy = document.getElementById('hacked-dummy');
+  const shadow = document.getElementById('dummy-shadow');
+
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  
+  if (shadow) {
+    // 人影が徐々にカメラへ近づいてくる演出
+    await wait(400);
+    shadow.style.width = '380px';
+    shadow.style.height = '620px';
+    shadow.style.filter = 'blur(8px)';
+  }
+  
+  await wait(1800);
+
+  // 3. 店主の顔（赤い目）が突如ジャンプスケアで出現
+  const face = document.getElementById('jumpscare-face');
+  if (face) {
+    face.style.display = 'flex';
+    if (audioCtx) {
+      // 悲鳴のような高周波の不協和音
+      playBeep(180, 70, 1.2, 0.5);
+      playBeep(210, 50, 1.2, 0.5);
+    }
+  }
+
+  await wait(1000);
+
+  // 4. 「みいつけた」巨大テロップ表示
+  const hackText = document.getElementById('hacking-text');
+  if (hackText) {
+    hackText.style.display = 'block';
+    if (audioCtx) {
+      playBeep(35, 30, 2.0, 0.6);
+    }
+  }
+
+  await wait(2500);
+
+  if (synthInterval) clearInterval(synthInterval);
+
+  // 5. 強烈なグリッチ砂嵐
+  const cover = document.getElementById('glitch-cover');
+  if (cover) {
+    cover.style.display = 'block';
+    if (audioCtx) {
+      playBeep(90, 85, 1.2, 0.4);
+    }
+  }
+
+  await wait(1500);
+
+  // 6. オーバーレイを非表示にして本来のバッドエンド画面を表示
+  overlay.style.display = 'none';
+  if (cover) cover.style.display = 'none';
+  if (face) face.style.display = 'none';
+  if (hackText) hackText.style.display = 'none';
+
+  const badEndOverlay = document.getElementById('bad-end-overlay');
+  if (badEndOverlay) badEndOverlay.classList.add('visible');
+  playBeep(45, 45, 4.0, 0.3);
 }
 
 // ─── SETTINGS ─────────────────────────────────────────────────
@@ -763,6 +855,7 @@ function closePlayerSns() {
   overlay.classList.remove('open');
 }
 function switchToPickedPhone() {
+  currentDevice = 'picked'; // 拾ったスマホへ切り替え
   if (shutdownActive) {
     showToast('⚠️', 'システム', '端末のバッテリーが切れています。');
     return;
@@ -774,15 +867,30 @@ function switchToPickedPhone() {
   }
 }
 function flipDevice() {
+  currentDevice = 'player'; // 自分のスマホへ切り替え→先に設定しcheckTriggersが正しく動くように
   if (isMobile()) {
     const pp = document.getElementById('player-phone');
     pp.style.display = 'flex';
     setTimeout(() => { pp.style.transform = 'translateY(0)'; }, 20);
   }
   
-  // 自分のスマホへ戻る（フリップする）とき、友人とのメッセージ画面を自動で開く
   setTimeout(() => {
+    // 初めて自分のスマホに戻ったとき（会話未開始）は
+    // ホーム画面を見せて、通知トーストで友人からのメッセージを知らせるだけにする
+    if (playerChatIndex === 0) {
+      setTimeout(() => {
+        showToast('💬', 'メッセージ (友人)', 'おい、フードハンター ケンが緊急生配信してるぞ！');
+      }, 800);
+      return;
+    }
+
+    // 2回目以降はチャットスレッドを自動で開く
     openThread();
+
+    // 自分のスマホへ戻ったことを記録（ギャラリーバッジ等の解禁に使う）
+    if (!gameState.flags.returnedToPlayerPhone && !gameState.isLocked) {
+      setFlag('returnedToPlayerPhone', true);
+    }
     
     // 手動で自分のスマホに戻ってきたときに、現在のゲーム進行度に応じてチャットの会話を進める
     if (gameState.currentStep === 'unlocked' && playerChatIndex === 6) {
@@ -807,6 +915,7 @@ function startStory() {
   }
   // 最初は「拾ったスマホのロック画面」を前面に表示します。
   switchToPickedPhone();
+  triggerFirstNotification();
 }
 window.startStory = startStory;
 window.openThread = openThread;
@@ -829,9 +938,8 @@ function loadWallpaper() {
 
 // ─── INIT ─────────────────────────────────────────────────────
 
-// P-10: ゲーム開始時の画面幅でモードを固定（リサイズ時は再判定しない）
-const _isMobileFixed = window.innerWidth <= 768;
-function isMobile() { return _isMobileFixed; }
+// P-10: PC/スマホを区別せず、常にモバイルUI（フルスクリーン切り替え方式）で動作する
+function isMobile() { return true; }
 
 document.addEventListener('DOMContentLoaded', () => {
   loadWallpaper();
@@ -899,4 +1007,22 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('settings-overlay').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeSettings();
   });
+
+  setupShareLinks();
 });
+
+function setupShareLinks() {
+  const gameUrl = "https://xinniku-xxxkotsu-ramen.pages.dev/";
+  const clearText = encodeURIComponent("拾ったスマホから繋がる、ある失踪事件の記録――\n『〇ンニク〇んこつラーメン』を解決。太郎の救出に成功。\n\n#〇ンニク〇んこつラーメン");
+  const badText = encodeURIComponent("拾ったスマホから繋がる、ある失踪事件の記録――\n『〇ンニク〇んこつラーメン』。……みいつけた。\n\n#〇ンニク〇んこつラーメン");
+  
+  const clearLink = document.getElementById('share-clear-x');
+  const badLink = document.getElementById('share-bad-x');
+  
+  if (clearLink) {
+    clearLink.href = `https://x.com/intent/tweet?text=${clearText}&url=${encodeURIComponent(gameUrl)}`;
+  }
+  if (badLink) {
+    badLink.href = `https://x.com/intent/tweet?text=${badText}&url=${encodeURIComponent(gameUrl)}`;
+  }
+}
