@@ -130,7 +130,7 @@ const NOTIFS = [
     check: () => gameState.currentStep === 'location_spec',
     icon: '💬',
     app: 'LIME',
-    msg: '【フードハンターケン】新着メッセージがあります…',
+    msg: '【フードハンター ケン】新着メッセージがあります…',
     delay: 1500,
     badge: 'chat'
   }
@@ -178,6 +178,21 @@ function processToast() {
   el.querySelector('.toast-msg').textContent  = msg;
   el.classList.add('show');
   playBeep();
+
+  // スマホのバイブレーション（振動）演出をクラス付与で行う
+  // 自分のスマホ（player-phone）か、デスクトップ（desktop）のうち、表示中のものを小刻みに揺らす
+  const targetDevice = (gameState.isLocked || document.getElementById('player-phone').style.display !== 'none') 
+    ? document.getElementById('player-phone') 
+    : document.getElementById('desktop');
+  
+  if (targetDevice) {
+    targetDevice.classList.remove('shake-device');
+    // リフローを挟んでアニメーションをリスタート
+    void targetDevice.offsetWidth;
+    targetDevice.classList.add('shake-device');
+    setTimeout(() => { targetDevice.classList.remove('shake-device'); }, 1200);
+  }
+
   setTimeout(() => {
     el.classList.remove('show');
     setTimeout(processToast, 600);
@@ -250,6 +265,21 @@ function initLockScreen() {
         </div>
       `;
       el.classList.add('visible');
+      
+      // 音声再生（audioCtxの準備ができている場合のみ）
+      if (audioCtx) {
+        playBeep(880, 660, 0.25, 0.15);
+      }
+      
+      // ロック画面自体をブルブルと振動させる
+      const targetDevice = document.getElementById('lock-screen');
+      
+      if (targetDevice) {
+        targetDevice.classList.remove('shake-device');
+        void targetDevice.offsetWidth; // リフロー
+        targetDevice.classList.add('shake-device');
+        setTimeout(() => { targetDevice.classList.remove('shake-device'); }, 1200);
+      }
     }
   }, 1500);
 }
@@ -611,8 +641,8 @@ function resetGame() {
 
 const PLAYER_CHAT_SCENARIO = [
   // --- 初期会話（インデックス 0〜5）---
-  // 友人がフードハンターケンの緊急配信を見てプレイヤーに連絡してきた
-  { sender: 'recv', text: 'おい、フードハンターケンが緊急生配信してるぞ！ タベアルキ太郎が昨日から連絡取れないって、配信でずっと呼びかけてる…' },
+  // 友人がフードハンター ケンの緊急配信を見てプレイヤーに連絡してきた
+  { sender: 'recv', text: 'おい、フードハンター ケンが緊急生配信してるぞ！ タベアルキ太郎が昨日から連絡取れないって、配信でずっと呼びかけてる…' },
   { sender: 'sent', text: 'マジか！？ 実はさっき変なスマホ拾ったんだよ。裏に「ラーメン店オープン記念」のケースがついてたやつ。太郎のじゃないか？' },
   { sender: 'recv', text: 'それ絶対太郎のスマホじゃん！ ロックとかかかってない？' },
   { sender: 'sent', text: 'かかってる。8桁のパスコードがわからん' },
@@ -672,6 +702,10 @@ function renderNextPlayerMessage() {
   
   if (playerChatIndex < PLAYER_CHAT_SCENARIO.length) {
     const nextMsg = PLAYER_CHAT_SCENARIO[playerChatIndex];
+    // ロック中（インデックス6に到達する前）に、自動で「ロック解除できたぞ！」へ進まないように制御
+    if (playerChatIndex === 6 && gameState.isLocked) {
+      return;
+    }
     // グッドエンド：インデックス13はグッドエンド充電切れの先頭なので、
     // シャットダウン後にjumpされるまでここで停止する
     if (playerChatIndex === 13) {
@@ -679,7 +713,7 @@ function renderNextPlayerMessage() {
     }
     // グッドエンド：インデックス16まで（0〜15まで表示）でクリアへ
     if (playerChatIndex === 17) {
-      // グッドエンドの最後「助け出す！」を表示後、クリアシーケンス開始
+      // グッドエンドの最後「助け出す！」を表示後、クリアシーセルフ開始
       setTimeout(triggerClear, 3500);
       return;
     }

@@ -122,8 +122,10 @@
         <span class="phone-bar-wifi">📶</span>
       </div>
       <span id="player-phone-clock">--:--</span>
-      <div class="phone-bar-right">
+      <div class="phone-bar-right" style="display:flex; align-items:center; gap:8px;">
         <span class="phone-bar-battery">🔋 78%</span>
+        <button onclick="openSettings()" aria-label="設定を開く" title="設定"
+          style="background:none; border:none; color:rgba(255,255,255,0.5); font-size:13px; cursor:pointer; padding:2px; transition:color 0.2s;">⚙</button>
       </div>
     </div>
     <!-- デバイス切り替え用トグルバー -->
@@ -236,8 +238,6 @@
   <div id="settings-overlay" role="dialog" aria-label="設定メニュー">
     <div class="settings-panel">
       <h3>⚙ 設定</h3>
-      <button class="settings-btn" onclick="exportState()">💾 進捗をエクスポート（JSON）</button>
-      <button class="settings-btn" onclick="importState()">📂 進捗をインポート</button>
       <button class="settings-btn danger" onclick="resetGame()">🔄 ゲームをリセット</button>
       <button class="settings-btn close-btn" onclick="closeSettings()">✕ 閉じる</button>
     </div>
@@ -260,7 +260,7 @@
           <p>店主は遺体損壊・食品衛生法違反ほか複数の容疑で逮捕。</p>
           <p>&nbsp;</p>
           <p>配信者・タベアルキ太郎は無事保護されました。</p>
-          <p>相方・フードハンターケンの通報が命を繋ぎとめました。</p>
+          <p>相方・フードハンター ケンの通報が命を繋ぎとめました。</p>
         </div>
       </div>
       <div class="epil-credit">ご協力ありがとうございました</div>

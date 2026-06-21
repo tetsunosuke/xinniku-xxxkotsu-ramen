@@ -770,3 +770,34 @@ html, body {
     display: none !important;
   }
 }
+
+/* ── VIBRATION & SHAKE ANIMATION ── */
+.shake-device {
+  animation: deviceVibrate 0.4s ease-in-out 3;
+}
+
+@keyframes deviceVibrate {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  10% { transform: translate(-2px, 1px) rotate(-0.5deg); }
+  20% { transform: translate(1px, -2px) rotate(0.5deg); }
+  30% { transform: translate(-1px, 2px) rotate(-1deg); }
+  40% { transform: translate(2px, -1px) rotate(0.5deg); }
+  50% { transform: translate(-2px, 1px) rotate(-0.5deg); }
+  60% { transform: translate(1px, -2px) rotate(0.5deg); }
+  70% { transform: translate(-1px, 2px) rotate(-1deg); }
+  80% { transform: translate(2px, -1px) rotate(0.5deg); }
+  90% { transform: translate(-1px, 1px) rotate(0deg); }
+}
+
+/* 通知トーストが出現する際の少し弾むようなアニメーションの微調整 */
+#notification-toast.show {
+  top: 55px;
+  animation: toastBounce 0.45s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+
+@keyframes toastBounce {
+  0% { transform: translateX(-50%) scale(0.85) translateY(-10px); }
+  70% { transform: translateX(-50%) scale(1.03) translateY(3px); }
+  100% { transform: translateX(-50%) scale(1) translateY(0); }
+}
+
