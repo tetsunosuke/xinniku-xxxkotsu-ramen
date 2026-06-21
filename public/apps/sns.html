@@ -29,7 +29,24 @@
       padding:12px 16px;
       display:flex; align-items:center; gap:14px;
     }
-    .header-icon { font-size:22px; cursor:pointer; padding:4px; }
+    .header-icon {
+      font-size: 20px;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background-color 0.2s, transform 0.1s;
+      margin-left: -6px;
+    }
+    .header-icon:hover {
+      background-color: var(--hover);
+    }
+    .header-icon:active {
+      transform: scale(0.9);
+    }
     .header-title { font-size:19px; font-weight:700; }
 
     /* ── Profile ── */

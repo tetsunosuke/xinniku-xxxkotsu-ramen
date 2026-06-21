@@ -698,6 +698,8 @@
       if (quizLocked) return;
       quizLocked = true;
 
+      post('TRACK_EVENT', { eventName: 'quiz_answer', params: { step: quizStep + 1, correct: isCorrect } });
+
       const timeStr = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
       const choicesEl = document.getElementById('quiz-choices');
 

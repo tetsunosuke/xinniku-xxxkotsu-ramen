@@ -19,6 +19,7 @@ const DEFAULT_STATE = {
     casePhotoViewed: false,
     locationSent: false,
     returnedToPlayerPhone: false, // 拾ったスマホを解除後、一度自分のスマホへ戻ったか
+    ramenRevealed: false,
   },
   notifiedItems: []
 };
@@ -51,6 +52,16 @@ function setFlag(key, value) {
   syncBatteryFromStep();
 }
 
+function trackEvent(name, params = null) {
+  if (typeof window.gtag === 'function') {
+    if (params) {
+      window.gtag('event', name, params);
+    } else {
+      window.gtag('event', name);
+    }
+  }
+}
+
 function advanceStep(step) {
   const ORDER = ['intro','unlocked','news_found','location_spec','chat_sent','clear'];
   const cur = ORDER.indexOf(gameState.currentStep);
@@ -61,6 +72,7 @@ function advanceStep(step) {
     checkTriggers();
     updateBadges();
     syncBatteryFromStep();
+    trackEvent('step_' + step);
   }
 }
 
@@ -539,6 +551,9 @@ window.addEventListener('message', e => {
     case 'SHUTDOWN_START':
       triggerShutdownSequence(msg.endType);
       break;
+    case 'TRACK_EVENT':
+      trackEvent(msg.eventName, msg.params || null);
+      break;
   }
 });
 
@@ -606,6 +621,7 @@ function triggerClear() {
 
 async function triggerBadEnd() {
   gameState.currentStep = 'bad_end'; saveState();
+  trackEvent('game_bad_end');
   // Close all windows
   Object.keys(wins).forEach(closeWin);
   closeMobileApp();
@@ -918,6 +934,7 @@ function startStory() {
   // 最初は「拾ったスマホのロック画面」を前面に表示します。
   switchToPickedPhone();
   triggerFirstNotification();
+  trackEvent('game_start');
 }
 function closePlayerApp() {
   closeThread();

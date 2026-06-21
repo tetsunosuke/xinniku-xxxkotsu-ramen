@@ -336,11 +336,34 @@
       }
 
       // すでにreveal済みなら即座に暗い状態へ
-      if (s.flags?.newsRead && s.currentStep !== 'intro' && s.currentStep !== 'unlocked') {
-        // ニュースを読んでいる場合はクリック可能状態を復元
+      if (s.flags?.ramenRevealed) {
+        applyRevealInstant();
       }
     }
   });
+
+  function applyRevealInstant() {
+    if (revealed) return;
+    revealed = true;
+
+    document.getElementById('soup-desc').classList.add('revealed');
+    document.getElementById('hidden-msg').classList.add('show');
+
+    document.getElementById('store-hero').classList.add('revealed');
+    document.getElementById('store-noren').classList.add('revealed');
+    document.getElementById('store-name-logo').classList.add('revealed');
+    document.getElementById('store-tagline').classList.add('revealed');
+    document.getElementById('h3-notice').classList.add('revealed');
+    document.getElementById('h3-menu').classList.add('revealed');
+    document.getElementById('h3-info').classList.add('revealed');
+    document.getElementById('store-notice').classList.add('revealed');
+
+    document.getElementById('store-name-logo').innerHTML = `<span class="glitch-text">ジンニクじんこつラーメン</span>`;
+    document.getElementById('menu-1').innerHTML = `<span class="glitch-text">ジンニクじんこつラーメン（並）</span>`;
+    document.getElementById('menu-2').innerHTML = `<span class="glitch-text">ジンニクじんこつラーメン（大）</span>`;
+    document.getElementById('soup-desc').innerHTML = `特製じんこつ`;
+    document.getElementById('store-tagline').textContent = 'since 2023.06 ｜ 特別なスープをどうぞ';
+  }
 
   // Query param
   const params = new URLSearchParams(window.location.search);
@@ -365,6 +388,8 @@
     if (revealed) return;
     if (!stateNewsFound) return;
     revealed = true;
+    window.parent.postMessage({ type: 'SET_FLAG', key: 'ramenRevealed', value: true }, '*');
+    window.parent.postMessage({ type: 'TRACK_EVENT', eventName: 'ramen_store_revealed' }, '*');
 
     // スープ説明を「revealed」スタイルに
     document.getElementById('soup-desc').classList.add('revealed');
