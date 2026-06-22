@@ -3,6 +3,6 @@
 // Using a Vite raw import allows Astro/Vite to track public/index.html as a dependency.
 // This ensures that modifying public/index.html will trigger Hot Module Replacement (HMR)
 // and prevent the browser/dev-server from serving cached/stale content.
-import htmlContent from '../../public/index.html?raw';
+import htmlContent from '../templates/index.html?raw';
 ---
 <Fragment set:html={htmlContent} />
