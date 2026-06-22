@@ -218,14 +218,14 @@ html, body {
 }
 #passcode-error.show { opacity: 1; }
 
-/* ── DESKTOP ── */
-#desktop {
+/* ── PICKED PHONE HOME ── */
+#picked-phone-home {
   position: fixed; inset: 0; z-index: 1;
   display: flex; flex-direction: column;
 }
 
 /* Top bar */
-#desktop-bar {
+#picked-phone-bar {
   height: 38px; flex-shrink: 0;
   background: rgba(0,0,0,0.45);
   backdrop-filter: blur(10px);
@@ -234,7 +234,7 @@ html, body {
   justify-content: space-between;
   padding: 0 14px; position: relative; z-index: 10;
 }
-#desktop-clock { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.8); }
+#picked-phone-home-clock { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.8); }
 #settings-btn {
   background: none; border: none;
   color: rgba(255,255,255,0.5); font-size: 16px;

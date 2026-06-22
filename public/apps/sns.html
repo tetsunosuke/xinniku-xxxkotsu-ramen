@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SNS — タベアルキ太郎 / フードハンター ケン</title>
+  <title>SNS</title>
+  <link rel="stylesheet" href="../assets/css/apps-common.css">
   <style>
     :root {
       --bg: #000;
@@ -595,16 +596,12 @@
   <div class="scroll-hint">— 過去の投稿はありません —</div>
 </div>
 
+<script src="../assets/js/app-utils.js"></script>
 <script>
-  // iframeチェック
   if (window.self === window.top) { window.location.href = '../index.html'; }
-
   // Check query parameters to toggle profile view
   const urlParams = new URLSearchParams(window.location.search);
   const isPreview = urlParams.get('preview') === '1';
-
-  // 親へ通知
-  function post(type, data) { window.parent.postMessage(Object.assign({ type }, data), '*'); }
 
   // preview=1 でない場合（= 拾ったスマホから開いた場合）はログイン画面を表示
   if (!isPreview) {

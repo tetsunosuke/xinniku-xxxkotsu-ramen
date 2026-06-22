@@ -106,7 +106,7 @@ function syncBatteryFromStep() {
 function updateBatteryDisplay() {
   const batteryStr = `🔋 ${pickedBattery}%`;
   const pickedEl = document.getElementById('picked-phone-battery');
-  const desktopEl = document.getElementById('desktop-battery');
+  const desktopEl = document.getElementById('picked-phone-home-battery');
   if (pickedEl) pickedEl.textContent = batteryStr;
   if (desktopEl) desktopEl.textContent = batteryStr;
   // 自分のスマホのバッテリー表示
@@ -200,13 +200,13 @@ function processToast() {
     if (isMobile()) {
       targetDevice = (document.getElementById('player-phone').style.display !== 'none') 
         ? document.getElementById('player-phone') 
-        : document.getElementById('desktop');
+        : document.getElementById('picked-phone-home');
     } else {
       // PC版: アプリ名が「メッセージ」なら自分のスマホ、それ以外（LIME、SNS等）なら拾ったスマホ
       if (app === 'メッセージ') {
         targetDevice = document.getElementById('player-phone');
       } else {
-        targetDevice = document.getElementById('desktop');
+        targetDevice = document.getElementById('picked-phone-home');
       }
     }
   }
@@ -376,7 +376,7 @@ function updateLockTime() {
 
 // ─── DESKTOP CLOCK ────────────────────────────────────────────
 function updateClock() {
-  const el = document.getElementById('desktop-clock');
+  const el = document.getElementById('picked-phone-home-clock');
   if (el) el.textContent = new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
 }
 

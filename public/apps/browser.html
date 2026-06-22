@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ブラウザ</title>
+  <link rel="stylesheet" href="../assets/css/apps-common.css">
   <style>
     :root {
       --bg: #0e0e16;
@@ -12,12 +13,9 @@
       --text: #cdd0d4;
       --muted: #6a6a80;
       --link: #5ba3e0;
-      --font: 'Noto Sans JP', -apple-system, sans-serif;
       --accent: #e07060;
     }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:var(--bg); font-family:var(--font); color:var(--text);
-           height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+    body { background:var(--bg); color:var(--text); }
 
     /* ── Browser Tabs UI ── */
     #browser-tabs {
@@ -176,9 +174,15 @@
     #soup-desc.clickable {
       cursor: pointer;
       text-decoration: underline dotted rgba(255,160,60,0.7);
+      animation: pulseHint 2s infinite;
+    }
+    @keyframes pulseHint {
+      0%, 100% { color: rgba(255,200,120,0.9); text-shadow: none; }
+      50% { color: rgba(255,160,60,1); text-shadow: 0 0 8px rgba(255,160,60,0.6); }
     }
     #soup-desc.clickable:hover {
       color: var(--accent);
+      animation: none;
     }
     #soup-desc.revealed { color: var(--accent); }
 
@@ -312,6 +316,7 @@
 
 </div>
 
+<script src="../assets/js/app-utils.js"></script>
 <script>
   if (window.self === window.top) { window.location.href = '../index.html'; }
 

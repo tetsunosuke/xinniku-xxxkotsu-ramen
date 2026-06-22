@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LIME チャット</title>
+  <title>LIME (Chat)</title>
+  <link rel="stylesheet" href="../assets/css/apps-common.css">
   <style>
     /* ─ モバイル表示時のホームバー対応 ─ */
     @media (max-width: 768px) {
@@ -36,6 +37,8 @@
       --font: 'Noto Sans JP', -apple-system, sans-serif;
     }
 
+    body { background:var(--bg); color:var(--text); }
+
     * {
       margin: 0;
       padding: 0;
@@ -44,9 +47,7 @@
     }
 
     body {
-      background: var(--bg);
       font-family: var(--font);
-      color: var(--text);
       height: 100vh;
       display: flex;
       flex-direction: column;
@@ -536,10 +537,9 @@
   <div id="fade-out"></div>
   <div id="horror-overlay"></div>
 
-  <script>
-    if (window.self === window.top) { window.location.href = '../index.html'; }
-
-    function post(type, data) { window.parent.postMessage(Object.assign({ type }, data), '*'); }
+<script src="../assets/js/app-utils.js"></script>
+<script>
+  if (window.self === window.top) { window.location.href = '../index.html'; }
 
     // ─── 謎解きクイズデータ ───────────────────────────────
     const QUIZ_STEPS = [
