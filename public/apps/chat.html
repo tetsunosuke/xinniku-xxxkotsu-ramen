@@ -542,7 +542,7 @@
   if (window.self === window.top) { window.location.href = '../index.html'; }
 
     // ─── 謎解きクイズデータ ───────────────────────────────
-    const QUIZ_STEPS = [
+    let QUIZ_STEPS = [
       {
         question: '【謎1】この店はいつ、何をきっかけに業態を変えたのか？',
         choices: [
@@ -566,21 +566,21 @@
       {
         question: '【謎3】太郎が閉じ込められている厨房の場所はどこか？',
         choices: [
-          { text: '東京都台東区音無町3-19-4 地下1階', correct: true },
+          { text: '東京都台東区音無町3-19-4 地下1階', correct: false },
           { text: '東京都台東区羽黒町1-5-10', correct: false },
           { text: '東京都荒川区北日暮里4-22-1', correct: false },
         ],
-        correctMsg: '音無町3-19-4 地下1階！！ 今すぐ警察に連絡して現場に向かう！！ 太郎を助け出す！！',
-        wrongMsg: '確認してみる…… 違う！ この住所、関係ない場所だ。もう一度写真をよく調べてくれ！',
+        correctMsg: '音無町3-19-3 地下1階！！ 今すぐ警察に連絡して現場に向かう！！ 太郎を助け出す！！',
+        wrongMsg: '確認してみる……って、おい！行ってみたけどそこはただの空き地だったぞ！もう一度手がかりをよく調べてみてくれ！',
       },
     ];
-
+ 
     let gameState = null;
     let quizStep = 0;          // 0, 1, 2
     let quizLocked = false;    // ボタン連打防止
     let wrongCount = 0;        // 誤答累計
     let quizStarted = false;
-
+ 
     window.parent.postMessage({ type: 'GET_STATE' }, '*');
     window.addEventListener('message', e => {
       if (e.data?.type === 'STATE') {
@@ -588,9 +588,26 @@
         applyState();
       }
     });
-
+ 
     function applyState() {
       if (!gameState) return;
+
+      // 動的選択肢の更新
+      if (gameState.flags?.trueAddressFound) {
+        QUIZ_STEPS[2].choices = [
+          { text: '東京都台東区音無町3-19-3 地下1階', correct: true },
+          { text: '東京都台東区音無町3-19-4 地下1階', correct: false },
+          { text: '東京都台東区羽黒町1-5-10', correct: false },
+          { text: '東京都荒川区北日暮里4-22-1', correct: false },
+        ];
+      } else {
+        QUIZ_STEPS[2].choices = [
+          { text: '東京都台東区音無町3-19-4 地下1階', correct: false },
+          { text: '東京都台東区羽黒町1-5-10', correct: false },
+          { text: '東京都荒川区北日暮里4-22-1', correct: false },
+        ];
+      }
+
       const step = gameState.currentStep;
       const isLocationSpec = step === 'location_spec' || step === 'chat_sent' || step === 'clear';
       const isSent = step === 'chat_sent' || step === 'clear';
@@ -751,16 +768,53 @@
         addMessage('sent', sentText, timeStr);
         scrollBottom();
 
-        setTimeout(() => {
-          showTyping(1500, () => {
-            addMessage('recv', data.wrongMsg, timeStr);
-            scrollBottom();
+        // 特別処理：問3（quizStep === 2）で、かつ鏡をまだ撮影していないか、または真の住所を見つけていない場合
+        if (quizStep === 2 && (!gameState || !gameState.flags?.trueAddressFound)) {
+          const is3194 = sentText.includes('3-19-4');
+          const replyText = is3194
+            ? '確認してみる……って、おい！行ってみたけどそこはただの空き地だったぞ！おい、お前がさっき言ってたそのスマホ、本当に限定ケースなのか？？'
+            : '確認してみる…… 違う！ この住所、関係ない場所だ。もう一度写真をよく調べてくれ！';
 
-            // １つでも間違えたら即座にバッドエンドへ
-            document.getElementById('quiz-area').classList.remove('show');
-            setTimeout(startBadEnd, 1500);
-          });
-        }, 800);
+          setTimeout(() => {
+            showTyping(2000, () => {
+              addMessage('recv', replyText, timeStr);
+              scrollBottom();
+              
+              if (is3194) {
+                setTimeout(() => {
+                  showTyping(2000, () => {
+                    addMessage('recv', 'もう一度、何か別の手がかりがスマホの周りや本体に残ってないかよく調べてみてくれ！', timeStr);
+                    scrollBottom();
+                    
+                    post('SET_FLAG', { key: 'firstAddressSent', value: true });
+                    setTimeout(() => {
+                      quizLocked = false;
+                      renderQuiz();
+                    }, 2000);
+                  });
+                }, 1000);
+              } else {
+                post('SET_FLAG', { key: 'firstAddressSent', value: true });
+                setTimeout(() => {
+                  quizLocked = false;
+                  renderQuiz();
+                }, 2000);
+              }
+            });
+          }, 800);
+        } else {
+          // 通常の誤答
+          setTimeout(() => {
+            showTyping(1500, () => {
+              addMessage('recv', data.wrongMsg, timeStr);
+              scrollBottom();
+
+              // １つでも間違えたら即座にバッドエンドへ
+              document.getElementById('quiz-area').classList.remove('show');
+              setTimeout(startBadEnd, 1500);
+            });
+          }, 800);
+        }
       }
     }
 

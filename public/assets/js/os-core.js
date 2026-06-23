@@ -601,9 +601,9 @@ function triggerShutdownSequence(endType) {
       if (playerChatTimeout) clearTimeout(playerChatTimeout);
       
       if (endType === 'clear') {
-        playerChatIndex = 13; // グッドエンド用の充電切れメッセージへ
+        playerChatIndex = 19; // グッドエンド用の充電切れメッセージへ
       } else {
-        playerChatIndex = 17; // バッドエンド用の充電切れメッセージへ
+        playerChatIndex = 23; // バッドエンド用の充電切れメッセージへ
       }
       renderNextPlayerMessage();
     }, 3500);
@@ -768,13 +768,21 @@ const PLAYER_CHAT_SCENARIO = [
   { sender: 'recv', text: '……それって、まさかそのラーメン店のことじゃ。ゾッとするな。写真フォルダとかに何か残ってないか？ 太郎、撮影癖あるだろ' },
   { sender: 'sent', text: 'ある。最近追加された「厨房の写真」があるみたいだから詳しく調べてみる！' },
 
-  // --- グッドエンド用：充電切れ後（インデックス 13〜16）---
+  // --- 新設: 最初の住所送信後（空き地だった）（インデックス 13〜18） ---
+  { sender: 'recv', text: 'おい！ケンの配信見てたら、送った住所に行ったら「ただの空き地だった」って言ってるぞ！違う場所だったのか？' },
+  { sender: 'sent', text: 'えっ、厨房の写真にあった白菊ホールから推測したんだけど…犯人の罠だったのか？' },
+  { sender: 'recv', text: '何かがおかしいな。そういえば、太郎のスマホケースって限定記念品だろ？太郎のスマホの背面に何か別のヒントが書いてないか？' },
+  { sender: 'sent', text: '背面？スマホカバーがついてて直接は見えないけど…' },
+  { sender: 'recv', text: 'お前のスマホのカメラを起動して、鏡にスマホ背面を映して写真を撮ってみろよ！鏡の反転で何か見えない文字が読めるかもしれないぞ！' },
+  { sender: 'sent', text: 'なるほど、鏡に映して撮影してみる！' },
+
+  // --- グッドエンド用：充電切れ後（インデックス 19〜22）---
   { sender: 'sent', text: 'あっ、拾ったスマホの充電が切れちゃった…！' },
   { sender: 'recv', text: 'ケンの配信見てたら「今、匿名から住所の情報が届いた！！」って言い出した！ それってお前がLIMEで送ったやつだよな！？' },
-  { sender: 'recv', text: 'ケンが「台東区音無町3-19-4、今から警察と一緒に向かう！」って叫んでる！ 視聴者もザワついてる！！' },
-  { sender: 'recv', text: 'マジでやばい。お前すごいことしたぞ……！' },
+  { sender: 'recv', text: 'ケンが「台東区音無町3-19-3、今から警察と一緒に向かう！」って叫んでる！ 視聴者もザワついている！！' },
+  { sender: 'recv', text: '今度は本物の場所だったみたいだ！お前すごいことしたぞ……！' },
 
-  // --- バッドエンド用：充電切れ後（インデックス 17〜19）---
+  // --- バッドエンド用：充電切れ後（インデックス 23〜26）---
   { sender: 'sent', text: 'あっ、拾ったスマホの充電が切れちゃった…！' },
   { sender: 'recv', text: 'ケンの配信見てたら、住所に行ったら……空き地だったって言ってる。違う場所だったのか？' },
   { sender: 'recv', text: '「情報が間違ってた……太郎どこにいるんだ」って配信で泣いてる。どういうことだよ……' },
@@ -814,19 +822,22 @@ function renderNextPlayerMessage() {
     if (playerChatIndex === 6 && gameState.isLocked) {
       return;
     }
-    // グッドエンド：インデックス13はグッドエンド充電切れの先頭なので、
-    // シャットダウン後にjumpされるまでここで停止する
-    if (playerChatIndex === 13) {
-      return; 
+    // 鏡撮影ヒント前（インデックス13に到達する前）に、自動で進まないように制御
+    if (playerChatIndex === 13 && !gameState.flags.firstAddressSent) {
+      return;
     }
-    // グッドエンド：インデックス16まで（0〜15まで表示）でクリアへ
-    if (playerChatIndex === 17) {
-      // グッドエンドの最後「助け出す！」を表示後、クリアシーセルフ開始
+    // 鏡撮影会話完了後（インデックス19に到達する前）に、自動でグッドエンド会話へ進まないように制御
+    if (playerChatIndex === 19) {
+      return;
+    }
+    // グッドエンド：インデックス22まで表示（インデックス23に到達）でクリアへ
+    if (playerChatIndex === 23) {
+      // グッドエンドの最後「すごいことしたぞ！」を表示後、クリアシーセルフ開始
       setTimeout(triggerClear, 3500);
       return;
     }
-    // バッドエンド：インデックス20まで（0〜19表示）でバッドエンドへ
-    if (playerChatIndex === 20) {
+    // バッドエンド：インデックス26まで表示（インデックス27に到達）でバッドエンドへ
+    if (playerChatIndex === 27) {
       // バッドエンドの最後「返事しろよ！」を表示後、脅迫メッセージとバッドエンドへ
       setTimeout(() => {
         const div = document.createElement('div');
@@ -1001,18 +1012,25 @@ document.addEventListener('DOMContentLoaded', () => {
     'unlocked':     10,   // 0〜9を描画
     'news_found':   13,   // 0〜12を描画
     'location_spec':13,
-    'chat_sent':    13,
-    'clear':        13,
-    'bad_end':      13,
+    'chat_sent':    19,
+    'clear':        19,
+    'bad_end':      23,
   };
   playerChatIndex = stepIndexMap[gameState.currentStep] ?? 0;
+  if (gameState.currentStep === 'news_found' && gameState.flags.firstAddressSent) {
+    playerChatIndex = 19;
+  }
 
   // 進捗段階までのメッセージを一括描画
   const container = document.getElementById('player-thread-messages');
   if (container) {
     container.innerHTML = '';
-    const maxRender = Math.min(playerChatIndex, 13); // 充電切れメッセージ前まで描画
-    for (let i = 0; i < maxRender; i++) {
+    const maxRender = Math.min(playerChatIndex, 19); // グッド/バッド充電切れメッセージ前まで
+    let renderLimit = maxRender;
+    if (!gameState.flags.firstAddressSent) {
+      renderLimit = Math.min(renderLimit, 13);
+    }
+    for (let i = 0; i < renderLimit; i++) {
       const msgData = PLAYER_CHAT_SCENARIO[i];
       const msgDiv = document.createElement('div');
       msgDiv.className = `msg ${msgData.sender}`;
@@ -1051,3 +1069,111 @@ function setupShareLinks() {
     badLink.href = `https://x.com/intent/tweet?text=${badText}&url=${encodeURIComponent(gameUrl)}`;
   }
 }
+
+// ───疑似カメラ ＆ ギャラリー制御関数 (鏡撮影) ─────────────────────────
+let activeCameraDevice = 'player'; // 'player' または 'picked'
+
+function openCamera(device) {
+  activeCameraDevice = device;
+  const overlay = document.getElementById('global-camera-overlay');
+  if (overlay) overlay.classList.add('open');
+  
+  // デバイスに応じてビューファインダーを切り替え
+  const playerView = document.getElementById('camera-view-player');
+  const pickedView = document.getElementById('camera-view-picked');
+  
+  if (device === 'player') {
+    if (playerView) playerView.style.display = 'flex';
+    if (pickedView) pickedView.style.display = 'none';
+  } else {
+    if (playerView) playerView.style.display = 'none';
+    if (pickedView) pickedView.style.display = 'flex';
+  }
+  playBeep(440, 880, 0.1, 0.1);
+}
+
+function closeCamera() {
+  const overlay = document.getElementById('global-camera-overlay');
+  if (overlay) overlay.classList.remove('open');
+  playBeep(220, 110, 0.1, 0.1);
+}
+
+function takePhotoGlobal() {
+  // フラッシュ演出
+  const flash = document.getElementById('camera-flash');
+  if (flash) {
+    flash.style.opacity = '1';
+    setTimeout(() => { flash.style.opacity = '0'; }, 150);
+  }
+  
+  // シャッター音
+  playBeep(1200, 1200, 0.12, 0.25);
+  
+  // フラグ設定
+  if (activeCameraDevice === 'player') {
+    setFlag('playerMirrorPhotoTaken', true);
+    showToast('📷', 'カメラ', '写真を撮影しました（保存先: 写真アプリ）');
+    setTimeout(() => {
+      closeCamera();
+      openPlayerGallery();
+    }, 1000);
+  } else {
+    setFlag('pickedMirrorPhotoTaken', true);
+    showToast('📷', 'カメラ', '写真を撮影しました（保存先: 写真アプリ）');
+    
+    // 子iframeであるgallery.htmlへフラグが更新された状態を即通知
+    const iframe = document.getElementById('mobile-iframe');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage({ type: 'STATE', state: gameState }, '*');
+    }
+    
+    setTimeout(() => {
+      closeCamera();
+      openApp('gallery');
+    }, 1000);
+  }
+}
+
+// プレイヤー（自分）のスマホ用ギャラリー制御
+function openPlayerGallery() {
+  const overlay = document.getElementById('player-gallery-overlay');
+  if (overlay) overlay.classList.add('open');
+  
+  const empty = document.getElementById('player-gallery-empty');
+  const photo = document.getElementById('player-gallery-photo');
+  const inspectBtn = document.getElementById('player-photo-inspect-btn');
+  const txt = document.getElementById('player-photo-text');
+  
+  if (gameState && gameState.flags?.playerMirrorPhotoTaken) {
+    if (empty) empty.style.display = 'none';
+    if (photo) photo.style.display = 'flex';
+    
+    if (inspectBtn) inspectBtn.style.display = 'block';
+    if (txt) txt.style.display = 'none';
+  } else {
+    if (empty) empty.style.display = 'flex';
+    if (photo) photo.style.display = 'none';
+  }
+}
+
+function closePlayerGallery() {
+  const overlay = document.getElementById('player-gallery-overlay');
+  if (overlay) overlay.classList.remove('open');
+}
+
+function inspectPlayerMirrorPhoto() {
+  const inspectBtn = document.getElementById('player-photo-inspect-btn');
+  const txt = document.getElementById('player-photo-text');
+  
+  if (inspectBtn) inspectBtn.style.display = 'none';
+  if (txt) txt.style.display = 'block';
+  playBeep(660, 880, 0.15, 0.15);
+}
+
+// 露出
+window.openCamera = openCamera;
+window.closeCamera = closeCamera;
+window.takePhotoGlobal = takePhotoGlobal;
+window.openPlayerGallery = openPlayerGallery;
+window.closePlayerGallery = closePlayerGallery;
+window.inspectPlayerMirrorPhoto = inspectPlayerMirrorPhoto;

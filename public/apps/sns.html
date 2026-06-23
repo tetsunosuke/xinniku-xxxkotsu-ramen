@@ -121,6 +121,18 @@
     }
     .post.clickable { cursor:pointer; }
     .post.clickable:hover { background:var(--hover); }
+    .post-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .thread-line {
+      width: 2px;
+      background-color: var(--border);
+      margin: 4px auto 0;
+      flex-grow: 1;
+    }
     .post-ava {
       width:48px; height:48px; border-radius:50%; flex-shrink:0;
       background:linear-gradient(135deg, #1a2a3a, #2c3e50);
@@ -518,9 +530,12 @@
   </div>
 
   <!-- Ken Post 1: 誕生日投稿 (西暦のヒント) -->
-  <div class="post">
-    <div class="post-ava ken-ava">🦁</div>
-    <div class="post-body">
+  <div class="post" style="border-bottom: none; padding-bottom: 0;">
+    <div class="post-left">
+      <div class="post-ava ken-ava">🦁</div>
+      <div class="thread-line"></div>
+    </div>
+    <div class="post-body" style="padding-bottom: 8px;">
       <div class="post-head">
         <span class="post-name">フードハンター ケン</span>
         <span class="post-hdl">@foodhunter_ken</span>
@@ -532,6 +547,28 @@
         <span class="act">💬 34</span>
         <span class="act">🔁 12</span>
         <span class="act">♡ 290</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="post" style="margin-top: 0; padding-top: 4px;">
+    <div class="post-left">
+      <div class="post-ava">🍜</div>
+    </div>
+    <div class="post-body">
+      <div class="post-head">
+        <span class="post-name">タベアルキ太郎</span>
+        <span class="post-hdl">@tabearu_taro</span>
+        <span class="post-time">· 2026年3月5日</span>
+      </div>
+      <div style="font-size:13px; color:var(--muted); margin-bottom:4px;">
+        返信先: <span class="mention-link" onclick="showKen()">@foodhunter_ken</span>
+      </div>
+      <div class="post-text"><span class="mention-link" onclick="showKen()">@foodhunter_ken</span> おめ！同い年といっても、ケンは早生まれだから学年は先輩なんだよなー。いつも頼りにしてます、先輩！🙏</div>
+      <div class="post-actions">
+        <span class="act">💬 2</span>
+        <span class="act">🔁 1</span>
+        <span class="act">♡ 45</span>
       </div>
     </div>
   </div>

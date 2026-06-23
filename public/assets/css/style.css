@@ -630,6 +630,13 @@ html, body {
   z-index: 20; display: none; flex-direction: column;
 }
 #player-sns-overlay.open { display: flex; }
+
+/* Global Camera & Player Gallery Overlay */
+#global-camera-overlay, #player-gallery-overlay {
+  position: absolute; inset: 0; background: #000;
+  z-index: 1000; display: none; flex-direction: column;
+}
+#global-camera-overlay.open, #player-gallery-overlay.open { display: flex; }
 .sns-overlay-header {
   padding: 12px 16px; border-bottom: 1px solid #2f3336;
   display: flex; justify-content: space-between; font-size: 14px; color: #1d9bf0;
