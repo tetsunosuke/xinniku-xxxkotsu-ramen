@@ -787,18 +787,16 @@
                     scrollBottom();
                     
                     post('SET_FLAG', { key: 'firstAddressSent', value: true });
-                    setTimeout(() => {
-                      quizLocked = false;
-                      renderQuiz();
-                    }, 2000);
+                    
+                    // クイズエリアを非表示にし、バッドエンド演出へ
+                    document.getElementById('quiz-area').classList.remove('show');
+                    setTimeout(startBadEnd, 2000);
                   });
                 }, 1000);
               } else {
-                post('SET_FLAG', { key: 'firstAddressSent', value: true });
-                setTimeout(() => {
-                  quizLocked = false;
-                  renderQuiz();
-                }, 2000);
+                // 無関係な住所の場合も即バッドエンドへ
+                document.getElementById('quiz-area').classList.remove('show');
+                setTimeout(startBadEnd, 1500);
               }
             });
           }, 800);
