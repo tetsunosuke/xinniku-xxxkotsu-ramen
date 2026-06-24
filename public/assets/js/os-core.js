@@ -816,6 +816,34 @@ function renderNextPlayerMessage() {
   
   playerChatIndex++;
   
+  // --- クリア/バッドエンドの遷移判定 ---
+  // グッドエンド：インデックス22まで表示（インデックス23に到達）でクリアへ
+  if (playerChatIndex === 23) {
+    // グッドエンドの最後「すごいことしたぞ！」を表示後、クリアシーセルフ開始
+    setTimeout(triggerClear, 3500);
+    return;
+  }
+  // バッドエンド：インデックス26まで表示（インデックス27に到達）でバッドエンドへ
+  if (playerChatIndex === 27) {
+    // バッドエンドの最後「返事しろよ！」を表示後、脅迫メッセージとバッドエンドへ
+    setTimeout(() => {
+      const div = document.createElement('div');
+      div.className = 'msg recv';
+      div.innerHTML = `
+        <div class="msg-ava" style="background:#2a0000;filter:hue-rotate(180deg)">🔪</div>
+        <div class="msg-bubble" style="background:#2a0505;color:#ff6060">
+          余計なことをするな<br><span style="font-size:11px;color:rgba(255,60,60,0.5)">— 未知の番号</span>
+        </div>
+        <div class="msg-time" style="color:#ff4040">09:31</div>
+      `;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+
+      setTimeout(triggerBadEnd, 2500);
+    }, 2000);
+    return;
+  }
+
   if (playerChatIndex < PLAYER_CHAT_SCENARIO.length) {
     const nextMsg = PLAYER_CHAT_SCENARIO[playerChatIndex];
     // ロック中（インデックス6に到達する前）に、自動で「ロック解除できたぞ！」へ進まないように制御
@@ -828,32 +856,6 @@ function renderNextPlayerMessage() {
     }
     // 鏡撮影会話完了後（インデックス19に到達する前）に、自動でグッドエンド会話へ進まないように制御
     if (playerChatIndex === 19) {
-      return;
-    }
-    // グッドエンド：インデックス22まで表示（インデックス23に到達）でクリアへ
-    if (playerChatIndex === 23) {
-      // グッドエンドの最後「すごいことしたぞ！」を表示後、クリアシーセルフ開始
-      setTimeout(triggerClear, 3500);
-      return;
-    }
-    // バッドエンド：インデックス26まで表示（インデックス27に到達）でバッドエンドへ
-    if (playerChatIndex === 27) {
-      // バッドエンドの最後「返事しろよ！」を表示後、脅迫メッセージとバッドエンドへ
-      setTimeout(() => {
-        const div = document.createElement('div');
-        div.className = 'msg recv';
-        div.innerHTML = `
-          <div class="msg-ava" style="background:#2a0000;filter:hue-rotate(180deg)">🔪</div>
-          <div class="msg-bubble" style="background:#2a0505;color:#ff6060">
-            余計なことをするな<br><span style="font-size:11px;color:rgba(255,60,60,0.5)">— 未知の番号</span>
-          </div>
-          <div class="msg-time" style="color:#ff4040">09:31</div>
-        `;
-        container.appendChild(div);
-        container.scrollTop = container.scrollHeight;
-
-        setTimeout(triggerBadEnd, 2500);
-      }, 2000);
       return;
     }
 
