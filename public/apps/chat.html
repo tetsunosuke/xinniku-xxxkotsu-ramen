@@ -772,7 +772,7 @@
         if (quizStep === 2 && (!gameState || !gameState.flags?.trueAddressFound)) {
           const is3194 = sentText.includes('3-19-4');
           const replyText = is3194
-            ? '確認してみる……って、おい！行ってみたけどそこはただの空き地だったぞ！おい、お前がさっき言ってたそのスマホ、本当に限定ケースなのか？？'
+            ? 'わかった、今からそこ（3-19-4）に行ってみる！'
             : '確認してみる…… 違う！ この住所、関係ない場所だ。もう一度写真をよく調べてくれ！';
 
           setTimeout(() => {
@@ -782,17 +782,24 @@
               
               if (is3194) {
                 setTimeout(() => {
-                  showTyping(2000, () => {
-                    addMessage('recv', 'もう一度、何か別の手がかりがスマホの周りや本体に残ってないかよく調べてみてくれ！', timeStr);
+                  showTyping(2500, () => {
+                    addMessage('recv', '店はあった！今から入ってみる！', timeStr);
                     scrollBottom();
                     
-                    post('SET_FLAG', { key: 'firstAddressSent', value: true });
-                    
-                    // クイズエリアを非表示にし、バッドエンド演出へ
-                    document.getElementById('quiz-area').classList.remove('show');
-                    setTimeout(startBadEnd, 2000);
+                    setTimeout(() => {
+                      showTyping(3000, () => {
+                        addMessage('recv', '……おい、お前は誰だ！？うわっ、離せ、おい何すｒ', timeStr);
+                        scrollBottom();
+                        
+                        post('SET_FLAG', { key: 'firstAddressSent', value: true });
+                        
+                        // クイズエリアを非表示にし、バッドエンド演出へ
+                        document.getElementById('quiz-area').classList.remove('show');
+                        setTimeout(startBadEnd, 2000);
+                      });
+                    }, 1500);
                   });
-                }, 1000);
+                }, 1500);
               } else {
                 // 無関係な住所の場合も即バッドエンドへ
                 document.getElementById('quiz-area').classList.remove('show');
