@@ -594,18 +594,20 @@ function triggerShutdownSequence(endType) {
         }, 1500);
       }
 
-      // Automatically open the LIME chat thread on player's phone
-      openThread();
-      
-      // Inject battery dead notification / conversation
-      if (playerChatTimeout) clearTimeout(playerChatTimeout);
-      
-      if (endType === 'clear') {
-        playerChatIndex = 19; // グッドエンド用の充電切れメッセージへ
-      } else {
-        playerChatIndex = 23; // バッドエンド用の充電切れメッセージへ
-      }
-      renderNextPlayerMessage();
+      // Automatically open the LIME chat thread on player's phone after flipDevice is done
+      setTimeout(() => {
+        openThread();
+        
+        // Inject battery dead notification / conversation
+        if (playerChatTimeout) clearTimeout(playerChatTimeout);
+        
+        if (endType === 'clear') {
+          playerChatIndex = 19; // グッドエンド用の充電切れメッセージへ
+        } else {
+          playerChatIndex = 23; // バッドエンド用の充電切れメッセージへ
+        }
+        renderNextPlayerMessage();
+      }, 250);
     }, 3500);
   }, 2000);
 }
@@ -765,8 +767,8 @@ const PLAYER_CHAT_SCENARIO = [
 
   // --- ニュース発見後（インデックス 10〜12）---
   { sender: 'sent', text: '太郎のブラウザに、台東区の葬儀業者への家宅捜索ニュースがあった。しかも太郎がよく行ってたあのラーメン店のすぐ近くだって' },
-  { sender: 'recv', text: '……それって、まさかそのラーメン店のことじゃ。ゾッとするな。写真フォルダとかに何か残ってないか？ 太郎、撮影癖あるだろ' },
-  { sender: 'sent', text: 'ある。最近追加された「厨房の写真」があるみたいだから詳しく調べてみる！' },
+  { sender: 'recv', text: '……それって、まさかそのラーメン店のことじゃ。ゾッとするな。そういえば、ラーメン店のHPのスープ説明に「秘伝の骨」ってあったけど、このニュースと関係ないか？ 調べてみてくれ！' },
+  { sender: 'sent', text: '「秘伝の骨」か……。HPのその部分をもう一度詳しく調べてみる！写真フォルダの厨房写真も怪しいから合わせて見てみるよ。' },
 
   // --- 新設: 最初の住所送信後（空き地だった）（インデックス 13〜18） ---
   { sender: 'recv', text: 'おい！ケンの配信見てたら、送った住所に行ったら「ただの空き地だった」って言ってるぞ！違う場所だったのか？' },
