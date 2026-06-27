@@ -226,18 +226,100 @@
     @media (max-width: 768px) {
       #content { padding-bottom: 60px; }
     }
+
+    /* ── Page: Holdings (白菊ホールディングス) — iframe 版 ── */
+    .holdings-page {
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #shirakiku-iframe {
+      flex: 1;
+      width: 100%;
+      border: none;
+      display: block;
+      min-height: 600px;
+    }
+    
+    /* (旧holdings CSSは削除済み) */
+
+
+    /* モーダル */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:1000; padding:15px; backdrop-filter:blur(4px); }
+    .modal-box { background:#161622; border:1px solid var(--border); border-radius:10px; max-width:440px; width:100%; padding:25px; box-sizing:border-box; position:relative; }
+    .modal-close { position:absolute; top:12px; right:12px; background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer; }
+    .modal-close:hover { color:#fff; }
   </style>
 </head>
 <body>
 
 <!-- Browser Tabs -->
 <div id="browser-tabs">
+  <div id="tab-video" class="b-tab" onclick="showPage('video')" style="display:none">📺 TubeTuber</div>
   <div id="tab-ramen" class="b-tab active" onclick="showPage('ramen')">🍜 〇ンニク〇んこつラーメン</div>
   <div id="tab-news" class="b-tab" onclick="showPage('news')">📰 東都ニュースWeb</div>
+  <div id="tab-holdings" class="b-tab" onclick="showPage('holdings')" style="display:none">🏢 白菊ホールディングス</div>
 </div>
 
 <!-- Content -->
 <div id="content">
+
+  <!-- ページ: 動画サイト TubeTuber -->
+  <div id="page-video" class="video-page" style="display:none; max-width:680px; margin:0 auto; padding:15px; background:#0f0f0f; color:#fff; font-family:sans-serif; min-height:100%;">
+    <div style="display:flex; align-items:center; gap:10px; border-bottom:1px solid #222; padding-bottom:12px; margin-bottom:16px;">
+      <span style="font-size:18px; color:#ff0000; font-weight:bold; letter-spacing:-1px;">📺 TubeTuber</span>
+      <div style="flex:1; margin:0 10px; background:#222; border-radius:18px; padding:6px 12px; font-size:11px; color:#888; border:1px solid #333; text-align:left;">
+        🔍 タベアルキ太郎
+      </div>
+    </div>
+    <h3 style="font-size:13px; margin-bottom:12px; font-weight:bold; color:#aaa; text-align:left;">おすすめの関連動画</h3>
+    <div style="display:flex; flex-direction:column; gap:15px;">
+      <!-- 動画1: ケン緊急生配信 -->
+      <div style="display:flex; gap:12px; cursor:pointer; background:#181818; padding:8px; border-radius:8px; border:1px solid #282828; text-align:left;">
+        <div style="width:110px; height:62px; background:#331111; border-radius:4px; flex-shrink:0; display:flex; align-items:center; justify-content:center; position:relative; border:1px solid #552222;">
+          <span style="font-size:16px;">🔴</span>
+          <span style="position:absolute; bottom:4px; right:4px; background:#ff0000; color:#fff; font-size:8px; font-weight:bold; padding:1px 3px; border-radius:2px;">LIVE</span>
+        </div>
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:space-between;">
+          <div style="font-size:12px; font-weight:bold; line-height:1.4; color:#fff;">【緊急生放送】タベアルキ太郎が失踪したあのラーメン店の前に来ています…</div>
+          <div style="font-size:10px; color:#aaa; margin-top:2px;">フードハンター ケン ｜ 4.2万人が視聴中</div>
+        </div>
+      </div>
+      <!-- 動画2: 太郎ラーメン突撃 -->
+      <div style="display:flex; gap:12px; cursor:pointer; background:#181818; padding:8px; border-radius:8px; border:1px solid #282828; text-align:left;">
+        <div style="width:110px; height:62px; background:#222; border-radius:4px; flex-shrink:0; display:flex; align-items:center; justify-content:center; position:relative;">
+          <span style="font-size:20px;">🍜</span>
+          <span style="position:absolute; bottom:4px; right:4px; background:#000; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">14:20</span>
+        </div>
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:space-between;">
+          <div style="font-size:12px; font-weight:bold; line-height:1.4; color:#fff;">【中毒性MAX】噂の「〇ンニク〇んこつラーメン」に突撃！この旨さは本当に合法か！？</div>
+          <div style="font-size:10px; color:#aaa; margin-top:2px;">タベアルキ太郎 ｜ 18万回視聴 ｜ 1週間前</div>
+        </div>
+      </div>
+      <!-- 動画3: 家系ラーメン -->
+      <div style="display:flex; gap:12px; cursor:pointer; background:#181818; padding:8px; border-radius:8px; border:1px solid #282828; opacity:0.6; text-align:left;">
+        <div style="width:110px; height:62px; background:#222; border-radius:4px; flex-shrink:0; display:flex; align-items:center; justify-content:center; position:relative;">
+          <span style="font-size:20px;">🍥</span>
+          <span style="position:absolute; bottom:4px; right:4px; background:#000; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">18:05</span>
+        </div>
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:space-between;">
+          <div style="font-size:12px; font-weight:bold; line-height:1.4; color:#ddd;">【大食い】総重量5kg！濃厚家系ラーメン特大マシマシに完食チャレンジ！</div>
+          <div style="font-size:10px; color:#888; margin-top:2px;">タベアルキ太郎 ｜ 25万回視聴 ｜ 2週間前</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ページ: 白菊ホールディングス (shirakiku.html をiframeで表示) -->
+  <div id="page-holdings" class="holdings-page" style="display:none">
+    <iframe id="shirakiku-iframe" src="" title="白菊ホールディングス"></iframe>
+  </div>
+
+
+
+
 
   <!-- ページ: ニュース -->
   <div id="page-news" class="news-page" style="display:none">
@@ -304,7 +386,7 @@
       <div class="store-section" style="position:relative;">
         <h3 id="h3-info">店舗情報</h3>
         <p style="line-height:2.4">
-          📍 東京都台東区音無町3-19-4 地下1階<br>
+          <span id="store-address-click" onclick="openOwnerLogin()" style="cursor:pointer;">📍 東京都台東区音無町3-19-4 地下1階</span><br>
           🕐 11:00〜14:00 / 18:00〜23:00（火曜定休）<br>
           📞 03-xxxx-xxxx<br>
           🚃 JR鶯谷駅 徒歩8分
@@ -316,6 +398,45 @@
 
 </div>
 
+<!-- モーダル: ラーメン店管理者ログイン -->
+<div id="owner-login-modal" class="modal-overlay">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeOwnerLogin()">✕</button>
+    <div class="login-title">管理者システムログイン</div>
+    <input type="text" id="owner-id" class="login-input" placeholder="管理者ID" value="owner" readonly style="opacity:0.6; cursor:not-allowed;">
+    <input type="password" id="owner-pw" class="login-input" placeholder="アクセスパスコードを入力">
+    <button class="login-btn" onclick="submitOwnerLogin()">ログイン</button>
+    <div id="owner-login-err" class="login-error">パスコードが正しくありません</div>
+  </div>
+</div>
+
+<!-- モーダル: ラーメン店管理者裏ページ（日誌） -->
+<div id="owner-admin-modal" class="modal-overlay">
+  <div class="modal-box" style="max-width:500px;">
+    <button class="modal-close" onclick="closeOwnerAdmin()">✕</button>
+    <h3 style="color:#f0c080; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px; font-size:14px;">店主日誌 ＆ 仕入れ管理</h3>
+    <div style="max-height:320px; overflow-y:auto; font-size:12px; line-height:1.8; color:#cdd0d4; padding-right:8px; text-align:left;">
+      <p style="font-weight:bold; color:#ffa0a0; border-left:3px solid #ff3333; padding-left:8px; margin-bottom:8px;">【仕入れ元に関する極秘メモ】</p>
+      <p style="margin-bottom:16px;">
+        白菊フードシステムから送られてくる「特製濃縮骨髄エキス」の正体に気づいてしまった。彼らの出荷伝票の元を辿ると、親会社である白菊ホールの火葬場や納骨堂になっていた。あれは人骨（じんこつ）だ。私の妻の骨を煮込んでスープにした狂気が、今やグループ全体のビジネスに利用されている。<br>
+        だが、もうこの旨味なしでは客は納得しないのだ……。私はあの会社から逃れられない。
+      </p>
+      
+      <p style="font-weight:bold; color:#ffa0a0; border-left:3px solid #ff3333; padding-left:8px; margin-bottom:8px;">【サプリメント部門について】</p>
+      <p style="margin-bottom:16px;">
+        白菊ホールディングスがヘルスケア部門で大々的に販売しているカルシウムサプリ「白菊の恵み」……。あれにも我々が使っているものと同じ人骨の粉末が混入されていると聞いた。一般消費者が毎日あれを飲んでいるかと思うと、吐き気がする。なんという恐ろしい会社だ。
+      </p>
+
+      <p style="font-weight:bold; color:#5ba3e0; border-left:3px solid #5ba3e0; padding-left:8px; margin-bottom:8px;">【発注システム用アクセス情報】</p>
+      <p style="background:rgba(255,255,255,0.05); padding:10px; border-radius:6px; font-family:monospace; margin-bottom:10px;">
+        白菊ホールディングス 加盟店・役員用システム<br>
+        顧客管理ID: <strong>RM-9942</strong><br>
+        アクセスパスコード: <strong>SHIRAKIKU_DARK_090</strong>
+      </p>
+    </div>
+  </div>
+</div>
+
 <script src="../assets/js/app-utils.js"></script>
 <script>
   if (window.self === window.top) { window.location.href = '../index.html'; }
@@ -323,6 +444,11 @@
   let currentPage = 'ramen';
   let stateNewsFound = false;
   let revealed = false;
+  let extraActive = false;
+  let initialPageSet = false;
+
+  const params = new URLSearchParams(window.location.search);
+  const device = params.get('device') || 'picked';
 
   // Get state from parent
   window.parent.postMessage({ type: 'GET_STATE' }, '*');
@@ -330,6 +456,46 @@
     if (e.data?.type === 'STATE') {
       const s = e.data.state;
       stateNewsFound = s.currentStep !== 'intro' && s.currentStep !== 'unlocked';
+      extraActive = !!(s.flags?.extraActive || s.flags?.gameCleared);
+
+      // shirakiku iframeにもSTATEを転送
+      relayStateToShirakiku(s);
+
+      // タブおよび初期表示ページの制御
+      const tabRamen = document.getElementById('tab-ramen');
+      const tabNews = document.getElementById('tab-news');
+      const tabVideo = document.getElementById('tab-video');
+      const tabHoldings = document.getElementById('tab-holdings');
+
+      if (device === 'player') {
+        if (tabVideo) tabVideo.style.display = 'block';
+        if (tabNews) tabNews.style.display = 'none';
+
+        if (extraActive) {
+          if (tabRamen) tabRamen.style.display = 'block';
+          if (tabHoldings) tabHoldings.style.display = 'block';
+          if (!initialPageSet) {
+            initialPageSet = true;
+            showPage(params.get('page') || 'holdings');
+          }
+        } else {
+          if (tabRamen) tabRamen.style.display = 'none';
+          if (tabHoldings) tabHoldings.style.display = 'none';
+          if (!initialPageSet) {
+            initialPageSet = true;
+            showPage('video');
+          }
+        }
+      } else {
+        if (tabRamen) tabRamen.style.display = 'block';
+        if (tabNews) tabNews.style.display = 'block';
+        if (tabVideo) tabVideo.style.display = 'none';
+        if (tabHoldings) tabHoldings.style.display = 'none';
+        if (!initialPageSet) {
+          initialPageSet = true;
+          showPage(params.get('page') || 'ramen');
+        }
+      }
       
       const soupDesc = document.getElementById('soup-desc');
       if (soupDesc) {
@@ -370,22 +536,31 @@
     document.getElementById('store-tagline').textContent = 'since 2023.06 ｜ 特別なスープをどうぞ';
   }
 
-  // Query param
-  const params = new URLSearchParams(window.location.search);
-  showPage(params.get('page') || 'ramen');
+
 
   function showPage(p) {
     currentPage = p;
-    document.querySelectorAll('#page-news,#page-ramen').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('#page-news,#page-ramen,#page-holdings,#page-video').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.b-tab').forEach(el => el.classList.remove('active'));
 
     document.getElementById('page-' + p).style.display = 'block';
     document.getElementById('tab-' + p).classList.add('active');
 
+    // holdingsタブが選ばれたときにiframeをロードする（遅延ロード）
+    if (p === 'holdings') {
+      const iframe = document.getElementById('shirakiku-iframe');
+      if (iframe && (!iframe.getAttribute('src') || iframe.getAttribute('src') === '')) {
+        iframe.setAttribute('src', 'shirakiku.html');
+      }
+    }
+
     if (p === 'news') {
       window.parent.postMessage({ type: 'SET_FLAG', key: 'newsRead', value: true }, '*');
       window.parent.postMessage({ type: 'ADVANCE_STEP', step: 'news_found' }, '*');
     }
+
+    // 最新の状態を再同期要求
+    window.parent.postMessage({ type: 'GET_STATE' }, '*');
   }
 
   // 文字化けギミック (隠しトリガーをクリックした時のみ発動)
@@ -430,6 +605,37 @@
       corrupt(document.getElementById('soup-desc'), '秘伝の骨', '特製じんこつ');
       document.getElementById('store-tagline').textContent = 'since 2023.06 ｜ 特別なスープをどうぞ';
     }, 600);
+  }
+
+  /* ── ラーメン店管理者ログイン制御 ── */
+  function openOwnerLogin() {
+    document.getElementById('owner-login-err').style.display = 'none';
+    document.getElementById('owner-pw').value = '';
+    document.getElementById('owner-login-modal').style.display = 'flex';
+  }
+  function closeOwnerLogin() {
+    document.getElementById('owner-login-modal').style.display = 'none';
+  }
+  function submitOwnerLogin() {
+    const pw = document.getElementById('owner-pw').value.trim();
+    // 白菊ホールディングス表HPのフード事業に記載されたロットコード
+    if (pw === 'ENISHI-0826' || pw === 'enishi-0826') {
+      closeOwnerLogin();
+      document.getElementById('owner-admin-modal').style.display = 'flex';
+    } else {
+      document.getElementById('owner-login-err').style.display = 'block';
+    }
+  }
+  function closeOwnerAdmin() {
+    document.getElementById('owner-admin-modal').style.display = 'none';
+  }
+
+  /* ── 白菊ホールディングスiframe への STATE 転送 ── */
+  function relayStateToShirakiku(state) {
+    const iframe = document.getElementById('shirakiku-iframe');
+    if (iframe && iframe.contentWindow && iframe.src) {
+      iframe.contentWindow.postMessage({ type: 'STATE', state }, '*');
+    }
   }
 </script>
 </body>
