@@ -889,7 +889,7 @@ function openThread() {
   }
   renderPlayerChat();
   document.querySelector('.chat-thread').classList.add('open');
-  
+
   if (activePlayerThread === 'friend' && playerChatIndex === 0) {
     renderNextPlayerMessage();
   } else if (activePlayerThread === 'taro' && playerChatIndex === 22) {
@@ -904,7 +904,7 @@ function renderNextPlayerMessage() {
   if (!container) return;
 
   const msgData = PLAYER_CHAT_SCENARIO[playerChatIndex];
-  
+
   // スレッドが一致している場合のみバブルを描画
   if (msgData.thread === activePlayerThread) {
     drawBubble(container, msgData);
@@ -943,7 +943,7 @@ function renderNextPlayerMessage() {
 
   if (playerChatIndex < PLAYER_CHAT_SCENARIO.length) {
     const nextMsg = PLAYER_CHAT_SCENARIO[playerChatIndex];
-    
+
     // 進行制限
     if (activePlayerThread === 'friend') {
       if (playerChatIndex === 6 && gameState.isLocked) return;
@@ -1041,7 +1041,7 @@ const PLAYER_CHAT_SCENARIO = [
   { thread: 'taro', sender: 'sent', text: '無事で本当によかったです！店主も無事逮捕されたみたいですね。' },
   { thread: 'taro', sender: 'recv', text: 'ありがとうございます。ただ……実は警察にはまだ裏が取れていないのですが、気になることがあって。あのラーメン屋のサイトに何か別の秘密があるらしいんです。' },
   { thread: 'taro', sender: 'recv', text: '彼らが仕入れていた「白菊ホールディングス」という巨大グループのサイトに何か関係があるんじゃないかと思っています。よかったら、あなたのスマホのブラウザからラーメン屋のサイトをもう一度調べてみてくれないでしょうか？' },
-  { thread: 'taro', sender: 'sent', text: 'わかった、調べてみる！' },
+  { thread: 'taro', sender: 'sent', text: 'そうなんですか！調べてみます！' },
 
   // --- バッドエンド用：充電切れ後（インデックス 27〜30）---
   { thread: 'friend', sender: 'sent', text: 'あっ、拾ったスマホの充電が切れちゃった…！' },
@@ -1214,7 +1214,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pp) { pp.style.display = 'flex'; pp.style.transform = 'none'; }
     const ls = document.getElementById('lock-screen');
     if (ls) ls.style.display = 'none';
-    
+
     // クリア後ナレーションオーバーレイを表示
     const extraIntro = document.getElementById('extra-intro-overlay');
     if (extraIntro) extraIntro.style.display = 'flex';
@@ -1248,7 +1248,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'clear': 19,
     'bad_end': 27,
   };
-  
+
   if (!isExtraMode) {
     playerChatIndex = stepIndexMap[gameState.currentStep] ?? 0;
     if (gameState.currentStep === 'news_found' && gameState.flags.firstAddressSent) {
