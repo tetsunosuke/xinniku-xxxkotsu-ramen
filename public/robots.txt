@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /apps/
 
-Sitemap: https://xinniku-xxxkotsu-ramen.pages.dev/sitemap.xml
+Sitemap: https://xinniku-xxxkotsu-ramen.pages.dev/sitemap-main.xml
