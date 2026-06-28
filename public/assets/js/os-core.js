@@ -1234,7 +1234,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const isExtra = window.location.pathname.includes('extra') || window.location.search.includes('mode=extra');
   isExtraMode = isExtra;
   if (isExtraMode) {
-    gameState.flags.extraActive = true;
+    if (gameState.flags.extraActive === undefined) {
+      gameState.flags.extraActive = false; // 初回遷移時はまだ未完了（ナレーションを読む）
+    }
     gameState.flags.gameCleared = true;
     gameState.isLocked = false;
     gameState.currentStep = 'news_found';
@@ -1260,9 +1262,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const ls = document.getElementById('lock-screen');
     if (ls) ls.style.display = 'none';
 
-    // クリア後ナレーションオーバーレイを表示
+    // クリア後ナレーションオーバーレイを表示（まだ未読の場合のみ）
     const extraIntro = document.getElementById('extra-intro-overlay');
-    if (extraIntro) extraIntro.style.display = 'flex';
+    if (extraIntro && !gameState.flags.extraActive) {
+      extraIntro.style.display = 'flex';
+    } else if (extraIntro) {
+      extraIntro.style.display = 'none';
+    }
     syncBatteryFromStep();
   } else if (!gameState.isLocked) {
     const ls = document.getElementById('lock-screen');
