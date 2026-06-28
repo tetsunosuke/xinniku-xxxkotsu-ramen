@@ -1244,8 +1244,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!gameState.flags.taroChatIndex || gameState.flags.taroChatIndex < 22) {
       gameState.flags.taroChatIndex = 22;
     }
-    playerChatIndex = gameState.flags.taroChatIndex;
-    activePlayerThread = 'taro';
+    
+    if (gameState.flags.extraActive) {
+      playerChatIndex = gameState.flags.taroChatIndex;
+      activePlayerThread = 'taro';
+    } else {
+      playerChatIndex = 22; // 初期状態ではまだメッセージを描画させない
+      activePlayerThread = 'friend';
+    }
     saveState();
 
     // 「⇄ 拾ったスマホを見る」ボタンを非表示にする
@@ -1308,8 +1314,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     activePlayerThread = 'friend';
   } else {
-    playerChatIndex = gameState.flags.taroChatIndex || 22;
-    activePlayerThread = 'taro';
+    // extraモード時
+    if (gameState.flags.extraActive) {
+      // すでにナレーション読了済みでゲームが開始している場合
+      playerChatIndex = gameState.flags.taroChatIndex || 22;
+      activePlayerThread = 'taro';
+    } else {
+      // まだ「数日後...」のナレーション（イントロ）を読んでいない場合
+      playerChatIndex = 22;
+      activePlayerThread = 'friend'; // 初期表示はfriendスレッド（またはチャットを閉じ状態にしておく）
+    }
   }
 
   // スレッドのヘッダー名とメッセージ履歴の一括描画
