@@ -1508,9 +1508,9 @@
   </div>
 
   <script>
-    // サブディレクトリ階層で誤った index.html を iframe 内に読み込まないよう、絶対パス / または /extra にリダイレクト
-    if (window.self === window.top) {
-      const isExtra = window.location.pathname.includes('extra');
+    // iframe内（アプリ内）で読み込まれているときはリダイレクトを防ぎ、単体で直接開かれたときのみリダイレクトする
+    if (window.self === window.top && window.location.pathname.includes('/apps/')) {
+      const isExtra = window.location.pathname.includes('extra') || document.referrer.includes('extra');
       window.location.href = isExtra ? '/extra' : '/';
     }
 

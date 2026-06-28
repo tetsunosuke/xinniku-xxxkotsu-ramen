@@ -154,8 +154,8 @@
 
 <script src="../assets/js/app-utils.js"></script>
 <script>
-  if (window.self === window.top) {
-    const isExtra = window.location.pathname.includes('extra');
+  if (window.self === window.top && window.location.pathname.includes('/apps/')) {
+    const isExtra = window.location.pathname.includes('extra') || document.referrer.includes('extra');
     window.location.href = isExtra ? '/extra' : '/';
   }
 
