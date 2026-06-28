@@ -414,10 +414,10 @@ function updateClock() {
 
 // ─── APP CONFIG ───────────────────────────────────────────────
 const APPS = {
-  sns: { title: 'SNS', icon: '🐦', src: 'apps/sns.html', w: 480, h: 640 },
-  browser: { title: 'ブラウザ', icon: '🌐', src: 'apps/browser.html', w: 620, h: 520 },
-  gallery: { title: '写真', icon: '📷', src: 'apps/gallery.html', w: 440, h: 600 },
-  chat: { title: 'LIME', icon: '💬', src: 'apps/chat.html', w: 400, h: 640 }
+  sns: { title: 'SNS', icon: '🐦', src: '/apps/sns.html', w: 480, h: 640 },
+  browser: { title: 'ブラウザ', icon: '🌐', src: '/apps/browser.html', w: 620, h: 520 },
+  gallery: { title: '写真', icon: '📷', src: '/apps/gallery.html', w: 440, h: 600 },
+  chat: { title: 'LIME', icon: '💬', src: '/apps/chat.html', w: 400, h: 640 }
 };
 
 // isMobile は初期化時に固定（下部の _isMobileFixed を参照）
@@ -1095,7 +1095,7 @@ let activePlayerThread = 'friend'; // 'friend' または 'taro'（常に初期�
 function openPlayerSnsApp() {
   const overlay = document.getElementById('player-sns-overlay');
   const iframe = document.getElementById('player-sns-iframe');
-  iframe.src = 'apps/sns.html?preview=1';
+  iframe.src = '/apps/sns.html?preview=1';
   overlay.classList.add('open');
   playClick();
 }
@@ -1109,7 +1109,7 @@ function closePlayerSnsApp() {
 function openPlayerBrowser() {
   const overlay = document.getElementById('player-browser-overlay');
   const iframe = document.getElementById('player-browser-iframe');
-  iframe.src = 'apps/browser.html?device=player';
+  iframe.src = '/apps/browser.html?device=player';
   overlay.style.display = 'flex';
   playClick();
 }
