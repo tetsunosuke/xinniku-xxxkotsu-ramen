@@ -468,12 +468,6 @@
 
 <script src="../assets/js/app-utils.js"></script>
 <script>
-  // iframe内（アプリ内）で読み込まれているときはリダイレクトを防ぎ、単体で直接開かれたときのみリダイレクトする
-  if (window.self === window.top && window.location.pathname.includes('/apps/')) {
-    const isExtra = window.location.pathname.includes('extra') || document.referrer.includes('extra');
-    window.location.href = isExtra ? '/extra' : '/';
-  }
-
   let currentPage = 'ramen';
   let stateNewsFound = false;
   let revealed = false;

@@ -1508,12 +1508,6 @@
   </div>
 
   <script>
-    // iframe内（アプリ内）で読み込まれているときはリダイレクトを防ぎ、単体で直接開かれたときのみリダイレクトする
-    if (window.self === window.top && window.location.pathname.includes('/apps/')) {
-      const isExtra = window.location.pathname.includes('extra') || document.referrer.includes('extra');
-      window.location.href = isExtra ? '/extra' : '/';
-    }
-
     // ── Hidden Characters Puzzle ──
     const clickedChars = new Set();
     const targetChars = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7'];

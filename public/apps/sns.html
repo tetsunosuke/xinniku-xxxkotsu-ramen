@@ -635,11 +635,6 @@
 </div>
 
 <script src="../assets/js/app-utils.js"></script>
-<script>
-  if (window.self === window.top && window.location.pathname.includes('/apps/')) {
-    const isExtra = window.location.pathname.includes('extra') || document.referrer.includes('extra');
-    window.location.href = isExtra ? '/extra' : '/';
-  }
   // Check query parameters to toggle profile view
   const urlParams = new URLSearchParams(window.location.search);
   const isPreview = urlParams.get('preview') === '1';

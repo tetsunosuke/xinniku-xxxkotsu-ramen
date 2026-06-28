@@ -153,12 +153,6 @@
 </div>
 
 <script src="../assets/js/app-utils.js"></script>
-<script>
-  if (window.self === window.top && window.location.pathname.includes('/apps/')) {
-    const isExtra = window.location.pathname.includes('extra') || document.referrer.includes('extra');
-    window.location.href = isExtra ? '/extra' : '/';
-  }
-
   const PHOTOS = [
     { id:'mirror',  file:'../assets/images/mirror_case.png', label:'IMG_0848', date:'2024年11月12日', mirrorSpecial:true,
       inspectionText: '鏡に映したスマホの背面を撮影した写真だ。左右反転したことで、限定ケースの刻印の文字が正しく読めるようになっている！\nそこには「〇ンニク〇んこつラーメン since 2019.08.26 / 台東区音無町3-19-3」と書かれている。\n厨房の写真から推測した「3-19-4」と、この刻印に書かれている「3-19-3」は住所の枝番が違っている。太郎が囚われている真の場所は、こちらの住所なのだろうか？' },
