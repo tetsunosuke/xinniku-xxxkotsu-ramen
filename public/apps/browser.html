@@ -428,12 +428,6 @@
         白菊ホールディングスがヘルスケア部門で大々的に販売しているカルシウムサプリ「白菊の恵み」……。あれにも我々が使っているものと同じ人骨の粉末が混入されていると聞いた。一般消費者が毎日あれを飲んでいるかと思うと、吐き気がする。なんという恐ろしい会社だ。
       </p>
 
-      <p style="font-weight:bold; color:#5ba3e0; border-left:3px solid #5ba3e0; padding-left:8px; margin-bottom:8px;">【発注システム用アクセス情報】</p>
-      <p style="background:rgba(255,255,255,0.05); padding:10px; border-radius:6px; font-family:monospace; margin-bottom:10px;">
-        白菊ホールディングス 加盟店・役員用システム<br>
-        顧客管理ID: <strong>RM-9942</strong><br>
-        アクセスパスコード: <strong>SHIRAKIKU_DARK_090</strong>
-      </p>
     </div>
   </div>
 </div>
@@ -454,6 +448,10 @@
   // Get state from parent
   window.parent.postMessage({ type: 'GET_STATE' }, '*');
   window.addEventListener('message', e => {
+    if (e.data?.type === 'TRIGGER_TRUE_END') {
+      window.parent.postMessage({ type: 'TRIGGER_TRUE_END' }, '*');
+      return;
+    }
     if (e.data?.type === 'STATE') {
       const s = e.data.state;
       stateNewsFound = s.currentStep !== 'intro' && s.currentStep !== 'unlocked';
@@ -619,8 +617,8 @@
   }
   function submitOwnerLogin() {
     const pw = document.getElementById('owner-pw').value.trim();
-    // 白菊ホールディングス表HPのフード事業に記載されたロットコード
-    if (pw === 'ENISHI-0826' || pw === 'enishi-0826') {
+    // 白菊ホールディングスの創業年 (1974)
+    if (pw === '1974') {
       closeOwnerLogin();
       document.getElementById('owner-admin-modal').style.display = 'flex';
     } else {

@@ -1044,6 +1044,26 @@
       box-shadow: 0 0 28px rgba(255, 0, 0, 0.2);
       color: #ff6666;
     }
+
+    /* ══ HIDDEN CHARS PUZZLE ══ */
+    .hidden-char {
+      font-size: 1.18em;
+      font-family: inherit;
+      font-weight: bold;
+      cursor: pointer;
+      color: inherit;
+      transition: color 0.15s, text-shadow 0.15s;
+      display: inline-block;
+    }
+
+    .hidden-char:hover {
+      text-shadow: 0 0 3px rgba(184, 147, 74, 0.8);
+    }
+
+    .hidden-char.clicked {
+      color: #ff4444 !important;
+      text-shadow: 0 0 5px #ff0000;
+    }
   </style>
 </head>
 
@@ -1119,11 +1139,12 @@
 
       <div class="hero-content">
         <div class="hero-eyebrow">SINCE 1974 — LIFE &amp; SOCIAL INNOVATION</div>
-        <h1 class="hero-title">生命のバトンを繋ぐ、<br>未来への礎。</h1>
+        <h1 class="hero-title">未来<span class="hidden-char" onclick="clickChar(this, 'c1')">に</span>バトンをつなぐ、<br>未来への礎。
+        </h1>
         <p class="hero-sub">
-          白菊ホールディングスは、セレモニー・フード・ヘルスケアの事業を通じて、<br>
+          白菊ホールディ<span class="hidden-char" onclick="clickChar(this, 'c2')">ン</span>グスは、セレモニー・フード・ヘルスケアの事業を通じて、<br>
           人々のライフステージ全体に寄り添い続けてきました。<br>
-          グループ独自の<strong>資源循環サイクル</strong>が、持続可能な社会を支えます。
+          グループ独自の資源循環サイクルが、持続可能な社会を支えます。
         </p>
       </div>
     </section>
@@ -1139,7 +1160,7 @@
             <h3>尊い縁をつなぐ使命</h3>
             <p>
               白菊ホールディングスは1974年の創業以来、「縁（えにし）」を大切にしてきました。
-              生命の旅路に寄り添い、別れの悲しみを和らげ、そして次の命へと繋ぐ——
+              生命の旅路に寄り添い、別れの悲しみを和ら<span class="hidden-char" onclick="clickChar(this, 'c3')">げ</span>、そして次の命へと繋ぐ——
               私たちのあらゆる事業は、この使命の上に成り立っています。<br><br>
               グループが誇る独自の<strong>資源循環サイクル</strong>は、自然の摂理に則った
               持続可能な形で、生命の恵みを社会へと還元し続けます。
@@ -1150,7 +1171,8 @@
               <div class="vc-icon">🏵️</div>
               <div>
                 <div class="vc-title">敬意（Reverence）</div>
-                <div class="vc-desc">すべての生命に対する深い敬意を持ち、最高の品格でサービスを提供します。</div>
+                <div class="vc-desc">すべての生命に対する深い敬意を持ち、その品格を重<span class="hidden-char"
+                    onclick="clickChar(this, 'c4')">ん</span>じ、最高のサービスを提供します。</div>
               </div>
             </div>
             <div class="value-card">
@@ -1187,7 +1209,8 @@
               <div class="biz-sub">SHIRAKIKU HALL</div>
             </div>
             <div class="biz-body">
-              <p>都内10か所の白菊ホールを中心に、家族葬・一般葬・火葬代行サービスを展開。地域の皆様の大切なお別れを、格調高く厳かにサポートいたします。</p>
+              <p>都内10か所の白菊ホールを中心に、家族葬・一般葬・火葬代行サービスを展開。地域<span class="hidden-char"
+                  onclick="clickChar(this, 'c5')">の</span>皆様の大切なお別れを、格調高く厳かにサポートいたします。</p>
               <div class="biz-tags">
                 <span class="tag">葬儀</span>
                 <span class="tag">火葬代行</span>
@@ -1203,13 +1226,18 @@
               <div class="biz-sub">SHIRAKIKU FOOD SYSTEM</div>
             </div>
             <div class="biz-body">
-              <p>法事会食の仕出しから飲食店向け特選食材の卸売まで。グループ独自の製法による骨髄エキスは、提携加盟店から高い評価をいただいております。ロットコード: <strong>ENISHI-0826</strong>。
+              <p>法事会食の仕<span class="hidden-char"
+                  onclick="clickChar(this, 'c6')">だ</span>しから飲食店向け特選食材の卸売まで。グループ独自の製法による骨髄エキスは、提携加盟店から高い評価をいただいております。
               </p>
               <div class="biz-tags">
                 <span class="tag">法事仕出し</span>
                 <span class="tag">食材卸</span>
                 <span class="tag">スープ原料</span>
               </div>
+              <a id="secret-list-link" href="#" onclick="openSecretModal(); return false;"
+                style="display: none; color: var(--gold-lt); font-weight: bold; margin-top: 14px; text-decoration: underline; font-size: 12.5px;">
+                👉 【極秘】提携店向け出荷管理コード一覧
+              </a>
             </div>
           </div>
 
@@ -1220,7 +1248,8 @@
               <div class="biz-sub">SHIRAKIKU LIFECARE</div>
             </div>
             <div class="biz-body">
-              <p>大人気健康食品「天然由来カルシウム：白菊の恵み」が好評通販中。厳選された国内原料による骨粉を超微細加工し、カルシウム含有率99%を実現しました。</p>
+              <p>大人気健康食品「天然由来カルシウム：白菊の恵み」が好評通販中。厳選された国内原料による骨粉を超微細加工<span class="hidden-char"
+                  onclick="clickChar(this, 'c7')">し</span>、カルシウム含有率99%を実現しました。</p>
               <div class="biz-tags">
                 <span class="tag">サプリメント</span>
                 <span class="tag">健康食品</span>
@@ -1337,6 +1366,64 @@
     </div>
   </div>
 
+  <!-- ── SECRET MODAL ────────────────────────────────────── -->
+  <div id="secret-modal" class="modal-bg" onclick="handleSecretModalBgClick(event)">
+    <div class="modal" style="max-width: 420px;">
+      <div class="modal-head" style="background: #1a0404; border-bottom: 2px solid var(--gold);">
+        <div class="modal-title" style="color: #ff8888; font-size: 14px; font-weight: bold; font-family: var(--ff);">
+          【極秘】出荷管理システム / CLIENT CODES</div>
+        <div class="modal-subtitle" style="color: rgba(255,255,255,0.3); font-size: 9px; letter-spacing: 2px;">
+          RESTRICTED ACCESS</div>
+        <button class="modal-close" onclick="closeSecretModal()">✕</button>
+      </div>
+      <div class="modal-body" style="background: #0f0203; color: #ffa0a0; padding: 24px;">
+        <p
+          style="font-size: 12px; margin-bottom: 15px; color: #ff6666; border-bottom: 1px solid rgba(255,30,30,0.2); padding-bottom: 8px;">
+          白菊フードシステム 提携加盟店コードおよび納品時パスコード一覧
+        </p>
+        <table
+          style="width: 100%; border-collapse: collapse; font-size: 12.5px; font-family: monospace; text-align: left; color: #ffa0a0;">
+          <thead>
+            <tr style="border-bottom: 1px solid rgba(255,30,30,0.3); color: var(--gold-lt);">
+              <th style="padding: 6px 4px; font-weight: bold;">取引先加盟店</th>
+              <th style="padding: 6px 4px; font-weight: bold;">出荷コード</th>
+              <th style="padding: 6px 4px; font-weight: bold;">ステータス</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 8px 4px;">割烹 しらきく</td>
+              <td style="padding: 8px 4px; color: #fff;">5539</td>
+              <td style="padding: 8px 4px; color: #888;">完了</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 8px 4px;">中華料理 栄華</td>
+              <td style="padding: 8px 4px; color: #fff;">8821</td>
+              <td style="padding: 8px 4px; color: #ffa0a0;">保留</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,30,30,0.2); background: rgba(255,0,0,0.08);">
+              <td style="padding: 8px 4px; font-weight: bold; color: #ff6666;">🍜 ジンニクじんこつ</td>
+              <td style="padding: 8px 4px; font-weight: bold; color: #ff4444;">1974</td>
+              <td style="padding: 8px 4px; font-weight: bold; color: #ff3333;">納品済</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 8px 4px;">ホテル・ラフレシア</td>
+              <td style="padding: 8px 4px; color: #fff;">0942</td>
+              <td style="padding: 8px 4px; color: #888;">調整中</td>
+            </tr>
+          </tbody>
+        </table>
+        <div
+          style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px; color: #ff8888; border-left: 2px solid var(--gold); line-height: 1.6;">
+          ⚠️ <strong>【役員連絡用メモ】</strong><br>
+          統合に伴い、今月のログインIDは <strong>RM-9942</strong>、パスコードは <strong>0900</strong> へ一新されました。
+        </div>
+        <button class="modal-btn" onclick="closeSecretModal()"
+          style="margin-top: 20px; background: #1a0404; border: 1px solid var(--gold); color: var(--gold-lt);">閉じる</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ── DARK SYSTEM ─────────────────────────────────────── -->
   <div id="dark-system">
     <div class="dark-topbar">
@@ -1365,7 +1452,7 @@
           調達元: 白菊ホール音無町式場（身元不明・保管分）<br>
           配合比率: 特濃骨髄抽出エキスの素 100%<br>
           用途: 提携店「ジンニクじんこつラーメン」宛仕入れ材料<br>
-          状態: <span style="color:#ff4444">納品完了（受領印: 鏡栄治）</span> ｜ ロットコード: ENISHI-0826
+          状態: <span style="color:#ff4444">納品完了（受領印: 鏡栄治）</span>
         </div>
       </div>
 
@@ -1388,6 +1475,43 @@
 
   <script>
     if (window.self === window.top) { window.location.href = '../index.html'; }
+
+    // ── Hidden Characters Puzzle ──
+    const clickedChars = new Set();
+    const targetChars = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7'];
+
+    function clickChar(el, charId) {
+      if (clickedChars.has(charId)) return;
+      el.classList.add('clicked');
+      clickedChars.add(charId);
+
+      // 一瞬明滅フラッシュするフィードバック
+      el.style.opacity = '0.3';
+      setTimeout(() => { el.style.opacity = '1'; }, 150);
+
+      if (targetChars.every(c => clickedChars.has(c))) {
+        setTimeout(() => {
+          const link = document.getElementById('secret-list-link');
+          if (link) {
+            link.style.display = 'block';
+            document.getElementById('business')?.scrollIntoView({ behavior: 'smooth' });
+            alert('フードサービス事業の紹介に「【極秘】出荷管理コード一覧」が解放されました。');
+          }
+        }, 300);
+      }
+    }
+
+    function openSecretModal() {
+      document.getElementById('secret-modal').classList.add('open');
+    }
+
+    function closeSecretModal() {
+      document.getElementById('secret-modal').classList.remove('open');
+    }
+
+    function handleSecretModalBgClick(e) {
+      if (e.target === e.currentTarget) closeSecretModal();
+    }
 
     // ── State ──
     window.top.postMessage({ type: 'GET_STATE' }, '*');
@@ -1419,7 +1543,7 @@
     function submitLogin() {
       const id = document.getElementById('login-id').value.trim();
       const pw = document.getElementById('login-pw').value.trim();
-      if (id === 'RM-9942' && pw === 'SHIRAKIKU_DARK_090') {
+      if (id === 'RM-9942' && pw === '0900') {
         closeLogin();
         showDarkSystem();
       } else {
@@ -1442,7 +1566,14 @@
     // ── True End ──
     function triggerTrueEnd() {
       if (confirm('この闇取引の全データを警視庁へ匿名告発（送信）します。よろしいですか？')) {
-        window.top.postMessage({ type: 'TRIGGER_TRUE_END' }, '*');
+        const payload = { type: 'TRIGGER_TRUE_END' };
+        window.top.postMessage(payload, '*');
+        if (window.parent) {
+          window.parent.postMessage(payload, '*');
+          if (window.parent.parent) {
+            window.parent.parent.postMessage(payload, '*');
+          }
+        }
       }
     }
   </script>

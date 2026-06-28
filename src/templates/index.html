@@ -281,6 +281,7 @@
   <div id="settings-overlay" role="dialog" aria-label="設定メニュー">
     <div class="settings-panel">
       <h3>⚙ 設定</h3>
+      <button class="settings-btn" onclick="openAchievementsModal(); closeSettings();" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); color: #fff; margin-bottom: 10px;">🏆 獲得実績を確認</button>
       <button class="settings-btn danger" onclick="resetGame()">🔄 ゲームをリセット</button>
       <button class="settings-btn close-btn" onclick="closeSettings()">✕ 閉じる</button>
     </div>
@@ -289,6 +290,19 @@
   <!-- ══════════ EPILOGUE (グッドエンド) ══════════ -->
   <div id="epilogue-overlay" data-nosnippet role="region" aria-label="エンディング">
     <div class="end-content">
+      <div style="font-family: var(--font); font-weight: 900; font-size: 24px; color: #fcc419; letter-spacing: 4px; text-shadow: 0 0 15px rgba(252, 196, 25, 0.4); margin-bottom: 5px;">🏆 GAME CLEAR</div>
+      <div style="font-family: var(--font); font-weight: bold; font-size: 13px; color: #aaa; letter-spacing: 2px; margin-bottom: 25px;">- GOOD END -</div>
+      
+      <!-- 実績バッジ -->
+      <div style="display: inline-flex; align-items: center; gap: 10px; background: rgba(252, 196, 25, 0.1); border: 1px solid rgba(252, 196, 25, 0.25); padding: 8px 16px; border-radius: 20px; margin-bottom: 25px; font-size: 12px; color: #fcc419; font-weight: bold;">
+        🏅 獲得実績: 生存者（通常クリア）
+      </div>
+
+      <!-- ニュース報道画像 -->
+      <div style="width: 100%; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 5px 25px rgba(0,0,0,0.6);">
+        <img src="/assets/img/good_end_news.png" alt="Breaking News" style="width: 100%; height: auto; display: block;">
+      </div>
+
       <div class="end-label">E P I L O G U E</div>
       <div class="epil-player">
         <div class="epil-player-bar">
@@ -305,7 +319,7 @@
           <p>&nbsp;</p>
           <p>配信者・タベアルキ太郎は無事保護されたが、事件は本当に解決したのだろうか？</p>
           <p>一介のラーメン店主に過ぎない彼が、これほど大量の「人骨」を個人で調達し続けられたとは到底考えられない。押収された店主のメモには、ある巨大なグループ企業の名前が繰り返し記されていたという。</p>
-          <p>店主の歪んだ愛と狂気の裏で、その弱みに付け込み、彼を怪物へと仕立て上げながら人骨ビジネスで私腹を肥やす「巨大な黒幕」がいるのではないか……？</p>
+          <p>店主の歪んだ愛と狂気の裏で、その弱みに付け込み、彼を怪物へと仕立て上げながら人骨ビジネスで私腹を肥やす「巨大な黒幕」がいるのではないか……?</p>
           <p>澱みのスープの背後に潜む本当の闇は、まだ暴かれていない。</p>
         </div>
       </div>
@@ -330,7 +344,7 @@
   </div>
 
   <!-- ══════════ TRUE END (完全解決トゥルーエンド) ══════════ -->
-  <div id="true-end-overlay" role="region" aria-label="真のエンディング" style="position: fixed; inset: 0; background: #000; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-family: var(--font); padding: 20px; box-sizing: border-box; overflow-y: auto;">
+  <div id="true-end-overlay" role="region" aria-label="真のエンディング" style="position: fixed; inset: 0; background: #000; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: flex-start; color: #fff; font-family: var(--font); padding: 40px 20px; box-sizing: border-box; overflow-y: auto;">
     <style>
       @keyframes pulseGreen {
         0% { opacity: 0.4; }
@@ -347,7 +361,20 @@
         animation: pulseGreen 1s infinite;
       }
     </style>
-    <div class="end-content" style="max-width: 480px; width: 100%; text-align: center; animation: fadeIn 2s ease;">
+    <div class="end-content" style="max-width: 480px; width: 100%; text-align: center; animation: fadeIn 2s ease; margin: 0 auto;">
+      <div style="font-family: var(--font); font-weight: 900; font-size: 24px; color: #00ff66; letter-spacing: 4px; text-shadow: 0 0 15px rgba(0, 255, 102, 0.4); margin-bottom: 5px;">🏆 COMPLETE</div>
+      <div style="font-family: var(--font); font-weight: bold; font-size: 13px; color: #888; letter-spacing: 2px; margin-bottom: 25px;">- TRUE END -</div>
+
+      <!-- 実績バッジ -->
+      <div style="display: inline-flex; align-items: center; gap: 10px; background: rgba(0, 255, 102, 0.1); border: 1px solid rgba(0, 255, 102, 0.25); padding: 8px 16px; border-radius: 20px; margin-bottom: 25px; font-size: 12px; color: #00ff66; font-weight: bold;">
+        🏅 獲得実績: 澱みの根絶（完全解決）
+      </div>
+
+      <!-- ニュース報道画像 -->
+      <div style="width: 100%; border: 1px solid rgba(0,255,102,0.2); border-radius: 8px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 5px 25px rgba(0,255,102,0.15);">
+        <img src="/assets/img/true_end_news.png" alt="True End News" style="width: 100%; height: auto; display: block;">
+      </div>
+
       <div class="end-label" style="color: #00ff66; text-shadow: 0 0 10px rgba(0,255,102,0.5); font-size: 13px; font-weight: bold; margin-bottom: 20px; letter-spacing: 2px;">
         TRUE END: 澱みの根絶
       </div>
@@ -386,6 +413,14 @@
   <!-- ══════════ BAD END (バッドエンド) ══════════ -->
   <div id="bad-end-overlay" data-nosnippet role="region" aria-label="バッドエンド">
     <div class="end-content">
+      <div style="font-family: var(--font); font-weight: 900; font-size: 24px; color: #ff3333; letter-spacing: 4px; text-shadow: 0 0 15px rgba(255, 51, 51, 0.4); margin-bottom: 5px;">💀 GAME OVER</div>
+      <div style="font-family: var(--font); font-weight: bold; font-size: 13px; color: #aaa; letter-spacing: 2px; margin-bottom: 25px;">- BAD END -</div>
+
+      <!-- 実績バッジ -->
+      <div style="display: inline-flex; align-items: center; gap: 10px; background: rgba(255, 51, 51, 0.1); border: 1px solid rgba(255, 51, 51, 0.25); padding: 8px 16px; border-radius: 20px; margin-bottom: 25px; font-size: 12px; color: #ff3333; font-weight: bold;">
+        🏅 獲得実績: 澱みに融ける（ゲームオーバー）
+      </div>
+
       <div class="end-label"
         style="color: #ff3333; text-shadow: 0 0 10px rgba(255,0,0,0.5); font-size: 13px; font-weight: bold; margin-bottom: 20px; letter-spacing: 2px;">
         BAD END: 新たなダシ

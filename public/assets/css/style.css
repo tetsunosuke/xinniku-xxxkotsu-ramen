@@ -461,7 +461,8 @@ html, body {
 #epilogue-overlay, #bad-end-overlay {
   position: fixed; inset: 0; z-index: 9000;
   background: #000;
-  display: flex; align-items: center; justify-content: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  overflow-y: auto; padding: 40px 20px;
   opacity: 0; pointer-events: none;
   transition: opacity 2s ease;
 }
@@ -469,8 +470,9 @@ html, body {
   opacity: 1; pointer-events: all;
 }
 .end-content {
-  text-align: center; color: white; padding: 40px;
-  max-width: 640px; width: 90%;
+  text-align: center; color: white; padding: 40px 20px;
+  max-width: 640px; width: 100%;
+  margin: 0 auto;
   animation: endFadeUp 1.2s ease 0.8s both;
 }
 @keyframes endFadeUp {

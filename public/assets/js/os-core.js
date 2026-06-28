@@ -54,6 +54,7 @@ let gameState = (() => {
 // 現在プレイヤーが見ているデバイスを追跡（'player' = 自分のスマホ ・ 'picked' = 拾ったスマホ）
 // 初期状態は picked（ロック画面からスタート）
 let currentDevice = 'picked';
+let isExtraMode = false;
 
 // バッテリー管理
 let pickedBattery = 98; // 初期値98%
@@ -129,7 +130,7 @@ function syncBatteryFromStep() {
   // 自分のスマホのバッテリーもステップに応じて変化
   const playerBatteryByStep = { intro: 78, unlocked: 74, news_found: 69, location_spec: 63, chat_sent: 61, clear: 61, bad_end: 61 };
   const newPb = playerBatteryByStep[step] ?? playerBattery;
-  if (newPb < playerBattery) { playerBattery = newPb; savePlayerBattery(); }
+  if (isExtraMode || newPb < playerBattery) { playerBattery = newPb; savePlayerBattery(); }
   updateBatteryDisplay();
 }
 
@@ -1039,8 +1040,8 @@ const PLAYER_CHAT_SCENARIO = [
   // --- 新設: クリア後の太郎とのやり取り（インデックス 22〜26）---
   { thread: 'taro', sender: 'recv', text: 'タベアルキ太郎です。この度は本当にありがとうございました！警察での事情聴取も終わり、スマホも手元に戻ってきました。ケンからあなたの連絡先を聞いて、直接お礼を伝えたくてメッセージしました。' },
   { thread: 'taro', sender: 'sent', text: '無事で本当によかったです！店主も無事逮捕されたみたいですね。' },
-  { thread: 'taro', sender: 'recv', text: 'ありがとうございます。ただ……実は警察にはまだ裏が取れていないのですが、気になることがあって。あのラーメン屋のサイトに何か別の秘密があるらしいんです。' },
-  { thread: 'taro', sender: 'recv', text: '彼らが仕入れていた「白菊ホールディングス」という巨大グループのサイトに何か関係があるんじゃないかと思っています。よかったら、あなたのスマホのブラウザからラーメン屋のサイトをもう一度調べてみてくれないでしょうか？' },
+  { thread: 'taro', sender: 'recv', text: 'ありがとうございます。ただ……実は気になることがあって。私が拉致されていた際、店主が「サイトの店舗情報の住所のところから、俺の日誌（管理者ページ）に入れる」と独り言を言っていました。ただ、ログイン用のパスコードが分かりません。' },
+  { thread: 'taro', sender: 'recv', text: '店主は「パスコードは、仕入れ元である白菊ホールディングスの創業した西暦（4桁の数字）だ」とも言っていました。白菊グループのサイト（shirakiku.html）から創業年を調べれば、日誌を開けるはずです。極秘データが残っているかもしれないので、調べてみてくれないでしょうか？' },
   { thread: 'taro', sender: 'sent', text: 'そうなんですか！調べてみます！' },
 
   // --- バッドエンド用：充電切れ後（インデックス 27〜30）---
@@ -1084,6 +1085,9 @@ function closePlayerBrowser() {
   playClick();
 }
 function switchToPickedPhone() {
+  if (isExtraMode || gameState.flags.extraActive) {
+    return; // extraモード時は切り替え不可
+  }
   currentDevice = 'picked'; // 拾ったスマホへ切り替え
   if (shutdownActive) {
     showToast('⚠️', 'システム', '端末のバッテリーが切れています。');
@@ -1191,7 +1195,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const preloader = document.getElementById('preloader');
   setTimeout(() => preloader.classList.add('hidden'), 1200);
 
-  const isExtraMode = window.location.pathname.includes('extra') || window.location.search.includes('mode=extra');
+  const isExtra = window.location.pathname.includes('extra') || window.location.search.includes('mode=extra');
+  isExtraMode = isExtra;
   if (isExtraMode) {
     gameState.flags.extraActive = true;
     gameState.flags.gameCleared = true;
@@ -1204,6 +1209,10 @@ document.addEventListener('DOMContentLoaded', () => {
     playerChatIndex = gameState.flags.taroChatIndex;
     activePlayerThread = 'taro';
     saveState();
+
+    // 「⇄ 拾ったスマホを見る」ボタンを非表示にする
+    const flipBtn = document.querySelector('.bar-flip-btn');
+    if (flipBtn) flipBtn.style.display = 'none';
   }
 
   // Lock screen & Player phone initialization
