@@ -1047,22 +1047,64 @@
 
     /* ══ HIDDEN CHARS PUZZLE ══ */
     .hidden-char {
-      font-size: 1.18em;
+      font-size: 1.12em; /* 違和感を強めつつ少し自然なサイズに */
       font-family: inherit;
       font-weight: bold;
       cursor: pointer;
       color: inherit;
       transition: color 0.15s, text-shadow 0.15s;
       display: inline-block;
+      /* バグ明滅グリッチアニメーション */
+      animation: targetCharGlitch 6s infinite;
+    }
+
+    @keyframes targetCharGlitch {
+      0%, 93%, 98%, 100% {
+        transform: translate(0, 0);
+        color: inherit;
+        text-shadow: none;
+      }
+      94% {
+        transform: translate(-1.5px, 0.5px);
+        color: #ff3333;
+        text-shadow: 0.5px 0 2px rgba(255,0,0,0.5);
+      }
+      95% {
+        transform: translate(1px, -1px);
+        color: #a00000;
+      }
+      96% {
+        transform: translate(-0.5px, -0.5px);
+        color: inherit;
+        text-shadow: none;
+      }
+      97% {
+        transform: translate(1.5px, 1px);
+        color: #ff3333;
+        text-shadow: -0.5px 0 2px rgba(255,0,0,0.5);
+      }
+    }
+
+    /* 各文字でバグるタイミングをずらす */
+    .hidden-char:nth-of-type(2n) {
+      animation-delay: 1.5s;
+    }
+    .hidden-char:nth-of-type(3n) {
+      animation-delay: 3.2s;
+    }
+    .hidden-char:nth-of-type(4n) {
+      animation-delay: 4.7s;
     }
 
     .hidden-char:hover {
       text-shadow: 0 0 3px rgba(184, 147, 74, 0.8);
+      animation-play-state: paused; /* ホバー中はバグを止める */
     }
 
     .hidden-char.clicked {
       color: #ff4444 !important;
       text-shadow: 0 0 5px #ff0000;
+      animation: none !important; /* クリック後はバグを解除 */
     }
 
     /* ── ホラー演出用の赤フラッシュ＆スクリーン揺れ ── */
