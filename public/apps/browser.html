@@ -434,7 +434,11 @@
 
 <script src="../assets/js/app-utils.js"></script>
 <script>
-  if (window.self === window.top) { window.location.href = '../index.html'; }
+  // サブディレクトリ階層で誤った index.html を iframe 内に読み込まないよう、絶対パス / または /extra にリダイレクト
+  if (window.self === window.top) {
+    const isExtra = window.location.pathname.includes('extra');
+    window.location.href = isExtra ? '/extra' : '/';
+  }
 
   let currentPage = 'ramen';
   let stateNewsFound = false;

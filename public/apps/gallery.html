@@ -154,7 +154,10 @@
 
 <script src="../assets/js/app-utils.js"></script>
 <script>
-  if (window.self === window.top) { window.location.href = '../index.html'; }
+  if (window.self === window.top) {
+    const isExtra = window.location.pathname.includes('extra');
+    window.location.href = isExtra ? '/extra' : '/';
+  }
 
   const PHOTOS = [
     { id:'mirror',  file:'../assets/images/mirror_case.png', label:'IMG_0848', date:'2024年11月12日', mirrorSpecial:true,
