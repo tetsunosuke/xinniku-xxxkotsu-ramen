@@ -842,12 +842,15 @@ function renderPlayerChat() {
 
   if (activePlayerThread === 'friend') {
     if (titleEl) titleEl.textContent = 'メッセージ (友人)';
+    // friendスレッドの有効範囲は 0〜21（idx 22〜26はtaroスレッドのため除外）
+    // chat_sent=19, clear=22 のいずれも上限27未満（bad_end開始前）に収まる
     const maxRender = Math.min(playerChatIndex, 22);
     let renderLimit = maxRender;
     if (!gameState.flags.firstAddressSent) {
+      // firstAddressSent前はニュース発見後ヒント（idx 13〜18）を非表示
       renderLimit = Math.min(renderLimit, 13);
     }
-    // バッドエンド進行中の場合は、バッドエンド用のメッセージ（27〜30）も描画
+    // バッドエンド進行中の場合は、バッドエンド用のメッセージ（idx 27〜30）も描画
     if (gameState.currentStep === 'bad_end' && playerChatIndex >= 27) {
       for (let i = 0; i < 22; i++) {
         drawBubble(container, PLAYER_CHAT_SCENARIO[i]);
@@ -856,8 +859,11 @@ function renderPlayerChat() {
         drawBubble(container, PLAYER_CHAT_SCENARIO[i]);
       }
     } else {
+      // friendスレッドのメッセージのみを描画（taroスレッドを除外）
       for (let i = 0; i < renderLimit; i++) {
-        drawBubble(container, PLAYER_CHAT_SCENARIO[i]);
+        if (PLAYER_CHAT_SCENARIO[i] && PLAYER_CHAT_SCENARIO[i].thread === 'friend') {
+          drawBubble(container, PLAYER_CHAT_SCENARIO[i]);
+        }
       }
     }
   } else if (activePlayerThread === 'taro') {
@@ -1253,13 +1259,14 @@ document.addEventListener('DOMContentLoaded', () => {
     'unlocked': 10,   // 0〜9を描画
     'news_found': 13,   // 0〜12を描画
     'location_spec': 13,
-    'chat_sent': 19,
-    'clear': 19,
-    'bad_end': 27,
+    'chat_sent': 19,    // シャットダウン前（idx 0〜18）を復元
+    'clear': 22,        // グッドエンド完了（idx 0〜21 = 充電切れ〜「お前すごいことしたぞ」）を復元
+    'bad_end': 27,      // バッドエンド用メッセージ（idx 27〜）の開始前を復元
   };
 
   if (!isExtraMode) {
     playerChatIndex = stepIndexMap[gameState.currentStep] ?? 0;
+    // バッドエンドからリトライ後: news_found + firstAddressSent = 鏡ヒントまで復元
     if (gameState.currentStep === 'news_found' && gameState.flags.firstAddressSent) {
       playerChatIndex = 19;
     }
