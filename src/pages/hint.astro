@@ -170,6 +170,52 @@
       color: var(--gold);
     }
 
+    /* ── アコーディオン（details & summary）スタイル ── */
+    details {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin: 12px 0;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    details[open] {
+      border-color: rgba(255, 107, 107, 0.4);
+    }
+    summary {
+      padding: 12px 16px;
+      font-weight: bold;
+      color: var(--accent);
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+      transition: background-color 0.2s;
+      list-style: none; /* デフォルトの矢印を非表示 */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    summary::-webkit-details-marker {
+      display: none; /* Safari用矢印非表示 */
+    }
+    summary::after {
+      content: '＋';
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+    details[open] summary::after {
+      content: '－';
+    }
+    summary:hover {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+    .details-content {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.1);
+    }
+
     .footer {
       text-align: center;
       margin-top: 60px;
@@ -189,17 +235,17 @@
     <div data-nosnippet>
       <section>
         <h2>📖 ゲームの基本構造</h2>
-      <p>このゲームは、プレイヤー自身のスマートフォン（メッセージ画面）と、拾ったスマートフォンのデスクトップ画面を切り替えながら進めるアドベンチャーゲーム（ARG）です。</p>
-      <ul>
-        <li><strong>自分のスマホ</strong>: 友人とのメッセージのやり取りを行います。会話が進むことでヒントや指示が与えられます。</li>
-        <li><strong>拾ったスマホ</strong>: パスコードを解除して、内部のアプリ（SNS、ブラウザ、写真、LIME）から失踪した「タベアルキ太郎」の足取りを追います。</li>
-        <li>画面内の <span class="code-span">⇄ 自分のスマホへ戻る</span> ボタンや、自分のスマホ画面の <span class="code-span">拾ったスマホ</span> アイコンを使ってデバイスを切り替えます。</li>
-      </ul>
-    </section>
+        <p>このゲームは、プレイヤー自身のスマートフォン（メッセージ画面）と、拾ったスマートフォンのデスクトップ画面を切り替えながら進めるアドベンチャーゲーム（ARG）です。</p>
+        <ul>
+          <li><strong>自分のスマホ</strong>: 友人とのメッセージのやり取りを行います。会話が進むことでヒントや指示が与えられます。</li>
+          <li><strong>拾ったスマホ</strong>: パスコードを解除して、内部のアプリ（SNS、ブラウザ、写真、LIME）から失踪した「タベアルキ太郎」の足取りを追います。</li>
+          <li>画面内の <span class="code-span">⇄ 自分のスマホへ戻る</span> ボタンや、自分のスマホ画面の <span class="code-span">拾ったスマホ</span> アイコンを使ってデバイスを切り替えます。</li>
+        </ul>
+      </section>
 
-    <section>
-      <h2>🏁 チャート1: 拾ったスマホのロック解除</h2>
-      <p>ゲーム開始時、拾ったスマホはロックされており、<strong>8桁のパスコード</strong>を要求されます。このコードを特定するのが最初のステップです。</p>
+      <section>
+        <h2>🏁 チャート1: 拾ったスマホのロック解除</h2>
+        <p>ゲーム開始時、拾ったスマホはロックされており、<strong>8桁のパスコード</strong>を要求されます。このコードを特定するのが最初のステップです。</p>
       <ol>
         <li>
           <span class="badge badge-step">ステップ 1</span> <strong>自分のスマホで友人の話を聞く</strong><br>
@@ -213,22 +259,30 @@
           <span class="badge badge-step">ステップ 3</span> <strong>パスコードのヒント投稿を探す</strong><br>
           太郎の2021年10月10日の投稿に以下の記述があります：
           <div class="highlight-box">
-            「自分が生まれた年の西暦を先頭にくっつけて8桁に長くしてる。お気に入りのお店のオープン日と組み合わせるのが、自分の中で一番覚えやすい最強のルール！笑」
+            「自分が生まれた年の西暦を先頭にくっつけて8桁に長くしてる。お気に入りのお店のオープン日と組み合わせるのが,自分の中で一番覚えやすい最強のルール！笑」
           </div>
         </li>
         <li>
           <span class="badge badge-step">ステップ 4</span> <strong>生年（西暦4桁）とオープン日（4桁）を特定する</strong>
-          <ul>
-            <li><strong>生年</strong>: 相方ケンのプロフィール（太郎の自己紹介内のリンクから移動可能）の2026年3月5日の投稿に「今日でついに32歳になりました！」とあり、2026 - 32 = <strong>1994年</strong> と特定できます。さらに別の投稿で「同い年の相方」と言及されているほか、ケンの誕生日投稿への返信で太郎が「同い年といっても、ケンは早生まれだから学年は先輩なんだよなー」とコメントしており、太郎の生年も <strong>1994年</strong> であることが分かります。</li>
-            <li><strong>オープン日</strong>: 太郎のSNSの2020年8月26日の投稿に「中華そば 縁 1周年おめでとう！」とあります。ここからオープン日は <strong>08月26日</strong> と判明します。</li>
-          </ul>
+          <details>
+            <summary>生年とオープン日の具体的な特定手順（ヒント）</summary>
+            <div class="details-content">
+              <ul>
+                <li><strong>生年</strong>: 相方ケンのプロフィール（太郎の自己紹介内のリンクから移動可能）の2026年3月5日の投稿に「今日でついに32歳になりました！」とあり、2026 - 32 = <strong>1994年</strong> と特定できます。さらに別の投稿で「同い年の相方」と言及されているほか、ケンの誕生日投稿への返信で太郎が「同い年といっても、ケンは早生まれだから学年は先輩なんだよなー」とコメントしており、太郎の生年も <strong>1994年</strong> であることが分かります。</li>
+                <li><strong>オープン日</strong>: 太郎のSNSの2020年8月26日の投稿に「中華そば 縁 1周年おめでとう！」とあります。ここからオープン日は <strong>08月26日</strong> と判明します。</li>
+              </ul>
+            </div>
+          </details>
         </li>
         <li>
           <span class="badge badge-step">ステップ 5</span> <strong>パスコードを入力する</strong><br>
           これらを組み合わせた8桁のコードがパスコードです。
-          <div style="text-align: center;">
-            <span class="passcode">19940826</span>
-          </div>
+          <details>
+            <summary>🔑 ロック解除のパスコード（答え）</summary>
+            <div class="details-content" style="text-align: center;">
+              <span class="passcode">19940826</span>
+            </div>
+          </details>
         </li>
       </ol>
     </section>
@@ -263,10 +317,15 @@
         </li>
         <li>
           <span class="badge badge-step">ステップ 10</span> <strong>証拠アノテーションを確認する</strong>
-          <ul>
-            <li><strong>看板</strong>: 窓の外の看板を調べると、左右反転した文字から番地「音無町 3-19-4」が読めます。</li>
-            <li><strong>メモ</strong>: 壁のカレンダーを調べると、余白に「地下」と書き込まれています。</li>
-          </ul>
+          <details>
+            <summary>アノテーションから得られる情報（ヒント）</summary>
+            <div class="details-content">
+              <ul>
+                <li><strong>看板</strong>: 窓の外の看板を調べると、左右反転した文字から番地「音無町 3-19-4」が読めます。</li>
+                <li><strong>メモ</strong>: 壁のカレンダーを調べると、余白に「地下」と書き込まれています。</li>
+              </ul>
+            </div>
+          </details>
         </li>
         <li>
           <span class="badge badge-step">ステップ 11</span> <strong>場所を確定して相方に送信する</strong><br>
@@ -284,16 +343,113 @@
         <strong>⚠️ 注意: 1問でも間違えると、即座にバッドエンドへ直行します。</strong>
       </div>
 
-      <h3>【問1】この店はいつ、何をきっかけに業態を変えたのか？</h3>
-      <ul>
-        <li>⭕ <strong>正解:</strong> 「妻が亡くなった後、店名を「中華そば 縁」から突然「〇ンニク〇んこつラーメン」に変えた（2023年6月）」</li>
-        <li>❌ <strong>誤答:</strong> 他の2択（売上不振、最初から同じなど）</li>
-      </ul>
+      <details>
+        <summary>💡 LIMEでの問1＆問2の正解（答え）</summary>
+        <div class="details-content">
+          <h3>【問1】この店はいつ、何をきっかけに業態を変えたのか？</h3>
+          <ul>
+            <li>⭕ <strong>正解:</strong> 「妻が亡くなった後、店名を「中華そば 縁」から突然「〇ンニク〇んこつラーメン」に変えた（2023年6月）」</li>
+            <li>❌ <strong>誤答:</strong> 他の2択（売上不振、最初から同じなど）</li>
+          </ul>
 
-      <h3>【問2】スープのダシ――「秘伝の骨」の正体は何か？</h3>
-      <ul>
-        <li>⭕ <strong>正解:</strong> 「本来ダシに使ってはいけないもの。近隣の葬儀業者との取引記録と、店名の変化がそれを示唆している」</li>
-        <li>❌ <strong>誤答:</strong> 他の2択（豚骨と鶏ガラブレンド、希少な山の動物の骨）</li>
+          <h3>【問2】スープのダシ――「秘伝の骨」の正体は何か？</h3>
+          <ul>
+            <li>⭕ <strong>正解:</strong> 「本来ダシに使ってはいけないもの。近隣の葬儀業者との取引記録と、店名の変化がそれを示唆している」</li>
+            <li>❌ <strong>誤答:</strong> 他の2択（豚骨と鶏ガラブレンド、希少な山の動物の骨）</li>
+          </ul>
+          <div class="highlight-box green" style="margin-bottom:0">
+            <strong>💡 ヒント (正体暴きギミック)</strong><br>
+            「東都ニュースWeb」で遺体不正持ち出しのニュースを読んだ後、公式ホームページの「お知らせ」ボックスにある<strong>「秘伝の骨」</strong>というリンクテキストをクリックすると、文字化けギミックが発動して「〇ンニク」の真の正体が「ジンニク（人肉）」であることが暴かれます。
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>🔑 問3：真の住所を伝えるプロセスと正解（答え）</summary>
+        <div class="details-content">
+          <h3>【問3】太郎が閉じ込められている厨房の場所はどこか？</h3>
+          <ul>
+            <li>⭕ <strong>正解:</strong> 「東京都台東区音無町3-19-3 地下1階」</li>
+            <li>❌ <strong>誤答:</strong> 「東京都台東区音無町3-19-4 地下1階（厨房の窓の看板から推測できるが、実際は犯人の罠でケンが襲撃される）」、その他の選択肢</li>
+          </ul>
+
+          <div class="highlight-box green">
+            <strong>💡 鏡撮影のギミック (真の住所特定プロセス)</strong><br>
+            1. 問3で「3-19-4」を選択して送信すると、ケンが現地に向かいますが、店主に捕まってしまいバッドエンド（ゲームオーバー）になります。<br>
+            2. このバッドエンドの直前、プレイヤーのスマホ（自分のスマホ）で友人とのチャットが走り、「太郎のスマホの背面を鏡に映して撮ってみろ」というヒントが得られます。<br>
+            3. その後、ゲームオーバー（BAD END）画面から「最初からやり直す」を選択し、リトライした２週目で、今度はクイズに答える前に**太郎のスマホの「カメラ」アプリ**を開き、鏡を撮影します。<br>
+            4. 太郎のスマホの「写真」アプリで撮影した鏡写真を「調査」すると、鏡の左右反転が解消され、背面の刻印に刻まれた真の住所<strong>「台東区音無町3-19-3」</strong>が判明します。<br>
+            5. 再びLIMEを開くと「東京都台東区音無町3-19-3 地下1階」が選択肢に出現し、これを選択するとグッドエンドへ進みます。<br>
+            ※自分のスマホのカメラで鏡を撮っても、普通の無地ケースが写るだけで手がかりは得られません。
+          </div>
+
+          <div class="highlight-box green" style="margin-bottom:0">
+            <strong>🏆 全問正解時 (グッドエンド)</strong><br>
+            すべての問いに正しく答えると、ケンが警察を引き連れて指定 of 住所（3-19-3）へ突入します。拾ったスマホのバッテリーが切れ、シャットダウン演出が入った後、自分のスマホで友人と無事保護された喜びを分かち合い、グッドエンド（エピローグ動画アーカイブ）へ到達します。
+          </div>
+        </div>
+      </details>
+    </section>
+    </div>
+
+    <!-- 🔒 エクストラヒントのロック表示 -->
+    <div id="extra-locked-message" class="highlight-box" style="display: none; padding: 25px; text-align: center; border-left-color: var(--accent);">
+      <h3 style="color: var(--accent); margin-bottom: 10px;">🔒 エクストラステージのヒントはロックされています</h3>
+      <p style="font-size: 0.95rem; margin-bottom: 0;">
+        このセクションのヒントは、通常ルート（グッドエンド）をクリアして実績<strong>「生存者（通常クリア）」</strong>を解除すると表示されます。<br>
+        まずは通常ルートの解決を目指してください！
+      </p>
+    </div>
+
+    <div id="extra-hints" style="display: none;">
+      <section>
+        <h2>🏆 チャート5: 完全解決トゥルーエンド（真の解決）</h2>
+        <p>通常エンディング（グッドエンド）で太郎を救出した後、事件のさらなる奥に潜む巨大な闇（黒幕）を暴き出し、完全解決を迎えるためのエクストラチャートです。</p>
+        <ol>
+          <li>
+            <span class="badge badge-step">ステップ 1</span> <strong>グッドエンドをクリアし、「さらなる謎を調査する」を選択する</strong><br>
+            通常クリア時のエピローグ画面で、新しく出現した「🔍 さらなる謎を調査する」ボタンを押します。
+          </li>
+          <li>
+            <span class="badge badge-step">ステップ 2</span> <strong>太郎からお礼とヒントのメッセージを受け取る</strong><br>
+            自分のスマホに戻った後、無事保護された太郎本人からお礼メッセージが届きます。太郎は「ラーメン店の仕入れ先『白菊ホールディングス』という巨大グループに何か秘密がある気がする」と教えてくれます。
+          </li>
+          <li>
+            <span class="badge badge-step">ステップ 3</span> <strong>白菊ホールディングスHPの隠しパズルを解く</strong><br>
+            自分のスマホのホーム画面から「ブラウザ（🌐）」を起動し、新しく出現した「🏢 白菊ホールディングス」のタブを開きます。<br>
+            白菊HPの日本語テキストをよく読むと、**周囲 of 文字よりも少しだけサイズが大きい不自然なひらがな**が上から順に散らばっています。<br>
+            <details>
+              <summary>ひらがなクリックパズルのヒント（答え）</summary>
+              <div class="details-content">
+                ページ最上部から順番に、<strong>「に」「ん」「げ」「ん」「の」「だ」「し」</strong>の7文字をクリックすると、フードサービス事業の紹介カード内に隠しリンクが出現します。
+              </div>
+            </details>
+          </li>
+          <li>
+            <span class="badge badge-step">ステップ 4</span> <strong>ラーメン店HPの管理者ログイン</strong><br>
+            ブラウザの「🍜 〇ンニク〇んこつラーメン」タブに戻り、店舗情報セクションの「📍 東京都台東区音無町3-19-4 地下1階」をクリックします。<br>
+            <details>
+              <summary>管理者ログインのパスコード（答え）</summary>
+              <div class="details-content">
+                管理者ログイン画面が出現するため、パスコードに白菊ホールディングスの創業西暦（4桁）である <span class="code-span">1974</span> を入力してログインし、店主の裏日誌を確認します。
+              </div>
+            </details>
+          </li>
+          <li>
+            <span class="badge badge-step">ステップ 5</span> <strong>白菊ホールディングス裏ページへのログイン ＆ 匿名告発</strong><br>
+            ステップ3で出現した「👉 【極秘】提携店向け出荷管理コード一覧」リンクをクリックして極秘モーダルを開きます。
+            <details>
+              <summary>白菊役員用ログインID ＆ パスコード（答え）</summary>
+              <div class="details-content">
+                下部の注意書きから、役員用ログインID <span class="code-span">RM-9942</span> と新パスコード <span class="code-span">0900</span> を入手します。<br>
+                白菊HP最下部の「社員・役員専用ログイン」からそのIDとパスコードを入力してログインし、人骨サプリ配合データや太郎の拉致指示メッセージを確認します。<br>
+                最下部の「闇取引データを警察へ匿名送信（告発）する」ボタンを押すと、サイレン音の演出と共に、黒幕一斉逮捕のトゥルーエンド（TRUE END: 澱みの根絶）が始まります。
+              </div>
+            </details>
+          </li>
+        </ol>
+      </section>
+    </div>物の骨）</li>
       </ul>
       <div class="highlight-box green">
         <strong>💡 ヒント (正体暴きギミック)</strong><br>
