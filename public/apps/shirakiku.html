@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>白菊ホールディングス｜SHIRAKIKU HOLDINGS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --navy: #1a2744;
+      --navy-deep: #0f1a30;
+      --blue: #2d4a8a;
+      --blue-mid: #3a5faa;
+      --gold: #b8934a;
+      --gold-lt: #d4aa6a;
+      --cream: #f7f4ee;
+      --white: #ffffff;
+      --text: #2c2c2c;
+      --muted: #6b7280;
+      --border: #e5e0d5;
+      --fs: 'Noto Sans JP', sans-serif;
+      --ff: 'Noto Serif JP', serif;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 14px;
+    }
+
+    body {
+      font-family: var(--fs);
+      color: var(--text);
+      background: var(--white);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ══ NAV ══════════════════════════════════════════════════════ */
+    #nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      height: 58px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      text-decoration: none;
+    }
+
+    .nav-brand-badge {
+      width: 30px;
+      height: 30px;
+      background: var(--navy);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: var(--gold-lt);
+    }
+
+    .nav-brand-name {
+      font-family: var(--ff);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--navy);
+      letter-spacing: 0.5px;
+    }
+
+    .nav-brand-name small {
+      display: block;
+      font-family: var(--fs);
+      font-size: 9px;
+      font-weight: 400;
+      color: var(--muted);
+      letter-spacing: 2px;
+      margin-top: -1px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 12.5px;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.3px;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--navy);
+    }
+
+    .nav-cta {
+      background: var(--navy) !important;
+      color: var(--white) !important;
+      padding: 7px 18px;
+      border-radius: 20px;
+      font-weight: 500 !important;
+      letter-spacing: 0.3px;
+      transition: background 0.2s, transform 0.15s !important;
+    }
+
+    .nav-cta:hover {
+      background: var(--blue) !important;
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 520px) {
+      #nav {
+        padding: 0 12px;
+      }
+
+      .nav-brand-badge {
+        width: 24px;
+        height: 24px;
+        font-size: 11px;
+      }
+
+      .nav-brand-name {
+        font-size: 11.5px;
+      }
+
+      .nav-brand-name small {
+        font-size: 7.5px;
+        letter-spacing: 1px;
+      }
+
+      .nav-links {
+        gap: 8px;
+      }
+
+      .nav-cta {
+        padding: 5px 12px;
+        font-size: 11.5px !important;
+      }
+
+      .site-banner {
+        padding: 8px 12px;
+        font-size: 11px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+
+      .banner-link {
+        margin-left: 0;
+        font-size: 11px;
+      }
+    }
+
+    /* ══ BANNER ════════════════════════════════════════════════════ */
+    .site-banner {
+      background: linear-gradient(90deg, var(--gold) 0%, var(--gold-lt) 100%);
+      padding: 10px 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--navy-deep);
+    }
+
+    .banner-new {
+      background: var(--navy-deep);
+      color: var(--gold-lt);
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      letter-spacing: 1px;
+      flex-shrink: 0;
+    }
+
+    .banner-link {
+      margin-left: auto;
+      color: var(--navy-deep);
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ══ HERO ══════════════════════════════════════════════════════ */
+    #hero {
+      position: relative;
+      min-height: 520px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(145deg,
+          #c8d8e8 0%,
+          #d8e4ef 30%,
+          #e8eef5 55%,
+          #f0f4f8 80%);
+    }
+
+    /* 建物のシルエット（CSS art） */
+    .hero-building {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 680px;
+      height: 340px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .building-main {
+      position: relative;
+      width: 260px;
+      height: 300px;
+      background: linear-gradient(180deg, #b8c8d8 0%, #c8d4e0 40%, #d0dce8 100%);
+      border-radius: 4px 4px 0 0;
+    }
+
+    .building-main::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 30px;
+      background: linear-gradient(180deg, #a8b8cc 0%, #b8c8d8 100%);
+      border-radius: 4px 4px 0 0;
+    }
+
+    /* ガラスのグリッド */
+    .building-windows {
+      position: absolute;
+      inset: 40px 20px 0;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .w {
+      background: rgba(255, 255, 255, 0.45);
+      border-radius: 1px;
+    }
+
+    .w.lit {
+      background: rgba(220, 235, 255, 0.6);
+    }
+
+    .building-side {
+      width: 90px;
+      height: 240px;
+      background: linear-gradient(180deg, #a8b8c8 0%, #b8c8d8 100%);
+      border-radius: 2px 2px 0 0;
+    }
+
+    .building-side.left {
+      margin-right: 4px;
+    }
+
+    .building-side.right {
+      margin-left: 4px;
+    }
+
+    /* 背景の木々 */
+    .hero-trees {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 120px;
+      background:
+        radial-gradient(ellipse 60px 80px at 15% 100%, #7a9e6a 0%, transparent 70%),
+        radial-gradient(ellipse 80px 100px at 25% 100%, #6a8e5a 0%, transparent 70%),
+        radial-gradient(ellipse 50px 70px at 35% 100%, #8aae7a 0%, transparent 70%),
+        radial-gradient(ellipse 90px 110px at 75% 100%, #6a8e5a 0%, transparent 70%),
+        radial-gradient(ellipse 60px 80px at 85% 100%, #7a9e6a 0%, transparent 70%),
+        radial-gradient(ellipse 70px 90px at 92% 100%, #5a7e4a 0%, transparent 70%);
+    }
+
+    /* 空のグラデーション追加演出 */
+    .hero-sky {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 60% 20%, rgba(200, 220, 240, 0.5) 0%, transparent 70%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      padding: 0 28px 52px;
+      max-width: 600px;
+    }
+
+    .hero-eyebrow {
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--blue-mid);
+      font-weight: 500;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--blue-mid);
+    }
+
+    .hero-title {
+      font-family: var(--ff);
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 700;
+      color: var(--navy-deep);
+      line-height: 1.35;
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+    }
+
+    .hero-sub {
+      font-size: 13px;
+      color: #4a5568;
+      line-height: 1.9;
+      max-width: 440px;
+      margin-bottom: 28px;
+    }
+
+    .hero-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 28px;
+      background: var(--navy);
+      color: var(--white);
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      border-radius: 24px;
+      transition: background 0.2s, transform 0.15s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .hero-btn:hover {
+      background: var(--blue);
+      transform: translateY(-2px);
+    }
+
+    /* ══ SECTION COMMON ════════════════════════════════════════════ */
+    .sec {
+      padding: 72px 28px;
+    }
+
+    .sec-inner {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .sec-eyebrow {
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--gold);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .sec-title {
+      font-family: var(--ff);
+      font-size: clamp(20px, 3vw, 26px);
+      font-weight: 600;
+      color: var(--navy);
+      text-align: center;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .sec-desc {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.9;
+      max-width: 520px;
+      margin: 0 auto 48px;
+    }
+
+    /* ══ SECTION: INTRO ════════════════════════════════════════════ */
+    #intro {
+      background: var(--cream);
+    }
+
+    .intro-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    @media (max-width: 620px) {
+      .intro-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .intro-text h3 {
+      font-family: var(--ff);
+      font-size: 17px;
+      color: var(--navy);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--gold);
+      display: inline-block;
+    }
+
+    .intro-text p {
+      font-size: 13px;
+      line-height: 2.1;
+      color: #4a5568;
+    }
+
+    .intro-values {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .value-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 18px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .value-card:hover {
+      box-shadow: 0 4px 16px rgba(26, 39, 68, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .vc-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .vc-title {
+      font-family: var(--ff);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 3px;
+    }
+
+    .vc-desc {
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ══ SECTION: BUSINESS ═════════════════════════════════════════ */
+    #business {
+      background: var(--white);
+    }
+
+    .biz-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 560px) {
+      .biz-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .biz-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: box-shadow 0.25s, transform 0.2s;
+      cursor: default;
+    }
+
+    .biz-card:hover {
+      box-shadow: 0 8px 24px rgba(26, 39, 68, 0.1);
+      transform: translateY(-3px);
+    }
+
+    .biz-head {
+      background: var(--navy);
+      padding: 20px 22px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .biz-head::after {
+      content: '';
+      position: absolute;
+      bottom: -20px;
+      right: -20px;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 50%;
+    }
+
+    .biz-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .biz-name {
+      font-family: var(--ff);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: 0.3px;
+    }
+
+    .biz-sub {
+      font-size: 9px;
+      color: var(--gold-lt);
+      letter-spacing: 1.5px;
+      margin-top: 2px;
+    }
+
+    .biz-body {
+      padding: 18px 22px;
+      background: var(--white);
+    }
+
+    .biz-body p {
+      font-size: 12.5px;
+      line-height: 1.9;
+      color: #4a5568;
+    }
+
+    .biz-tags {
+      margin-top: 12px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-size: 10px;
+      color: var(--navy);
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--cream);
+    }
+
+    /* ══ SECTION: NUMBERS ══════════════════════════════════════════ */
+    #numbers {
+      background: var(--navy);
+    }
+
+    #numbers .sec-eyebrow {
+      color: var(--gold-lt);
+    }
+
+    #numbers .sec-title {
+      color: var(--white);
+    }
+
+    #numbers .sec-desc {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .num-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    @media (max-width: 480px) {
+      .num-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .num-item {
+      padding: 32px 20px;
+      text-align: center;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .num-item:last-child {
+      border-right: none;
+    }
+
+    .num-val {
+      font-family: var(--ff);
+      font-size: 40px;
+      font-weight: 300;
+      color: var(--gold-lt);
+      line-height: 1;
+      margin-bottom: 6px;
+      letter-spacing: -1px;
+    }
+
+    .num-val sup {
+      font-size: 16px;
+    }
+
+    .num-label {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.4);
+      letter-spacing: 0.5px;
+    }
+
+    /* ══ SECTION: NEWS ═════════════════════════════════════════════ */
+    #news {
+      background: var(--cream);
+    }
+
+    .news-list {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--white);
+    }
+
+    .news-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12.5px;
+    }
+
+    .news-item:last-child {
+      border-bottom: none;
+    }
+
+    .news-date {
+      color: var(--muted);
+      font-family: monospace;
+      width: 72px;
+      flex-shrink: 0;
+      font-size: 11px;
+    }
+
+    .news-cat {
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 9.5px;
+      font-weight: 700;
+      flex-shrink: 0;
+      letter-spacing: 0.3px;
+    }
+
+    .cat-biz {
+      background: rgba(45, 74, 138, 0.1);
+      color: var(--blue);
+    }
+
+    .cat-ir {
+      background: rgba(184, 147, 74, 0.12);
+      color: var(--gold);
+    }
+
+    .news-title {
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* ══ FOOTER ════════════════════════════════════════════════════ */
+    #footer {
+      background: var(--navy-deep);
+      padding: 36px 28px 24px;
+      text-align: center;
+    }
+
+    .footer-brand {
+      font-family: var(--ff);
+      font-size: 15px;
+      color: var(--gold-lt);
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .footer-links a {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.35);
+      text-decoration: none;
+      transition: color 0.2s;
+      letter-spacing: 0.3px;
+    }
+
+    .footer-links a:hover {
+      color: var(--gold-lt);
+    }
+
+    .footer-login-btn {
+      cursor: pointer;
+      color: var(--gold-lt) !important;
+      font-weight: 600 !important;
+    }
+
+    .footer-copy {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.15);
+      letter-spacing: 0.5px;
+    }
+
+    /* ══ LOGIN MODAL ═══════════════════════════════════════════════ */
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 16, 28, 0.88);
+      backdrop-filter: blur(10px);
+      z-index: 9000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-bg.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--white);
+      max-width: 380px;
+      width: 100%;
+      border-radius: 10px;
+      overflow: hidden;
+      animation: slideUp 0.25s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-head {
+      background: var(--navy);
+      padding: 22px 24px;
+      position: relative;
+    }
+
+    .modal-head::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+    }
+
+    .modal-title {
+      font-family: var(--ff);
+      font-size: 14px;
+      color: var(--white);
+      margin-bottom: 3px;
+      letter-spacing: 0.3px;
+    }
+
+    .modal-subtitle {
+      font-size: 9px;
+      color: rgba(255, 255, 255, 0.35);
+      letter-spacing: 2px;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 18px;
+      cursor: pointer;
+      transition: color 0.2s;
+      line-height: 1;
+    }
+
+    .modal-close:hover {
+      color: var(--white);
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 9.5px;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .field-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: var(--cream);
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--text);
+      margin-bottom: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: var(--fs);
+    }
+
+    .field-input:focus {
+      border-color: var(--blue-mid);
+      background: var(--white);
+    }
+
+    .modal-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--navy);
+      color: var(--white);
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: var(--fs);
+    }
+
+    .modal-btn:hover {
+      background: var(--blue);
+    }
+
+    .field-error {
+      font-size: 11.5px;
+      color: #dc2626;
+      margin-top: 10px;
+      display: none;
+      text-align: center;
+    }
+
+    /* ══ DARK SYSTEM ═══════════════════════════════════════════════ */
+    #dark-system {
+      display: none;
+    }
+
+    #dark-system.show {
+      display: block;
+    }
+
+    .dark-topbar {
+      background: #060809;
+      border-bottom: 1px solid rgba(255, 30, 30, 0.2);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .dark-topbar-title {
+      font-family: monospace;
+      font-size: 11px;
+      color: #ff4444;
+      letter-spacing: 0.5px;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
+      }
+    }
+
+    .dark-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: monospace;
+      font-size: 9.5px;
+      color: #ff6666;
+    }
+
+    .dark-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ff3333;
+      animation: blink 1s infinite;
+    }
+
+    .dark-body {
+      background: #060809;
+      min-height: calc(100vh - 58px);
+      padding: 20px;
+      font-family: monospace;
+    }
+
+    /* スキャンライン */
+    .dark-body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg,
+          rgba(255, 0, 0, 0.012) 0, rgba(255, 0, 0, 0.012) 1px,
+          transparent 1px, transparent 3px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .dark-section {
+      position: relative;
+      z-index: 1;
+      background: #0f0203;
+      border: 1px solid rgba(255, 30, 30, 0.18);
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .dark-section-hd {
+      font-size: 10.5px;
+      color: #ff4444;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid rgba(255, 30, 30, 0.12);
+    }
+
+    .dark-alert {
+      position: relative;
+      z-index: 1;
+      border-left: 3px solid #ff3333;
+      padding: 10px 14px;
+      font-size: 11px;
+      color: #ff8888;
+      background: rgba(255, 0, 0, 0.04);
+      margin-bottom: 14px;
+    }
+
+    .dark-log {
+      font-size: 11px;
+      color: #ffa0a0;
+      line-height: 1.8;
+      background: #1a0404;
+      border: 1px solid rgba(255, 30, 30, 0.12);
+      border-radius: 3px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .dark-key {
+      color: #ff6666;
+    }
+
+    .dark-report-btn {
+      position: relative;
+      z-index: 1;
+      display: block;
+      width: 100%;
+      margin-top: 20px;
+      padding: 13px;
+      background: #100003;
+      border: 1px solid #ff3333;
+      color: #ff4444;
+      font-family: monospace;
+      font-size: 12.5px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      box-shadow: 0 0 18px rgba(255, 0, 0, 0.08);
+    }
+
+    .dark-report-btn:hover {
+      background: #1f0008;
+      box-shadow: 0 0 28px rgba(255, 0, 0, 0.2);
+      color: #ff6666;
+    }
+
+    /* ══ HIDDEN CHARS PUZZLE ══ */
+    .hidden-char {
+      font-size: 1.18em;
+      font-family: inherit;
+      font-weight: bold;
+      cursor: pointer;
+      color: inherit;
+      transition: color 0.15s, text-shadow 0.15s;
+      display: inline-block;
+    }
+
+    .hidden-char:hover {
+      text-shadow: 0 0 3px rgba(184, 147, 74, 0.8);
+    }
+
+    .hidden-char.clicked {
+      color: #ff4444 !important;
+      text-shadow: 0 0 5px #ff0000;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── NAV ──────────────────────────────────────────────── -->
+  <nav id="nav">
+    <a class="nav-brand" href="#" onclick="return false;">
+      <div class="nav-brand-badge">🏵</div>
+      <div class="nav-brand-name">
+        白菊ホールディングス
+        <small>SHIRAKIKU HOLDINGS</small>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#" class="nav-cta" onclick="openLogin(); return false;">社員・役員ログイン</a></li>
+    </ul>
+  </nav>
+
+  <!-- 表サイト -->
+  <div id="public-site">
+
+    <!-- ── HERO ───────────────────────────────────────────── -->
+    <section id="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-sky"></div>
+      <div class="hero-trees"></div>
+
+      <!-- 建物 CSS アート -->
+      <div class="hero-building">
+        <div class="building-side left"></div>
+        <div class="building-main">
+          <div class="building-windows">
+            <div class="w lit"></div>
+            <div class="w"></div>
+            <div class="w lit"></div>
+            <div class="w lit"></div>
+            <div class="w"></div>
+            <div class="w"></div>
+            <div class="w lit"></div>
+            <div class="w"></div>
+            <div class="w"></div>
+            <div class="w lit"></div>
+            <div class="w lit"></div>
+            <div class="w lit"></div>
+            <div class="w"></div>
+            <div class="w lit"></div>
+            <div class="w"></div>
+            <div class="w"></div>
+            <div class="w"></div>
+            <div class="w lit"></div>
+            <div class="w"></div>
+            <div class="w lit"></div>
+            <div class="w lit"></div>
+            <div class="w"></div>
+            <div class="w lit"></div>
+            <div class="w lit"></div>
+            <div class="w"></div>
+            <div class="w"></div>
+            <div class="w lit"></div>
+            <div class="w"></div>
+            <div class="w"></div>
+            <div class="w lit"></div>
+            <div class="w lit"></div>
+            <div class="w lit"></div>
+            <div class="w"></div>
+            <div class="w lit"></div>
+            <div class="w lit"></div>
+          </div>
+        </div>
+        <div class="building-side right"></div>
+      </div>
+
+      <div class="hero-content">
+        <div class="hero-eyebrow">SINCE 1974 — LIFE &amp; SOCIAL INNOVATION</div>
+        <h1 class="hero-title">未来<span class="hidden-char" onclick="clickChar(this, 'c1')">に</span>バトンをつなぐ、<br>未来への礎。
+        </h1>
+        <p class="hero-sub">
+          白菊ホールディ<span class="hidden-char" onclick="clickChar(this, 'c2')">ン</span>グスは、セレモニー・フード・ヘルスケアの事業を通じて、<br>
+          人々のライフステージ全体に寄り添い続けてきました。<br>
+          グループ独自の資源循環サイクルが、持続可能な社会を支えます。
+        </p>
+      </div>
+    </section>
+
+    <!-- ── INTRO ──────────────────────────────────────────── -->
+    <section class="sec" id="intro">
+      <div class="sec-inner">
+        <div class="sec-eyebrow">PHILOSOPHY</div>
+        <h2 class="sec-title">グループ理念</h2>
+        <p class="sec-desc">半世紀にわたる信頼と実績。私たちが大切にしてきた価値観をご紹介します。</p>
+        <div class="intro-grid">
+          <div class="intro-text">
+            <h3>尊い縁をつなぐ使命</h3>
+            <p>
+              白菊ホールディングスは1974年の創業以来、「縁（えにし）」を大切にしてきました。
+              生命の旅路に寄り添い、別れの悲しみを和ら<span class="hidden-char" onclick="clickChar(this, 'c3')">げ</span>、そして次の命へと繋ぐ——
+              私たちのあらゆる事業は、この使命の上に成り立っています。<br><br>
+              グループが誇る独自の<strong>資源循環サイクル</strong>は、自然の摂理に則った
+              持続可能な形で、生命の恵みを社会へと還元し続けます。
+            </p>
+          </div>
+          <div class="intro-values">
+            <div class="value-card">
+              <div class="vc-icon">🏵️</div>
+              <div>
+                <div class="vc-title">敬意（Reverence）</div>
+                <div class="vc-desc">すべての生命に対する深い敬意を持ち、その品格を重<span class="hidden-char"
+                    onclick="clickChar(this, 'c4')">ん</span>じ、最高のサービスを提供します。</div>
+              </div>
+            </div>
+            <div class="value-card">
+              <div class="vc-icon">🔄</div>
+              <div>
+                <div class="vc-title">循環（Circulation）</div>
+                <div class="vc-desc">生命の素材を無駄なく活かし、グループ全体で価値を創造し続けます。</div>
+              </div>
+            </div>
+            <div class="value-card">
+              <div class="vc-icon">🌿</div>
+              <div>
+                <div class="vc-title">共生（Symbiosis）</div>
+                <div class="vc-desc">地域社会・自然環境との調和を保ちながら、持続可能な事業を展開します。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── BUSINESS ───────────────────────────────────────── -->
+    <section class="sec" id="business">
+      <div class="sec-inner">
+        <div class="sec-eyebrow">BUSINESS</div>
+        <h2 class="sec-title">グループ事業紹介</h2>
+        <p class="sec-desc">4つの事業部門が連携し、ライフステージ全体を支える独自のエコシステムを構築しています。</p>
+        <div class="biz-grid">
+
+          <div class="biz-card">
+            <div class="biz-head">
+              <div class="biz-icon">🏛️</div>
+              <div class="biz-name">セレモニー事業</div>
+              <div class="biz-sub">SHIRAKIKU HALL</div>
+            </div>
+            <div class="biz-body">
+              <p>都内10か所の白菊ホールを中心に、家族葬・一般葬・火葬代行サービスを展開。地域<span class="hidden-char"
+                  onclick="clickChar(this, 'c5')">の</span>皆様の大切なお別れを、格調高く厳かにサポートいたします。</p>
+              <div class="biz-tags">
+                <span class="tag">葬儀</span>
+                <span class="tag">火葬代行</span>
+                <span class="tag">遺骨収納</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="biz-card">
+            <div class="biz-head">
+              <div class="biz-icon">🍜</div>
+              <div class="biz-name">フードサービス事業</div>
+              <div class="biz-sub">SHIRAKIKU FOOD SYSTEM</div>
+            </div>
+            <div class="biz-body">
+              <p>法事会食の仕<span class="hidden-char"
+                  onclick="clickChar(this, 'c6')">だ</span>しから飲食店向け特選食材の卸売まで。グループ独自の製法による骨髄エキスは、提携加盟店から高い評価をいただいております。
+              </p>
+              <div class="biz-tags">
+                <span class="tag">法事仕出し</span>
+                <span class="tag">食材卸</span>
+                <span class="tag">スープ原料</span>
+              </div>
+              <a id="secret-list-link" href="#" onclick="openSecretModal(); return false;"
+                style="display: none; color: var(--gold-lt); font-weight: bold; margin-top: 14px; text-decoration: underline; font-size: 12.5px;">
+                👉 【極秘】提携店向け出荷管理コード一覧
+              </a>
+            </div>
+          </div>
+
+          <div class="biz-card">
+            <div class="biz-head">
+              <div class="biz-icon">💊</div>
+              <div class="biz-name">ヘルスケア通販事業</div>
+              <div class="biz-sub">SHIRAKIKU LIFECARE</div>
+            </div>
+            <div class="biz-body">
+              <p>大人気健康食品「天然由来カルシウム：白菊の恵み」が好評通販中。厳選された国内原料による骨粉を超微細加工<span class="hidden-char"
+                  onclick="clickChar(this, 'c7')">し</span>、カルシウム含有率99%を実現しました。</p>
+              <div class="biz-tags">
+                <span class="tag">サプリメント</span>
+                <span class="tag">健康食品</span>
+                <span class="tag">通販</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="biz-card">
+            <div class="biz-head">
+              <div class="biz-icon">🏢</div>
+              <div class="biz-name">不動産・施設管理事業</div>
+              <div class="biz-sub">SHIRAKIKU ESTATE</div>
+            </div>
+            <div class="biz-body">
+              <p>グループが保有する複数の地下施設を含む不動産の管理・運営を担当。セレモニー・フード事業との連携による独自の資源管理体制を構築しています。</p>
+              <div class="biz-tags">
+                <span class="tag">施設管理</span>
+                <span class="tag">地下倉庫</span>
+                <span class="tag">資源管理</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── NUMBERS ────────────────────────────────────────── -->
+    <section class="sec" id="numbers">
+      <div class="sec-inner">
+        <div class="sec-eyebrow">OUR NUMBERS</div>
+        <h2 class="sec-title">グループ実績</h2>
+        <p class="sec-desc">半世紀の歴史が積み上げた信頼と実績</p>
+        <div class="num-grid">
+          <div class="num-item">
+            <div class="num-val">50<sup>年</sup></div>
+            <div class="num-label">創業からの歴史</div>
+          </div>
+          <div class="num-item">
+            <div class="num-val">10<sup>か所</sup></div>
+            <div class="num-label">グループ式場数</div>
+          </div>
+          <div class="num-item">
+            <div class="num-val">12,000<sup>+</sup></div>
+            <div class="num-label">年間サービス件数</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── NEWS ──────────────────────────────────────────── -->
+    <section class="sec" id="news">
+      <div class="sec-inner">
+        <div class="sec-eyebrow">NEWS & IR</div>
+        <h2 class="sec-title">IR・ニュースリリース</h2>
+        <p class="sec-desc"></p>
+        <div class="news-list">
+          <div class="news-item">
+            <span class="news-date">2026.06.24</span>
+            <span class="news-cat cat-biz">事業</span>
+            <span class="news-title">「白菊ライフケア」オンラインショップにて新カルシウムサプリメント発売</span>
+          </div>
+          <div class="news-item">
+            <span class="news-date">2026.06.18</span>
+            <span class="news-cat cat-biz">事業</span>
+            <span class="news-title">白菊フードシステム、関東エリアの提携飲食店へ新規仕入れ食材の配送体制を強化</span>
+          </div>
+          <div class="news-item">
+            <span class="news-date">2026.06.05</span>
+            <span class="news-cat cat-ir">IR</span>
+            <span class="news-title">第32期定期株主総会 決議ご通知の発送について</span>
+          </div>
+          <div class="news-item">
+            <span class="news-date">2026.05.28</span>
+            <span class="news-cat cat-ir">IR</span>
+            <span class="news-title">2025年度 連結業績報告および2026年度事業計画を発表</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FOOTER ─────────────────────────────────────────── -->
+    <footer id="footer">
+      <div class="footer-brand">白菊ホールディングス</div>
+      <div class="footer-links">
+        <a href="#" onclick="return false;">会社概要</a>
+        <a href="#" onclick="return false;">プレスリリース</a>
+        <a href="#" onclick="return false;">サステナビリティ</a>
+        <a href="#" onclick="return false;">個人情報保護方針</a>
+        <a href="#" class="footer-login-btn" onclick="openLogin(); return false;">社員・役員専用ログイン</a>
+      </div>
+      <div class="footer-copy">© 2024 SHIRAKIKU HOLDINGS CO., LTD. ALL RIGHTS RESERVED.</div>
+    </footer>
+
+  </div><!-- /public-site -->
+
+  <!-- ── LOGIN MODAL ────────────────────────────────────── -->
+  <div id="modal-bg" class="modal-bg" onclick="handleModalBgClick(event)">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title">グループ役員・社員専用システム</div>
+        <div class="modal-subtitle">AUTHORIZED PERSONNEL ONLY</div>
+        <button class="modal-close" onclick="closeLogin()">✕</button>
+      </div>
+      <div class="modal-body">
+        <label class="field-label">顧客管理ID / EMPLOYEE ID</label>
+        <input type="text" id="login-id" class="field-input" placeholder="例: RM-XXXX" autocomplete="off">
+        <label class="field-label">アクセスパスコード / PASSCODE</label>
+        <input type="password" id="login-pw" class="field-input" placeholder="パスコードを入力" autocomplete="new-password">
+        <button class="modal-btn" onclick="submitLogin()">ログイン / LOGIN</button>
+        <div id="login-error" class="field-error">IDまたはパスコードが正しくありません</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECRET MODAL ────────────────────────────────────── -->
+  <div id="secret-modal" class="modal-bg" onclick="handleSecretModalBgClick(event)">
+    <div class="modal" style="max-width: 420px;">
+      <div class="modal-head" style="background: #1a0404; border-bottom: 2px solid var(--gold);">
+        <div class="modal-title" style="color: #ff8888; font-size: 14px; font-weight: bold; font-family: var(--ff);">
+          【極秘】出荷管理システム / CLIENT CODES</div>
+        <div class="modal-subtitle" style="color: rgba(255,255,255,0.3); font-size: 9px; letter-spacing: 2px;">
+          RESTRICTED ACCESS</div>
+        <button class="modal-close" onclick="closeSecretModal()">✕</button>
+      </div>
+      <div class="modal-body" style="background: #0f0203; color: #ffa0a0; padding: 24px;">
+        <p
+          style="font-size: 12px; margin-bottom: 15px; color: #ff6666; border-bottom: 1px solid rgba(255,30,30,0.2); padding-bottom: 8px;">
+          白菊フードシステム 提携加盟店コードおよび納品時パスコード一覧
+        </p>
+        <table
+          style="width: 100%; border-collapse: collapse; font-size: 12.5px; font-family: monospace; text-align: left; color: #ffa0a0;">
+          <thead>
+            <tr style="border-bottom: 1px solid rgba(255,30,30,0.3); color: var(--gold-lt);">
+              <th style="padding: 6px 4px; font-weight: bold;">取引先加盟店</th>
+              <th style="padding: 6px 4px; font-weight: bold;">出荷コード</th>
+              <th style="padding: 6px 4px; font-weight: bold;">ステータス</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 8px 4px;">割烹 しらきく</td>
+              <td style="padding: 8px 4px; color: #fff;">5539</td>
+              <td style="padding: 8px 4px; color: #888;">完了</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 8px 4px;">中華料理 栄華</td>
+              <td style="padding: 8px 4px; color: #fff;">8821</td>
+              <td style="padding: 8px 4px; color: #ffa0a0;">保留</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,30,30,0.2); background: rgba(255,0,0,0.08);">
+              <td style="padding: 8px 4px; font-weight: bold; color: #ff6666;">🍜 ジンニクじんこつ</td>
+              <td style="padding: 8px 4px; font-weight: bold; color: #ff4444;">1974</td>
+              <td style="padding: 8px 4px; font-weight: bold; color: #ff3333;">納品済</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 8px 4px;">ホテル・ラフレシア</td>
+              <td style="padding: 8px 4px; color: #fff;">0942</td>
+              <td style="padding: 8px 4px; color: #888;">調整中</td>
+            </tr>
+          </tbody>
+        </table>
+        <div
+          style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px; color: #ff8888; border-left: 2px solid var(--gold); line-height: 1.6;">
+          ⚠️ <strong>【役員連絡用メモ】</strong><br>
+          統合に伴い、今月のログインIDは <strong>RM-9942</strong>、パスコードは <strong>0900</strong> へ一新されました。
+        </div>
+        <button class="modal-btn" onclick="closeSecretModal()"
+          style="margin-top: 20px; background: #1a0404; border: 1px solid var(--gold); color: var(--gold-lt);">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DARK SYSTEM ─────────────────────────────────────── -->
+  <div id="dark-system">
+    <div class="dark-topbar">
+      <div class="dark-topbar-title">⚠ SHIRAKIKU HOLDINGS — 資源管理・物流システム [CLASSIFIED]</div>
+      <div class="dark-status">
+        <div class="dark-dot"></div>SECURE CONNECTION ESTABLISHED
+      </div>
+    </div>
+    <div class="dark-body">
+      <div class="dark-alert">
+        ⚠ セキュリティ警告: 本システム内のログは最高機密に指定されています。外部流出は厳禁。<br>
+        アクセスはグループ役員および承認済み加盟店代表者のみに限定されます。
+      </div>
+
+      <div class="dark-section">
+        <div class="dark-section-hd">💀 骨原料 調達・配合記録（直近ロット）</div>
+        <div class="dark-log">
+          <span class="dark-key">[ロットNo: SH-サプリ-409]</span><br>
+          調達元: 白菊ホール荒川斎場（火葬余剰分）<br>
+          配合比率: 人骨粉末 45% ｜ カルシウム賦形剤 55%<br>
+          用途: 「白菊の恵み」サプリメント製造ライン<br>
+          状態: <span style="color:#ff4444">出荷済・一般通販配送完了</span>
+        </div>
+        <div class="dark-log">
+          <span class="dark-key">[ロットNo: SH-フード-112]</span><br>
+          調達元: 白菊ホール音無町式場（身元不明・保管分）<br>
+          配合比率: 特濃骨髄抽出エキスの素 100%<br>
+          用途: 提携店「ジンニクじんこつラーメン」宛仕入れ材料<br>
+          状態: <span style="color:#ff4444">納品完了（受領印: 鏡栄治）</span>
+        </div>
+      </div>
+
+      <div class="dark-section">
+        <div class="dark-section-hd">✉ 役員間メッセージログ（緊急転送分）</div>
+        <div class="dark-log">
+          <span class="dark-key">From: 代表取締役 白菊栄治 ｜ To: ジンニク店主 鏡栄治</span><br>
+          <span class="dark-key">件名: 例の配信者（タベアルキ太郎）の処分について</span><br><br>
+          例の動画配信者・タベアルキ太郎が、当社のサプリメントの製造ラインと、お前の店の仕入れルートを嗅ぎ回っているようだ。<br>
+          白菊ホールからお前の店への遺骨横流しや、サプリメントへの人骨混入の事実が公になれば、ホールディングス全体、そしてお前の店も終わりだ。<br>
+          見つけ次第、すぐに奴を拘束しろ。処分方法はお前の店の『ダシ材料』にすればいい。警察の目を欺くため、旧店舗（音無町3-19-3）の地下室へ連れ込み、そこに監禁しろ。本日夜に実行しろ。
+        </div>
+      </div>
+
+      <button class="dark-report-btn" onclick="triggerTrueEnd()">
+        📢 この闇取引データを警察へ匿名送信（告発）する
+      </button>
+    </div>
+  </div>
+
+  <script>
+    if (window.self === window.top) { window.location.href = '../index.html'; }
+
+    // ── Hidden Characters Puzzle ──
+    const clickedChars = new Set();
+    const targetChars = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7'];
+
+    function clickChar(el, charId) {
+      if (clickedChars.has(charId)) return;
+      el.classList.add('clicked');
+      clickedChars.add(charId);
+
+      // 一瞬明滅フラッシュするフィードバック
+      el.style.opacity = '0.3';
+      setTimeout(() => { el.style.opacity = '1'; }, 150);
+
+      if (targetChars.every(c => clickedChars.has(c))) {
+        setTimeout(() => {
+          const link = document.getElementById('secret-list-link');
+          if (link) {
+            link.style.display = 'block';
+            document.getElementById('business')?.scrollIntoView({ behavior: 'smooth' });
+            alert('フードサービス事業の紹介に「【極秘】出荷管理コード一覧」が解放されました。');
+          }
+        }, 300);
+      }
+    }
+
+    function openSecretModal() {
+      document.getElementById('secret-modal').classList.add('open');
+    }
+
+    function closeSecretModal() {
+      document.getElementById('secret-modal').classList.remove('open');
+    }
+
+    function handleSecretModalBgClick(e) {
+      if (e.target === e.currentTarget) closeSecretModal();
+    }
+
+    // ── State ──
+    window.top.postMessage({ type: 'GET_STATE' }, '*');
+    window.addEventListener('message', e => {
+      if (e.data?.type === 'STATE') {
+        // STATE received — no special handling needed for this page
+      }
+    });
+
+
+
+    // ── Login Modal ──
+    function openLogin() {
+      document.getElementById('login-error').style.display = 'none';
+      document.getElementById('login-id').value = '';
+      document.getElementById('login-pw').value = '';
+      document.getElementById('modal-bg').classList.add('open');
+      setTimeout(() => document.getElementById('login-id').focus(), 100);
+    }
+
+    function closeLogin() {
+      document.getElementById('modal-bg').classList.remove('open');
+    }
+
+    function handleModalBgClick(e) {
+      if (e.target === e.currentTarget) closeLogin();
+    }
+
+    function submitLogin() {
+      const id = document.getElementById('login-id').value.trim();
+      const pw = document.getElementById('login-pw').value.trim();
+      if (id === 'RM-9942' && pw === '0900') {
+        closeLogin();
+        showDarkSystem();
+      } else {
+        document.getElementById('login-error').style.display = 'block';
+        document.getElementById('login-pw').value = '';
+      }
+    }
+
+    document.getElementById('login-pw').addEventListener('keydown', e => {
+      if (e.key === 'Enter') submitLogin();
+    });
+
+    // ── Dark System ──
+    function showDarkSystem() {
+      document.getElementById('public-site').style.display = 'none';
+      document.getElementById('nav').style.display = 'none';
+      document.getElementById('dark-system').classList.add('show');
+    }
+
+    // ── True End ──
+    function triggerTrueEnd() {
+      if (confirm('この闇取引の全データを警視庁へ匿名告発（送信）します。よろしいですか？')) {
+        const payload = { type: 'TRIGGER_TRUE_END' };
+        window.top.postMessage(payload, '*');
+        if (window.parent) {
+          window.parent.postMessage(payload, '*');
+          if (window.parent.parent) {
+            window.parent.parent.postMessage(payload, '*');
+          }
+        }
+      }
+    }
+  </script>
+</body>
+
+</html>

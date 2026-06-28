@@ -3,6 +3,26 @@
    ゲーム状態管理 / ウィンドウ管理 / 通知 / ロック画面
    ============================================================ */
 
+// ─── ACHIEVEMENTS ─────────────────────────────────────────────
+const ACHIEVEMENTS_KEY = 'yodomi_achievements';
+const ACHIEVEMENTS = {
+  unlock_first_step: { name: '最初の一歩', desc: '太郎のスマホのパスコードロックを解除した。', icon: '🔓' },
+  end_normal_clear: { name: '澱みの生存者', desc: 'タベアルキ太郎を店主の魔の手から無事救出した。', icon: '🏃' },
+  end_bad_end: { name: '狂気のスープ', desc: '店主の新たな『ダシ』として澱みに溶けた。', icon: '🍜' },
+  end_true_end: { name: '澱みの根絶', desc: '白菊ホールディングスの闇を暴き、事件を完全解決に導いた。', icon: '🏆' }
+};
+
+let userAchievements = {
+  unlock_first_step: false,
+  end_normal_clear: false,
+  end_bad_end: false,
+  end_true_end: false
+};
+try {
+  const saved = localStorage.getItem(ACHIEVEMENTS_KEY);
+  if (saved) userAchievements = JSON.parse(saved);
+} catch (e) { }
+
 // ─── GAME STATE ───────────────────────────────────────────────
 const STATE_KEY = 'yodomi_gameState';
 const CORRECT_PASSCODE = '19940826';
@@ -34,13 +54,24 @@ let gameState = (() => {
 // 現在プレイヤーが見ているデバイスを追跡（'player' = 自分のスマホ ・ 'picked' = 拾ったスマホ）
 // 初期状態は picked（ロック画面からスタート）
 let currentDevice = 'picked';
+let isExtraMode = false;
 
 // バッテリー管理
 let pickedBattery = 98; // 初期値98%
 let shutdownActive = false;
 
 function saveState() {
-  try { localStorage.setItem(STATE_KEY, JSON.stringify(gameState)); } catch {}
+  try {
+    localStorage.setItem(STATE_KEY, JSON.stringify(gameState));
+
+    // 開いているすべての子iframeに対して、最新の状態をブロードキャスト送信する
+    ['mobile-iframe', 'player-browser-iframe', 'player-sns-iframe'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.contentWindow) {
+        el.contentWindow.postMessage({ type: 'STATE', state: gameState }, '*');
+      }
+    });
+  } catch { }
 }
 
 function setFlag(key, value) {
@@ -63,7 +94,7 @@ function trackEvent(name, params = null) {
 }
 
 function advanceStep(step) {
-  const ORDER = ['intro','unlocked','news_found','location_spec','chat_sent','clear'];
+  const ORDER = ['intro', 'unlocked', 'news_found', 'location_spec', 'chat_sent', 'clear'];
   const cur = ORDER.indexOf(gameState.currentStep);
   const nxt = ORDER.indexOf(step);
   if (nxt > cur) {
@@ -97,9 +128,9 @@ function syncBatteryFromStep() {
     pickedBattery = 0;
   }
   // 自分のスマホのバッテリーもステップに応じて変化
-  const playerBatteryByStep = { intro:78, unlocked:74, news_found:69, location_spec:63, chat_sent:61, clear:61, bad_end:61 };
+  const playerBatteryByStep = { intro: 78, unlocked: 74, news_found: 69, location_spec: 63, chat_sent: 61, clear: 61, bad_end: 61 };
   const newPb = playerBatteryByStep[step] ?? playerBattery;
-  if (newPb < playerBattery) { playerBattery = newPb; savePlayerBattery(); }
+  if (isExtraMode || newPb < playerBattery) { playerBattery = newPb; savePlayerBattery(); }
   updateBatteryDisplay();
 }
 
@@ -122,8 +153,8 @@ const NOTIFS = [
     id: 'hint_gallery',
     // ニュース発見後、かつ一度自分のスマホへ戻ってから（友人がヒントを言ってくれる）
     check: () => gameState.currentStep === 'news_found'
-                 && gameState.flags.returnedToPlayerPhone
-                 && !(gameState.flags.kitchenPhotoViewed && gameState.flags.casePhotoViewed),
+      && gameState.flags.returnedToPlayerPhone
+      && !(gameState.flags.kitchenPhotoViewed && gameState.flags.casePhotoViewed),
     icon: '💬',
     app: 'メッセージ (友人)',
     msg: 'ケンの配信で「写真フォルダにも手がかりがあるかも」って言ってたよ！調べてみろ！',
@@ -157,14 +188,14 @@ function checkTriggers() {
 function updateBadges() {
   const badgeMap = {
     // SNSバッジは廃止（ログイン画面のため意味がない）
-    sns:     () => false,
+    sns: () => false,
     // ブラウザバッジ：ロック解除後〜ニュース記事を読むまで
     browser: () => !gameState.isLocked && !gameState.flags.newsRead,
     // ギャラリーバッジ：ニュース発見後 かつ 一度自分のスマホへ戻ってから
     gallery: () => gameState.currentStep === 'news_found'
-                   && gameState.flags.returnedToPlayerPhone
-                   && !(gameState.flags.kitchenPhotoViewed && gameState.flags.casePhotoViewed),
-    chat:    () => (gameState.flags.newsRead && gameState.flags.kitchenPhotoViewed && gameState.flags.casePhotoViewed && gameState.currentStep === 'news_found') || (gameState.currentStep === 'location_spec' && gameState.currentStep !== 'chat_sent')
+      && gameState.flags.returnedToPlayerPhone
+      && !(gameState.flags.kitchenPhotoViewed && gameState.flags.casePhotoViewed),
+    chat: () => (gameState.flags.newsRead && gameState.flags.kitchenPhotoViewed && gameState.flags.casePhotoViewed && gameState.currentStep === 'news_found') || (gameState.currentStep === 'location_spec' && gameState.currentStep !== 'chat_sent')
   };
   Object.entries(badgeMap).forEach(([id, cond]) => {
     const el = document.getElementById('badge-' + id);
@@ -187,8 +218,8 @@ function processToast() {
   const { icon, app, msg } = toastQueue.shift();
   const el = document.getElementById('notification-toast');
   el.querySelector('.toast-icon').textContent = icon;
-  el.querySelector('.toast-app').textContent  = app;
-  el.querySelector('.toast-msg').textContent  = msg;
+  el.querySelector('.toast-app').textContent = app;
+  el.querySelector('.toast-msg').textContent = msg;
   el.classList.add('show');
   playBeep();
 
@@ -198,8 +229,8 @@ function processToast() {
     targetDevice = document.getElementById('lock-screen');
   } else {
     if (isMobile()) {
-      targetDevice = (document.getElementById('player-phone').style.display !== 'none') 
-        ? document.getElementById('player-phone') 
+      targetDevice = (document.getElementById('player-phone').style.display !== 'none')
+        ? document.getElementById('player-phone')
         : document.getElementById('picked-phone-home');
     } else {
       // PC版: アプリ名が「メッセージ」なら自分のスマホ、それ以外（LIME、SNS等）なら拾ったスマホ
@@ -210,7 +241,7 @@ function processToast() {
       }
     }
   }
-  
+
   if (targetDevice) {
     targetDevice.classList.remove('shake-device');
     // リフローを挟んでアニメーションをリスタート
@@ -234,23 +265,23 @@ function unlockAudio() {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     gameState.flags.audioUnlocked = true;
     saveState();
-  } catch {}
+  } catch { }
 }
 
 function playBeep(freq1 = 880, freq2 = 660, dur = 0.25, vol = 0.15) {
   if (!audioCtx) return;
   try {
-    const osc  = audioCtx.createOscillator();
+    const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.connect(gain); gain.connect(audioCtx.destination);
     osc.type = 'sine';
     osc.frequency.setValueAtTime(freq1, audioCtx.currentTime);
     osc.frequency.setValueAtTime(freq2, audioCtx.currentTime + dur * 0.5);
-    gain.gain.setValueAtTime(vol,     audioCtx.currentTime);
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
     osc.start(audioCtx.currentTime);
     osc.stop(audioCtx.currentTime + dur);
-  } catch {}
+  } catch { }
 }
 
 function playError() { playBeep(200, 180, 0.3, 0.2); }
@@ -262,7 +293,7 @@ let passcode = '';
 function initLockScreen() {
   const pad = document.getElementById('number-pad');
   if (!pad) return;
-  [1,2,3,4,5,6,7,8,9,'',0,'⌫'].forEach(n => {
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, '⌫'].forEach(n => {
     const btn = document.createElement('button');
     btn.className = 'passcode-btn' + (n === '' ? ' empty' : n === '⌫' ? ' del-btn' : '');
     btn.textContent = n;
@@ -293,15 +324,15 @@ function triggerFirstNotification() {
         </div>
       `;
       el.classList.add('visible');
-      
+
       // 音声再生（audioCtxの準備ができている場合のみ）
       if (audioCtx) {
         playBeep(880, 660, 0.25, 0.15);
       }
-      
+
       // ロック画面自体をブルブルと振動させる
       const targetDevice = document.getElementById('lock-screen');
-      
+
       if (targetDevice) {
         targetDevice.classList.remove('shake-device');
         void targetDevice.offsetWidth; // リフロー
@@ -320,7 +351,7 @@ function addDigit(d) {
 }
 
 function deleteDigit() {
-  passcode = passcode.slice(0,-1);
+  passcode = passcode.slice(0, -1);
   renderDots();
 }
 
@@ -336,7 +367,7 @@ function checkPasscode() {
   } else {
     playError();
     const disp = document.getElementById('passcode-display');
-    const err  = document.getElementById('passcode-error');
+    const err = document.getElementById('passcode-error');
     disp.classList.add('shake');
     err.classList.add('show');
     passcode = '';
@@ -351,6 +382,7 @@ function checkPasscode() {
 function doUnlock() {
   gameState.isLocked = false;
   advanceStep('unlocked');
+  unlockAchievement('unlock_first_step'); // 実績解除
   const ls = document.getElementById('lock-screen');
   ls.classList.add('fade-out');
   setTimeout(() => {
@@ -367,25 +399,25 @@ function updateLockTime() {
   const now = new Date();
   const timeEl = document.getElementById('lock-time');
   const dateEl = document.getElementById('lock-date');
-  if (timeEl) timeEl.textContent = now.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+  if (timeEl) timeEl.textContent = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
   if (dateEl) {
-    const days = ['日','月','火','水','木','金','土'];
-    dateEl.textContent = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日（${days[now.getDay()]}）`;
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    dateEl.textContent = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日（${days[now.getDay()]}）`;
   }
 }
 
 // ─── DESKTOP CLOCK ────────────────────────────────────────────
 function updateClock() {
   const el = document.getElementById('picked-phone-home-clock');
-  if (el) el.textContent = new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+  if (el) el.textContent = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
 }
 
 // ─── APP CONFIG ───────────────────────────────────────────────
 const APPS = {
-  sns:     { title: 'SNS',     icon: '🐦', src: 'apps/sns.html',     w: 480, h: 640 },
+  sns: { title: 'SNS', icon: '🐦', src: 'apps/sns.html', w: 480, h: 640 },
   browser: { title: 'ブラウザ', icon: '🌐', src: 'apps/browser.html', w: 620, h: 520 },
-  gallery: { title: '写真',     icon: '📷', src: 'apps/gallery.html', w: 440, h: 600 },
-  chat:    { title: 'LIME',    icon: '💬', src: 'apps/chat.html',    w: 400, h: 640 }
+  gallery: { title: '写真', icon: '📷', src: 'apps/gallery.html', w: 440, h: 600 },
+  chat: { title: 'LIME', icon: '💬', src: 'apps/chat.html', w: 400, h: 640 }
 };
 
 // isMobile は初期化時に固定（下部の _isMobileFixed を参照）
@@ -394,13 +426,13 @@ function openApp(appId, extra = null) {
   const cfg = APPS[appId]; if (!cfg) return;
   playClick();
   if (isMobile()) openMobile(appId, extra);
-  else             openWindow(appId, extra);
+  else openWindow(appId, extra);
 }
 
 // ─── MOBILE ───────────────────────────────────────────────────
 function openMobile(appId, extra) {
   const overlay = document.getElementById('mobile-app-overlay');
-  const iframe  = document.getElementById('mobile-iframe');
+  const iframe = document.getElementById('mobile-iframe');
   let src = APPS[appId].src;
   if (extra) src += '?' + new URLSearchParams(extra).toString();
   iframe.src = src;
@@ -490,13 +522,13 @@ function makeDraggable(win, handle) {
   handle.addEventListener('mousedown', e => {
     if (e.target.closest('button')) return;
     dragging = true; sx = e.clientX; sy = e.clientY;
-    sl = parseInt(win.style.left)||0; st = parseInt(win.style.top)||0;
+    sl = parseInt(win.style.left) || 0; st = parseInt(win.style.top) || 0;
     e.preventDefault();
   });
   document.addEventListener('mousemove', e => {
     if (!dragging) return;
     win.style.left = sl + e.clientX - sx + 'px';
-    win.style.top  = st + e.clientY - sy + 'px';
+    win.style.top = st + e.clientY - sy + 'px';
   });
   document.addEventListener('mouseup', () => { dragging = false; });
 }
@@ -517,7 +549,7 @@ function renderTaskbar() {
 // ─── POSTMESSAGE ──────────────────────────────────────────────
 window.addEventListener('message', e => {
   const msg = e.data; if (!msg || !msg.type) return;
-  switch(msg.type) {
+  switch (msg.type) {
     case 'OPEN_APP':
       openApp(msg.appId, msg.extra || null);
       break;
@@ -551,6 +583,9 @@ window.addEventListener('message', e => {
     case 'SHUTDOWN_START':
       triggerShutdownSequence(msg.endType);
       break;
+    case 'TRIGGER_TRUE_END':
+      triggerTrueEnd();
+      break;
     case 'TRACK_EVENT':
       trackEvent(msg.eventName, msg.params || null);
       break;
@@ -564,7 +599,7 @@ function triggerShutdownSequence(endType) {
   updateBatteryDisplay();
 
   showToast('⚠️', 'システム', 'バッテリー残量がありません。シャットダウンします...');
-  
+
   // Close any running apps on picked phone
   Object.keys(wins).forEach(closeWin);
   closeMobileApp();
@@ -585,7 +620,7 @@ function triggerShutdownSequence(endType) {
     setTimeout(() => {
       // Flip back to Player's phone automatically
       flipDevice();
-      
+
       // Hide shutdown overlay so the player can see their phone
       if (overlay) {
         overlay.style.opacity = '0';
@@ -597,14 +632,14 @@ function triggerShutdownSequence(endType) {
       // Automatically open the LIME chat thread on player's phone after flipDevice is done
       setTimeout(() => {
         openThread();
-        
+
         // Inject battery dead notification / conversation
         if (playerChatTimeout) clearTimeout(playerChatTimeout);
-        
+
         if (endType === 'clear') {
-          playerChatIndex = 19; // グッドエンド用の充電切れメッセージへ
+          playerChatIndex = 19; // グッドエンド用の充電切れメッセージへ（idx 19〜21）
         } else {
-          playerChatIndex = 23; // バッドエンド用の充電切れメッセージへ
+          playerChatIndex = 27; // バッドエンド用の充電切れメッセージへ（idx 27〜30）
         }
         renderNextPlayerMessage();
       }, 250);
@@ -615,15 +650,100 @@ function triggerShutdownSequence(endType) {
 // ─── ENDINGS ──────────────────────────────────────────────────
 function triggerClear() {
   advanceStep('clear');
+  unlockAchievement('end_normal_clear'); // 実績解除
   const el = document.getElementById('epilogue-overlay');
   if (el) {
     setTimeout(() => el.classList.add('visible'), 500);
   }
 }
 
+function startExtraScenario() {
+  // クリア後は、別のURLである /extra へリダイレクト（遷移）させます。
+  window.location.href = '/extra';
+}
+
+function proceedToExtraStory() {
+  const intro = document.getElementById('extra-intro-overlay');
+  if (intro) intro.style.display = 'none';
+
+  // クリア後フラグをセット（先にフラグを立ててから openThread を呼ぶ）
+  gameState.flags.extraActive = true;
+  saveState();
+
+  // スレッドを太郎に切り替えておく
+  activePlayerThread = 'taro';
+  if (playerChatIndex < 22) playerChatIndex = 22;
+
+  // 自分のスマホへ切り替え
+  flipDevice();
+
+  // LIMEチャットを起動し、太郎からのメッセージを開始
+  // flipDevice() のアニメーション（100ms）完了後に開く
+  setTimeout(() => {
+    openThread();
+  }, 500);
+}
+
+async function triggerTrueEnd() {
+  gameState.currentStep = 'true_end'; saveState();
+  trackEvent('game_true_end');
+  unlockAchievement('end_true_end'); // 実績解除
+
+  // アプリ（ブラウザ）を閉じる
+  closePlayerApp();
+
+  // 1. 強烈なグリッチ砂嵐・明滅の開始（サイレン演出の準備）
+  const cover = document.getElementById('glitch-cover');
+  if (cover) cover.style.display = 'block';
+
+  // パトカーのサイレン音（Beep音の繰り返しで表現）
+  let sirenInterval = null;
+  if (audioCtx) {
+    try {
+      let toggle = false;
+      sirenInterval = setInterval(() => {
+        // パトカーの「ピーポー」音を再現 (770Hz と 960Hz)
+        const freq = toggle ? 960 : 770;
+        playBeep(freq, freq, 0.4, 0.35);
+        toggle = !toggle;
+
+        // 画面明滅エフェクトを連動
+        if (cover) {
+          cover.style.opacity = toggle ? '0.7' : '0.98';
+        }
+      }, 500);
+    } catch (e) { }
+  }
+
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+  // 2. サイレンと無線音をシミュレートするトースト
+  await wait(800);
+  showToast('🚨', '緊急無線', '警視庁本部より全局！白菊ホールディングス本社ビルおよび関連施設への突入を開始せよ！');
+  await wait(1800);
+  showToast('🚨', '速報', '白菊ホールディングス代表取締役らを死体損壊容疑で逮捕。');
+
+  await wait(2000);
+
+  // サイレンの停止
+  if (sirenInterval) clearInterval(sirenInterval);
+  if (cover) cover.style.display = 'none';
+
+  // 3. トゥルーエンドオーバーレイを表示
+  const trueEndOverlay = document.getElementById('true-end-overlay');
+  if (trueEndOverlay) {
+    trueEndOverlay.style.display = 'flex';
+    trueEndOverlay.style.opacity = '0';
+    await wait(50);
+    trueEndOverlay.style.transition = 'opacity 2.0s ease';
+    trueEndOverlay.style.opacity = '1';
+  }
+}
+
 async function triggerBadEnd() {
   gameState.currentStep = 'bad_end'; saveState();
   trackEvent('game_bad_end');
+  unlockAchievement('end_bad_end'); // 実績解除
   // Close all windows
   Object.keys(wins).forEach(closeWin);
   closeMobileApp();
@@ -638,7 +758,7 @@ async function triggerBadEnd() {
 
   // 1. ハッキングオーバーレイの表示
   overlay.style.display = 'flex';
-  
+
   // 不気味な電子ノイズ音の開始
   let synthInterval = null;
   if (audioCtx) {
@@ -647,14 +767,14 @@ async function triggerBadEnd() {
       synthInterval = setInterval(() => {
         playBeep(Math.random() * 150 + 40, Math.random() * 150 + 40, 0.12, 0.12);
       }, 250);
-    } catch(e) {}
+    } catch (e) { }
   }
 
   const dummy = document.getElementById('hacked-dummy');
   const shadow = document.getElementById('dummy-shadow');
 
   const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-  
+
   if (shadow) {
     // 人影が徐々にカメラへ近づいてくる演出
     await wait(400);
@@ -662,7 +782,7 @@ async function triggerBadEnd() {
     shadow.style.height = '620px';
     shadow.style.filter = 'blur(8px)';
   }
-  
+
   await wait(1800);
 
   // 3. 店主の顔（赤い目）が突如ジャンプスケアで出現
@@ -713,6 +833,141 @@ async function triggerBadEnd() {
   playBeep(45, 45, 4.0, 0.3);
 }
 
+function renderPlayerChat() {
+  const container = document.getElementById('player-thread-messages');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const titleEl = document.querySelector('.chat-thread .thread-title');
+
+  if (activePlayerThread === 'friend') {
+    if (titleEl) titleEl.textContent = 'メッセージ (友人)';
+    // friendスレッドの有効範囲は 0〜21（idx 22〜26はtaroスレッドのため除外）
+    // chat_sent=19, clear=22 のいずれも上限27未満（bad_end開始前）に収まる
+    const maxRender = Math.min(playerChatIndex, 22);
+    let renderLimit = maxRender;
+    if (!gameState.flags.firstAddressSent) {
+      // firstAddressSent前はニュース発見後ヒント（idx 13〜18）を非表示
+      renderLimit = Math.min(renderLimit, 13);
+    }
+    // バッドエンド進行中の場合は、バッドエンド用のメッセージ（idx 27〜30）も描画
+    if (gameState.currentStep === 'bad_end' && playerChatIndex >= 27) {
+      for (let i = 0; i < 22; i++) {
+        drawBubble(container, PLAYER_CHAT_SCENARIO[i]);
+      }
+      for (let i = 27; i < playerChatIndex; i++) {
+        drawBubble(container, PLAYER_CHAT_SCENARIO[i]);
+      }
+    } else {
+      // friendスレッドのメッセージのみを描画（taroスレッドを除外）
+      for (let i = 0; i < renderLimit; i++) {
+        if (PLAYER_CHAT_SCENARIO[i] && PLAYER_CHAT_SCENARIO[i].thread === 'friend') {
+          drawBubble(container, PLAYER_CHAT_SCENARIO[i]);
+        }
+      }
+    }
+  } else if (activePlayerThread === 'taro') {
+    if (titleEl) titleEl.textContent = 'メッセージ (見慣れない番号)';
+    const startIdx = 22;
+    const currentTaroIdx = Math.max(playerChatIndex, 22);
+    for (let i = startIdx; i < currentTaroIdx; i++) {
+      if (PLAYER_CHAT_SCENARIO[i] && PLAYER_CHAT_SCENARIO[i].thread === 'taro') {
+        drawBubble(container, PLAYER_CHAT_SCENARIO[i]);
+      }
+    }
+  }
+  container.scrollTop = container.scrollHeight;
+}
+
+function drawBubble(container, msgData) {
+  if (!msgData) return;
+  const msgDiv = document.createElement('div');
+  msgDiv.className = `msg ${msgData.sender}`;
+  msgDiv.innerHTML = `<div class="msg-bubble">${msgData.text}</div>`;
+  container.appendChild(msgDiv);
+}
+
+function openThread() {
+  if (gameState.flags.extraActive) {
+    activePlayerThread = 'taro';
+    if (playerChatIndex < 22) playerChatIndex = 22;
+  } else {
+    activePlayerThread = 'friend';
+  }
+  renderPlayerChat();
+  document.querySelector('.chat-thread').classList.add('open');
+
+  if (activePlayerThread === 'friend' && playerChatIndex === 0) {
+    renderNextPlayerMessage();
+  } else if (activePlayerThread === 'taro' && playerChatIndex === 22) {
+    renderNextPlayerMessage();
+  }
+}
+
+function renderNextPlayerMessage() {
+  if (playerChatIndex >= PLAYER_CHAT_SCENARIO.length) return;
+
+  const container = document.getElementById('player-thread-messages');
+  if (!container) return;
+
+  const msgData = PLAYER_CHAT_SCENARIO[playerChatIndex];
+
+  // スレッドが一致している場合のみバブルを描画
+  if (msgData.thread === activePlayerThread) {
+    drawBubble(container, msgData);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  playerChatIndex++;
+  if (activePlayerThread === 'taro') {
+    gameState.flags.taroChatIndex = playerChatIndex;
+    saveState();
+  }
+
+  // --- クリア/バッドエンドの遷移判定 ---
+  if (activePlayerThread === 'friend' && playerChatIndex === 22) {
+    setTimeout(triggerClear, 3500);
+    return;
+  }
+  if (activePlayerThread === 'friend' && playerChatIndex === 31) {
+    setTimeout(() => {
+      const div = document.createElement('div');
+      div.className = 'msg recv';
+      div.innerHTML = `
+        <div class="msg-ava" style="background:#2a0000;filter:hue-rotate(180deg)">🔪</div>
+        <div class="msg-bubble" style="background:#2a0505;color:#ff6060">
+          余計なことをするな<br><span style="font-size:11px;color:rgba(255,60,60,0.5)">— 未知の番号</span>
+        </div>
+        <div class="msg-time" style="color:#ff4040">09:31</div>
+      `;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+
+      setTimeout(triggerBadEnd, 2500);
+    }, 2000);
+    return;
+  }
+
+  if (playerChatIndex < PLAYER_CHAT_SCENARIO.length) {
+    const nextMsg = PLAYER_CHAT_SCENARIO[playerChatIndex];
+
+    // 進行制限
+    if (activePlayerThread === 'friend') {
+      if (playerChatIndex === 6 && gameState.isLocked) return;
+      if (playerChatIndex === 13 && !gameState.flags.firstAddressSent) return;
+      if (playerChatIndex === 19) return;
+      if (playerChatIndex === 27) return; // バッドエンド進行前で停止
+    }
+
+    const delay = nextMsg.sender === 'recv' ? 2200 : 1400;
+    playerChatTimeout = setTimeout(renderNextPlayerMessage, delay);
+  }
+}
+
+function closeThread() {
+  document.querySelector('.chat-thread').classList.remove('open');
+}
+
 // ─── SETTINGS ─────────────────────────────────────────────────
 function openSettings() {
   document.getElementById('settings-overlay').classList.add('open');
@@ -722,7 +977,7 @@ function closeSettings() {
 }
 
 function exportState() {
-  const blob = new Blob([JSON.stringify(gameState, null, 2)], {type:'application/json'});
+  const blob = new Blob([JSON.stringify(gameState, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'yodomi_save.json';
@@ -749,143 +1004,96 @@ function resetGame() {
   location.reload();
 }
 
+function restartGameWithoutConfirm() {
+  localStorage.removeItem(STATE_KEY);
+  location.reload();
+}
+
 const PLAYER_CHAT_SCENARIO = [
   // --- 初期会話（インデックス 0〜5）---
-  // 友人がフードハンター ケンの緊急配信を見てプレイヤーに連絡してきた
-  { sender: 'recv', text: 'おい、フードハンター ケンが緊急生配信してるぞ！ タベアルキ太郎が昨日から連絡取れないって、配信でずっと呼びかけてる…' },
-  { sender: 'sent', text: 'マジか！？ 実はさっき変なスマホ拾ったんだよ。裏に「ラーメン店オープン記念」のケースがついてたやつ。太郎のじゃないか？' },
-  { sender: 'recv', text: 'それ絶対太郎のスマホじゃん！ ロックとかかかってない？' },
-  { sender: 'sent', text: 'かかってる。8桁のパスコードがわからん' },
-  { sender: 'recv', text: 'ケンが配信で言ってた。「太郎のSNSにヒントがある」って。太郎の公開SNS、調べてみろよ！' },
-  { sender: 'sent', text: 'なるほど。ちょっと調べてみる！' },
+  { thread: 'friend', sender: 'recv', text: 'おい、フードハンター ケンの緊急生配信してるぞ！ タベアルキ太郎が昨日から連絡取れないって、配信でずっと呼びかけてる…' },
+  { thread: 'friend', sender: 'sent', text: 'マジか！？ 実はさっき変なスマホ拾ったんだよ。裏に「ラーメン店オープン記念」のケースがついてたやつ。太郎のじゃないか？' },
+  { thread: 'friend', sender: 'recv', text: 'それ絶対太郎のスマホじゃん！ ロックとかかかってない？' },
+  { thread: 'friend', sender: 'sent', text: 'かかってる。8桁のパスコードがわからん' },
+  { thread: 'friend', sender: 'recv', text: 'ケンが配信で言ってた。「太郎のSNSにヒントがある」って。太郎の公開SNS、調べてみろよ！' },
+  { thread: 'friend', sender: 'sent', text: 'なるほど。ちょっと調べてみる！' },
 
   // --- ロック解除後（インデックス 6〜9）---
-  { sender: 'sent', text: 'ロック解除できたぞ！' },
-  { sender: 'recv', text: 'マジか！ 中身を確認してくれ！ ケンが配信で「太郎の行方をご存知の方はDMを」って言ってるけど、お前が直接太郎のLIMEからケンに連絡できないか？' },
-  { sender: 'sent', text: 'わかった。LIMEアプリとか、ブラウザとか、写真とか……ざっと見てみる' },
-  { sender: 'recv', text: '頼む。ケンも配信しながら自分で調べてるみたいだけど、スマホの中の情報は絶対そっちの方が詳しいはずだ' },
+  { thread: 'friend', sender: 'sent', text: 'ロック解除できたぞ！' },
+  { thread: 'friend', sender: 'recv', text: 'マジか！ 中身を確認してくれ！ ケンが配信で「太郎の行方をご存知の方はDMを」って言ってるけど、お前が直接太郎のLIMEからケンに連絡できないか？' },
+  { thread: 'friend', sender: 'sent', text: 'わかった。LIMEアプリとか、ブラウザとか、写真とか……ざっと見てみる' },
+  { thread: 'friend', sender: 'recv', text: '頼む。ケンも配信しながら自分で調べてるみたいだけど、スマホの中の情報は絶対そっちの方が詳しいはずだ' },
 
   // --- ニュース発見後（インデックス 10〜12）---
-  { sender: 'sent', text: '太郎のブラウザに、台東区の葬儀業者への家宅捜索ニュースがあった。しかも太郎がよく行ってたあのラーメン店のすぐ近くだって' },
-  { sender: 'recv', text: '……それって、まさかそのラーメン店のことじゃ。ゾッとするな。そういえば、ラーメン店のHPのスープ説明に「秘伝の骨」ってあったけど、このニュースと関係ないか？ 調べてみてくれ！' },
-  { sender: 'sent', text: '「秘伝の骨」か……。HPのその部分をもう一度詳しく調べてみる！写真フォルダの厨房写真も怪しいから合わせて見てみるよ。' },
+  { thread: 'friend', sender: 'sent', text: '太郎のブラウザに、台東区の葬儀業者への家宅捜索ニュースがあった。しかも太郎がよく行ってたあのラーメン店のすぐ近くだって' },
+  { thread: 'friend', sender: 'recv', text: '……それって、まさかそのラーメン店のことじゃ。ゾッとするな。そういえば、ラーメン店のHPのスープ説明に「秘伝の骨」ってあったけど、このニュースと関係ないか？ 調べてみてくれ！' },
+  { thread: 'friend', sender: 'sent', text: '「秘伝の骨」か……。HPのその部分をもう一度詳しく調べてみる！写真フォルダの厨房写真も怪しいから合わせて見てみるよ。' },
 
   // --- 新設: 最初の住所送信後（空き地だった）（インデックス 13〜18） ---
-  { sender: 'recv', text: 'おい！ケンの配信見てたら、送った住所に行ったら「ただの空き地だった」って言ってるぞ！違う場所だったのか？' },
-  { sender: 'sent', text: 'えっ、厨房の写真にあった白菊ホールから推測したんだけど…犯人の罠だったのか？' },
-  { sender: 'recv', text: '何かがおかしいな。そういえば、太郎のスマホケースって限定記念品だろ？太郎のスマホの背面に何か別のヒントが書いてないか？' },
-  { sender: 'sent', text: '背面？スマホカバーがついてて直接は見えないけど…' },
-  { sender: 'recv', text: 'お前のスマホのカメラを起動して、鏡にスマホ背面を映して写真を撮ってみろよ！鏡の反転で何か見えない文字が読めるかもしれないぞ！' },
-  { sender: 'sent', text: 'なるほど、鏡に映して撮影してみる！' },
+  { thread: 'friend', sender: 'recv', text: 'おい！ケンの配信見てたら、送った住所に行ったら「ただの空き地だった」って言ってるぞ！違う場所だったのか？' },
+  { thread: 'friend', sender: 'sent', text: 'えっ、厨房の写真にあった白菊ホールから推測したんだけど…犯人の罠だったのか？' },
+  { thread: 'friend', sender: 'recv', text: '何かがおかしいな。そういえば、太郎のスマホケースって限定記念品だろ？太郎のスマホの背面に何か別のヒントが書いてないか？' },
+  { thread: 'friend', sender: 'sent', text: '背面？スマホカバーがついてて直接は見えないけど…' },
+  { thread: 'friend', sender: 'recv', text: 'お前のスマホのカメラを起動して、鏡にスマホ背面を映して写真を撮ってみろよ！鏡の反転で何か見えない文字が読めるかもしれないぞ！' },
+  { thread: 'friend', sender: 'sent', text: 'なるほど、鏡に映して撮影してみる！' },
 
-  // --- グッドエンド用：充電切れ後（インデックス 19〜22）---
-  { sender: 'sent', text: 'あっ、拾ったスマホの充電が切れちゃった…！' },
-  { sender: 'recv', text: 'ケンの配信見てたら「今、匿名から住所の情報が届いた！！」って言い出した！ それってお前がLIMEで送ったやつだよな！？' },
-  { sender: 'recv', text: 'ケンが「台東区音無町3-19-3、今から警察と一緒に向かう！」って叫んでる！ 視聴者もザワついている！！' },
-  { sender: 'recv', text: '今度は本物の場所だったみたいだ！お前すごいことしたぞ……！' },
+  // --- グッドエンド用：充電切れ後（インデックス 19〜21）---
+  { thread: 'friend', sender: 'sent', text: 'あっ、拾ったスマホの充電が切れちゃった…！' },
+  { thread: 'friend', sender: 'recv', text: 'ケンの配信見てたら「今、太郎のスマホから住所の情報が届いた！！」って言い出した！ それってお前がLIMEで送ったやつだよな！？' },
+  { thread: 'friend', sender: 'recv', text: 'ケンが「台東区音無町3-19-3、今から警察と一緒に向かう！」って叫んでる！ 視聴者もザワついている！！' },
+  { thread: 'friend', sender: 'recv', text: 'お前すごいことしたぞ……！' },
 
-  // --- バッドエンド用：充電切れ後（インデックス 23〜26）---
-  { sender: 'sent', text: 'あっ、拾ったスマホの充電が切れちゃった…！' },
-  { sender: 'recv', text: 'おい！ケンの配信見てたら、送った住所（3-19-4）で店主に襲われて配信が切れちゃったぞ！！あそこは罠だったのか！？' },
-  { sender: 'recv', text: 'そういえば、太郎のスマホケースって限定記念品だろ？鏡に映して撮影したら、反転して何か別の住所が読めないか？' },
-  { sender: 'recv', text: 'おい、どうなってるんだ！ 返事しろよ！' }
+  // --- 新設: クリア後の太郎とのやり取り（インデックス 22〜26）---
+  { thread: 'taro', sender: 'recv', text: 'タベアルキ太郎です。この度は本当にありがとうございました！警察での事情聴取も終わり、スマホも手元に戻ってきました。ケンからあなたの連絡先を聞いて、直接お礼を伝えたくてメッセージしました。' },
+  { thread: 'taro', sender: 'sent', text: '無事で本当によかったです！店主も無事逮捕されたみたいですね。' },
+  { thread: 'taro', sender: 'recv', text: 'ありがとうございます。ただ……実は気になることがあって。私が拉致されていた際、店主が「サイトの店舗情報の住所のところから、俺の日誌（管理者ページ）に入れる」と独り言を言っていました。ただ、ログイン用のパスコードが分かりません。' },
+  { thread: 'taro', sender: 'recv', text: '店主は「パスコードは、仕入れ元である白菊ホールディングスの創業した西暦（4桁の数字）だ」とも言っていました。白菊グループのサイト（shirakiku.html）から創業年を調べれば、日誌を開けるはずです。極秘データが残っているかもしれないので、調べてみてくれないでしょうか？' },
+  { thread: 'taro', sender: 'sent', text: 'そうなんですか！調べてみます！' },
+
+  // --- バッドエンド用：充電切れ後（インデックス 27〜30）---
+  { thread: 'friend', sender: 'sent', text: 'あっ、拾ったスマホの充電が切れちゃった…！' },
+  { thread: 'friend', sender: 'recv', text: 'おい！ケンの配信見てたら、送った住所（3-19-4）で店主に襲われて配信が切れちゃったぞ！！あそこは罠だったのか！？' },
+  { thread: 'friend', sender: 'recv', text: 'そういえば、太郎のスマホケースって限定記念品だろ？鏡に映して撮影したら、反転して何か別の住所が読めないか？' },
+  { thread: 'friend', sender: 'recv', text: 'おい、どうなってるんだ！ 返事しろよ！' }
 ];
 
 let playerChatIndex = 0;
 let playerChatTimeout = null;
+let activePlayerThread = 'friend'; // 'friend' または 'taro'（常に初期値を明示）
 
-function openThread() {
-  document.querySelector('.chat-thread').classList.add('open');
-  // Start message generation if not started yet
-  if (playerChatIndex === 0) {
-    renderNextPlayerMessage();
-  }
-}
 
-function renderNextPlayerMessage() {
-  if (playerChatIndex >= PLAYER_CHAT_SCENARIO.length) return;
-  
-  const container = document.getElementById('player-thread-messages');
-  if (!container) return;
-  
-  const msgData = PLAYER_CHAT_SCENARIO[playerChatIndex];
-  const msgDiv = document.createElement('div');
-  msgDiv.className = `msg ${msgData.sender}`;
-  msgDiv.innerHTML = `<div class="msg-bubble">${msgData.text}</div>`;
-  
-  container.appendChild(msgDiv);
-  container.scrollTop = container.scrollHeight;
-  
-  playerChatIndex++;
-  
-  // --- クリア/バッドエンドの遷移判定 ---
-  // グッドエンド：インデックス22まで表示（インデックス23に到達）でクリアへ
-  if (playerChatIndex === 23) {
-    // グッドエンドの最後「すごいことしたぞ！」を表示後、クリアシーセルフ開始
-    setTimeout(triggerClear, 3500);
-    return;
-  }
-  // バッドエンド：インデックス26まで表示（インデックス27に到達）でバッドエンドへ
-  if (playerChatIndex === 27) {
-    // バッドエンドの最後「返事しろよ！」を表示後、脅迫メッセージとバッドエンドへ
-    setTimeout(() => {
-      const div = document.createElement('div');
-      div.className = 'msg recv';
-      div.innerHTML = `
-        <div class="msg-ava" style="background:#2a0000;filter:hue-rotate(180deg)">🔪</div>
-        <div class="msg-bubble" style="background:#2a0505;color:#ff6060">
-          余計なことをするな<br><span style="font-size:11px;color:rgba(255,60,60,0.5)">— 未知の番号</span>
-        </div>
-        <div class="msg-time" style="color:#ff4040">09:31</div>
-      `;
-      container.appendChild(div);
-      container.scrollTop = container.scrollHeight;
-
-      setTimeout(triggerBadEnd, 2500);
-    }, 2000);
-    return;
-  }
-
-  if (playerChatIndex < PLAYER_CHAT_SCENARIO.length) {
-    const nextMsg = PLAYER_CHAT_SCENARIO[playerChatIndex];
-    // ロック中（インデックス6に到達する前）に、自動で「ロック解除できたぞ！」へ進まないように制御
-    if (playerChatIndex === 6 && gameState.isLocked) {
-      return;
-    }
-    // 鏡撮影ヒント前（インデックス13に到達する前）に、自動で進まないように制御
-    if (playerChatIndex === 13 && !gameState.flags.firstAddressSent) {
-      return;
-    }
-    // 鏡撮影会話完了後（インデックス19に到達する前）に、自動でグッドエンド会話へ進まないように制御
-    if (playerChatIndex === 19) {
-      return;
-    }
-
-    const delay = nextMsg.sender === 'recv' ? 2200 : 1400;
-    playerChatTimeout = setTimeout(renderNextPlayerMessage, delay);
-  }
-}
-
-function closeThread() {
-  document.querySelector('.chat-thread').classList.remove('open');
-}
-
-function openPlayerSns() {
-  openPlayerBrowserSearch();
-}
-function openPlayerBrowserSearch() {
+function openPlayerSnsApp() {
   const overlay = document.getElementById('player-sns-overlay');
   const iframe = document.getElementById('player-sns-iframe');
   iframe.src = 'apps/sns.html?preview=1';
   overlay.classList.add('open');
+  playClick();
 }
-function closePlayerSns() {
+function closePlayerSnsApp() {
   const overlay = document.getElementById('player-sns-overlay');
   const iframe = document.getElementById('player-sns-iframe');
   iframe.src = '';
   overlay.classList.remove('open');
+  playClick();
+}
+function openPlayerBrowser() {
+  const overlay = document.getElementById('player-browser-overlay');
+  const iframe = document.getElementById('player-browser-iframe');
+  iframe.src = 'apps/browser.html?device=player';
+  overlay.style.display = 'flex';
+  playClick();
+}
+function closePlayerBrowser() {
+  const overlay = document.getElementById('player-browser-overlay');
+  const iframe = document.getElementById('player-browser-iframe');
+  iframe.src = '';
+  overlay.style.display = 'none';
+  playClick();
 }
 function switchToPickedPhone() {
+  if (isExtraMode || gameState.flags.extraActive) {
+    return; // extraモード時は切り替え不可
+  }
   currentDevice = 'picked'; // 拾ったスマホへ切り替え
   if (shutdownActive) {
     showToast('⚠️', 'システム', '端末のバッテリーが切れています。');
@@ -904,7 +1112,7 @@ function flipDevice() {
     pp.style.display = 'flex';
     setTimeout(() => { pp.style.transform = 'translateY(0)'; }, 20);
   }
-  
+
   setTimeout(() => {
     // 初めて自分のスマホに戻ったとき（会話未開始）は
     // チャットスレッドを自動で開き、通知トーストで友人からのメッセージを知らせる
@@ -924,7 +1132,7 @@ function flipDevice() {
     if (!gameState.flags.returnedToPlayerPhone && !gameState.isLocked) {
       setFlag('returnedToPlayerPhone', true);
     }
-    
+
     // 手動で自分のスマホに戻ってきたときに、現在のゲーム進行度に応じてチャットの会話を進める
     if (gameState.currentStep === 'unlocked' && playerChatIndex === 6) {
       renderNextPlayerMessage();
@@ -953,17 +1161,22 @@ function startStory() {
 }
 function closePlayerApp() {
   closeThread();
-  closePlayerSns();
+  closePlayerSnsApp();
+  closePlayerBrowser();
 }
 window.startStory = startStory;
 window.openThread = openThread;
 window.closeThread = closeThread;
-window.openPlayerSns = openPlayerSns;
-window.closePlayerSns = closePlayerSns;
+window.openPlayerSnsApp = openPlayerSnsApp;
+window.closePlayerSnsApp = closePlayerSnsApp;
+window.openPlayerBrowser = openPlayerBrowser;
+window.closePlayerBrowser = closePlayerBrowser;
 window.switchToPickedPhone = switchToPickedPhone;
 window.flipDevice = flipDevice;
 window.closePlayerApp = closePlayerApp;
 window.showToast = showToast;
+window.proceedToExtraStory = proceedToExtraStory;
+window.startExtraScenario = startExtraScenario;
 
 // ─── WALLPAPER ────────────────────────────────────────────────
 function loadWallpaper() {
@@ -988,10 +1201,40 @@ document.addEventListener('DOMContentLoaded', () => {
   const preloader = document.getElementById('preloader');
   setTimeout(() => preloader.classList.add('hidden'), 1200);
 
+  const isExtra = window.location.pathname.includes('extra') || window.location.search.includes('mode=extra');
+  isExtraMode = isExtra;
+  if (isExtraMode) {
+    gameState.flags.extraActive = true;
+    gameState.flags.gameCleared = true;
+    gameState.isLocked = false;
+    gameState.currentStep = 'news_found';
+    pickedBattery = 0;
+    if (!gameState.flags.taroChatIndex || gameState.flags.taroChatIndex < 22) {
+      gameState.flags.taroChatIndex = 22;
+    }
+    playerChatIndex = gameState.flags.taroChatIndex;
+    activePlayerThread = 'taro';
+    saveState();
+
+    // 「⇄ 拾ったスマホを見る」ボタンを非表示にする
+    const flipBtn = document.querySelector('.bar-flip-btn');
+    if (flipBtn) flipBtn.style.display = 'none';
+  }
+
   // Lock screen & Player phone initialization
   const pp = document.getElementById('player-phone');
   const intro = document.getElementById('novel-intro');
-  if (!gameState.isLocked) {
+  if (isExtraMode) {
+    if (intro) intro.style.display = 'none';
+    if (pp) { pp.style.display = 'flex'; pp.style.transform = 'none'; }
+    const ls = document.getElementById('lock-screen');
+    if (ls) ls.style.display = 'none';
+
+    // クリア後ナレーションオーバーレイを表示
+    const extraIntro = document.getElementById('extra-intro-overlay');
+    if (extraIntro) extraIntro.style.display = 'flex';
+    syncBatteryFromStep();
+  } else if (!gameState.isLocked) {
     const ls = document.getElementById('lock-screen');
     if (ls) ls.style.display = 'none';
     if (isMobile()) {
@@ -1012,37 +1255,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // P-04: リロード時のチャット進捗の同期（正しいインデックスで復元）
   const stepIndexMap = {
-    'intro':         0,
-    'unlocked':     10,   // 0〜9を描画
-    'news_found':   13,   // 0〜12を描画
-    'location_spec':13,
-    'chat_sent':    19,
-    'clear':        19,
-    'bad_end':      23,
+    'intro': 0,
+    'unlocked': 10,   // 0〜9を描画
+    'news_found': 13,   // 0〜12を描画
+    'location_spec': 13,
+    'chat_sent': 19,    // シャットダウン前（idx 0〜18）を復元
+    'clear': 22,        // グッドエンド完了（idx 0〜21 = 充電切れ〜「お前すごいことしたぞ」）を復元
+    'bad_end': 27,      // バッドエンド用メッセージ（idx 27〜）の開始前を復元
   };
-  playerChatIndex = stepIndexMap[gameState.currentStep] ?? 0;
-  if (gameState.currentStep === 'news_found' && gameState.flags.firstAddressSent) {
-    playerChatIndex = 19;
+
+  if (!isExtraMode) {
+    playerChatIndex = stepIndexMap[gameState.currentStep] ?? 0;
+    // バッドエンドからリトライ後: news_found + firstAddressSent = 鏡ヒントまで復元
+    if (gameState.currentStep === 'news_found' && gameState.flags.firstAddressSent) {
+      playerChatIndex = 19;
+    }
+    activePlayerThread = 'friend';
+  } else {
+    playerChatIndex = gameState.flags.taroChatIndex || 22;
+    activePlayerThread = 'taro';
   }
 
-  // 進捗段階までのメッセージを一括描画
-  const container = document.getElementById('player-thread-messages');
-  if (container) {
-    container.innerHTML = '';
-    const maxRender = Math.min(playerChatIndex, 19); // グッド/バッド充電切れメッセージ前まで
-    let renderLimit = maxRender;
-    if (!gameState.flags.firstAddressSent) {
-      renderLimit = Math.min(renderLimit, 13);
-    }
-    for (let i = 0; i < renderLimit; i++) {
-      const msgData = PLAYER_CHAT_SCENARIO[i];
-      const msgDiv = document.createElement('div');
-      msgDiv.className = `msg ${msgData.sender}`;
-      msgDiv.innerHTML = `<div class="msg-bubble">${msgData.text}</div>`;
-      container.appendChild(msgDiv);
-    }
-    container.scrollTop = container.scrollHeight;
-  }
+  // スレッドのヘッダー名とメッセージ履歴の一括描画
+  renderPlayerChat();
 
   // Clock
   updateClock();
@@ -1062,10 +1297,10 @@ function setupShareLinks() {
   const gameUrl = "https://xinniku-xxxkotsu-ramen.pages.dev/";
   const clearText = encodeURIComponent("拾ったスマホから繋がる、ある失踪事件の記録――\n『〇ンニク〇んこつラーメン』を解決。太郎の救出に成功。\n\n#〇ンニク〇んこつラーメン");
   const badText = encodeURIComponent("拾ったスマホから繋がる、ある失踪事件の記録――\n『〇ンニク〇んこつラーメン』。……みいつけた。\n\n#〇ンニク〇んこつラーメン");
-  
+
   const clearLink = document.getElementById('share-clear-x');
   const badLink = document.getElementById('share-bad-x');
-  
+
   if (clearLink) {
     clearLink.href = `https://x.com/intent/tweet?text=${clearText}&url=${encodeURIComponent(gameUrl)}`;
   }
@@ -1081,11 +1316,11 @@ function openCamera(device) {
   activeCameraDevice = device;
   const overlay = document.getElementById('global-camera-overlay');
   if (overlay) overlay.classList.add('open');
-  
+
   // デバイスに応じてビューファインダーを切り替え
   const playerView = document.getElementById('camera-view-player');
   const pickedView = document.getElementById('camera-view-picked');
-  
+
   if (device === 'player') {
     if (playerView) playerView.style.display = 'flex';
     if (pickedView) pickedView.style.display = 'none';
@@ -1109,10 +1344,10 @@ function takePhotoGlobal() {
     flash.style.opacity = '1';
     setTimeout(() => { flash.style.opacity = '0'; }, 150);
   }
-  
+
   // シャッター音
   playBeep(1200, 1200, 0.12, 0.25);
-  
+
   // フラグ設定
   if (activeCameraDevice === 'player') {
     setFlag('playerMirrorPhotoTaken', true);
@@ -1124,13 +1359,13 @@ function takePhotoGlobal() {
   } else {
     setFlag('pickedMirrorPhotoTaken', true);
     showToast('📷', 'カメラ', '写真を撮影しました（保存先: 写真アプリ）');
-    
+
     // 子iframeであるgallery.htmlへフラグが更新された状態を即通知
     const iframe = document.getElementById('mobile-iframe');
     if (iframe && iframe.contentWindow) {
       iframe.contentWindow.postMessage({ type: 'STATE', state: gameState }, '*');
     }
-    
+
     setTimeout(() => {
       closeCamera();
       openApp('gallery');
@@ -1142,16 +1377,16 @@ function takePhotoGlobal() {
 function openPlayerGallery() {
   const overlay = document.getElementById('player-gallery-overlay');
   if (overlay) overlay.classList.add('open');
-  
+
   const empty = document.getElementById('player-gallery-empty');
   const photo = document.getElementById('player-gallery-photo');
   const inspectBtn = document.getElementById('player-photo-inspect-btn');
   const txt = document.getElementById('player-photo-text');
-  
+
   if (gameState && gameState.flags?.playerMirrorPhotoTaken) {
     if (empty) empty.style.display = 'none';
     if (photo) photo.style.display = 'flex';
-    
+
     if (inspectBtn) inspectBtn.style.display = 'block';
     if (txt) txt.style.display = 'none';
   } else {
@@ -1168,10 +1403,104 @@ function closePlayerGallery() {
 function inspectPlayerMirrorPhoto() {
   const inspectBtn = document.getElementById('player-photo-inspect-btn');
   const txt = document.getElementById('player-photo-text');
-  
+
   if (inspectBtn) inspectBtn.style.display = 'none';
   if (txt) txt.style.display = 'block';
   playBeep(660, 880, 0.15, 0.15);
+}
+
+function unlockAchievement(key) {
+  if (!ACHIEVEMENTS[key]) return;
+  if (userAchievements[key]) return; // すでに解除済み
+
+  userAchievements[key] = true;
+  try {
+    localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(userAchievements));
+  } catch (e) { }
+
+  // Steam風トーストの表示
+  const toast = document.getElementById('steam-achievement-toast');
+  const toastName = document.getElementById('steam-achievement-name');
+  if (toast && toastName) {
+    toastName.textContent = ACHIEVEMENTS[key].name;
+    toast.classList.add('show');
+
+    // トロフィー解除のサウンドエフェクト (チャイム)
+    if (audioCtx) {
+      try {
+        playBeep(523.25, 523.25, 0.12, 0.2); // C5
+        setTimeout(() => playBeep(659.25, 659.25, 0.12, 0.2), 100); // E5
+        setTimeout(() => playBeep(783.99, 783.99, 0.3, 0.25), 200); // G5
+      } catch (err) { }
+    }
+
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 4000);
+  }
+}
+
+function openAchievementsModal() {
+  const list = document.getElementById('achievements-list');
+  if (!list) return;
+  list.innerHTML = '';
+
+  Object.entries(ACHIEVEMENTS).forEach(([key, ach]) => {
+    const unlocked = userAchievements[key];
+    const item = document.createElement('div');
+    item.className = 'achievement-item' + (unlocked ? '' : ' locked');
+
+    item.innerHTML = `
+      <div class="achievement-item-icon">${unlocked ? ach.icon : '🔒'}</div>
+      <div class="achievement-item-info">
+        <div class="achievement-item-name">${unlocked ? ach.name : '？？？'}</div>
+        <div class="achievement-item-desc">${unlocked ? ach.desc : '未獲得の実績（獲得条件を探してください）'}</div>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+
+  document.getElementById('achievements-modal').style.display = 'flex';
+  playClick();
+}
+
+function closeAchievementsModal() {
+  document.getElementById('achievements-modal').style.display = 'none';
+  playClick();
+}
+
+function retryFromBadEnd() {
+  // バッドエンドからのリトライ：データを全削除せず、空き地送信直前の状態に巻き戻す
+  gameState.currentStep = 'news_found';
+  gameState.flags.returnedToPlayerPhone = true;
+  gameState.flags.locationSent = false;
+  gameState.flags.firstAddressSent = true; // 1回空き地を送ったという履歴は残す
+
+  // バッテリーを回復（充電切れから復帰）
+  pickedBattery = 45;
+  shutdownActive = false;
+
+  // プレイヤー側のチャットインデックスを、鏡撮影の提案直前（インデックス13）に巻き戻す
+  playerChatIndex = 13;
+
+  saveState();
+  location.reload();
+}
+
+function restartGamePreservingUnlocks() {
+  // 実績やクリア後の解放フラグを維持したまま、進行だけを最初に戻す
+  const preservedFlags = {
+    extraActive: gameState.flags.extraActive || false,
+    gameCleared: gameState.flags.gameCleared || false
+  };
+
+  // 状態を初期化
+  gameState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+  gameState.flags.extraActive = preservedFlags.extraActive;
+  gameState.flags.gameCleared = preservedFlags.gameCleared;
+
+  saveState();
+  location.reload();
 }
 
 // 露出
@@ -1181,3 +1510,8 @@ window.takePhotoGlobal = takePhotoGlobal;
 window.openPlayerGallery = openPlayerGallery;
 window.closePlayerGallery = closePlayerGallery;
 window.inspectPlayerMirrorPhoto = inspectPlayerMirrorPhoto;
+window.openAchievementsModal = openAchievementsModal;
+window.closeAchievementsModal = closeAchievementsModal;
+window.restartGameWithoutConfirm = restartGameWithoutConfirm;
+window.retryFromBadEnd = retryFromBadEnd;
+window.restartGamePreservingUnlocks = restartGamePreservingUnlocks;

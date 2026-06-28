@@ -39,7 +39,12 @@
         <p class="novel-line">そんなことをぼんやりと考えていた、その時――</p>
         <p class="novel-line">拾ったスマートフォンが小さく震えた。通知だ。</p>
       </div>
-      <button class="novel-next-btn" onclick="startStory()">拾ったスマホを見てみる</button>
+      <div style="display:flex; flex-direction:column; gap:10px; width:100%;">
+        <button class="novel-next-btn" onclick="startStory()">拾ったスマホを見てみる</button>
+        <button class="novel-next-btn" onclick="openAchievementsModal()" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); font-size: 13px; font-weight: bold; color: rgba(255,255,255,0.7); display: flex; align-items: center; justify-content: center; gap: 8px;">
+          🏆 獲得実績を閲覧
+        </button>
+      </div>
     </div>
   </div>
 
@@ -161,11 +166,11 @@
 
       <!-- ホーム画面風のアイコングリッドレイアウト -->
       <div id="player-apps" class="player-home-grid" style="position: relative; z-index: 5;">
-        <div class="app-icon" onclick="showToast('🐦', 'SNS', 'ログイン画面：アカウントを紐付けてください。')">
+        <div class="app-icon" onclick="openPlayerSnsApp()">
           <div class="app-icon-img icon-sns">🐦</div>
           <div class="app-icon-label">SNS</div>
         </div>
-        <div class="app-icon" onclick="openPlayerBrowserSearch()">
+        <div class="app-icon" onclick="openPlayerBrowser()">
           <div class="app-icon-img icon-browser">🌐</div>
           <div class="app-icon-label">ブラウザ</div>
         </div>
@@ -184,13 +189,23 @@
       </div>
 
 
-      <!-- 内蔵iframeとしてのSNS閲覧画面（検索ブラウザ経由） -->
+      <!-- プレイヤーのスマホ用SNSアプリ画面 -->
       <div id="player-sns-overlay">
         <div class="sns-overlay-header">
-          <span class="back-btn-text" onclick="closePlayerSns()">← 戻る</span>
-          <span>🔍 タベアルキ太郎のSNS（公開タイムライン）を検索中</span>
+          <span class="back-btn-text" onclick="closePlayerSnsApp()">← 戻る</span>
+          <span>🐦 タベアルキ太郎のSNS (公開タイムライン)</span>
         </div>
         <iframe id="player-sns-iframe" src="" frameborder="0"></iframe>
+      </div>
+
+      <!-- プレイヤーのスマホ用ブラウザアプリ画面 -->
+      <div id="player-browser-overlay" style="position: absolute; inset: 0; background: #000; z-index: 15; display: none; flex-direction: column; font-family: var(--font);">
+        <div style="background: rgba(0,0,0,0.85); padding: 12px 16px; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: space-between; z-index: 10;">
+          <span class="back-btn-text" onclick="closePlayerBrowser()" style="color: #fff; font-size: 14px; cursor: pointer;">← 戻る</span>
+          <span style="font-weight: bold; color: #fff; font-size: 14px; letter-spacing: 1px;">🌐 ブラウザ</span>
+          <div style="width: 30px;"></div>
+        </div>
+        <iframe id="player-browser-iframe" src="" frameborder="0" style="flex: 1; width: 100%; border: none;"></iframe>
       </div>
     </div>
     <!-- 自分のスマホのホームバー -->
@@ -266,6 +281,7 @@
   <div id="settings-overlay" role="dialog" aria-label="設定メニュー">
     <div class="settings-panel">
       <h3>⚙ 設定</h3>
+      <button class="settings-btn" onclick="openAchievementsModal(); closeSettings();" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); color: #fff; margin-bottom: 10px;">🏆 獲得実績を確認</button>
       <button class="settings-btn danger" onclick="resetGame()">🔄 ゲームをリセット</button>
       <button class="settings-btn close-btn" onclick="closeSettings()">✕ 閉じる</button>
     </div>
@@ -274,6 +290,19 @@
   <!-- ══════════ EPILOGUE (グッドエンド) ══════════ -->
   <div id="epilogue-overlay" data-nosnippet role="region" aria-label="エンディング">
     <div class="end-content">
+      <div style="font-family: var(--font); font-weight: 900; font-size: 24px; color: #fcc419; letter-spacing: 4px; text-shadow: 0 0 15px rgba(252, 196, 25, 0.4); margin-bottom: 5px;">🏆 GAME CLEAR</div>
+      <div style="font-family: var(--font); font-weight: bold; font-size: 13px; color: #aaa; letter-spacing: 2px; margin-bottom: 25px;">- GOOD END -</div>
+      
+      <!-- 実績バッジ -->
+      <div style="display: inline-flex; align-items: center; gap: 10px; background: rgba(252, 196, 25, 0.1); border: 1px solid rgba(252, 196, 25, 0.25); padding: 8px 16px; border-radius: 20px; margin-bottom: 25px; font-size: 12px; color: #fcc419; font-weight: bold;">
+        🏅 獲得実績: 生存者（通常クリア）
+      </div>
+
+      <!-- ニュース報道画像 -->
+      <div style="width: 100%; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 5px 25px rgba(0,0,0,0.6);">
+        <img src="/assets/img/good_end_news.png" alt="Breaking News" style="width: 100%; height: auto; display: block;">
+      </div>
+
       <div class="end-label">E P I L O G U E</div>
       <div class="epil-player">
         <div class="epil-player-bar">
@@ -286,16 +315,96 @@
           <p>警察の介入により、台東区音無町3-19-4の地下室から、火葬場より持ち出された複数の遺体が発見された。店主は遺体損壊などの容疑で逮捕。</p>
           <p>&nbsp;</p>
           <p>「〇ンニク〇んこつラーメン」の真の店名は<strong>「ジンニクじんこつラーメン」</strong>であった。押収された秘伝のダシからは、昨年突然姿を消した店主の妻のDNAが検出されたという。</p>
-          <p>店主は、妻が亡くなって以来発見した禁忌のダシ「ジンニク」と「じんこつ」による病みつきになる旨味に取り憑かれ、その材料を集め続けていた……。</p>
+          <p>店主は「妻が溶けたスープを絶やすわけにはいかなかった。あれは妻そのものだった」と涙ながらに供述しているという。悲しみから始まった最初の禁忌は、いつしか引き返せない底なしの狂気へと彼を染め上げていった……。</p>
           <p>&nbsp;</p>
-          <p>配信者・タベアルキ太郎は無事保護されました。相方・フードハンター ケンの通報が彼の命を繋ぎとめました。</p>
+          <p>配信者・タベアルキ太郎は無事保護されたが、事件は本当に解決したのだろうか？</p>
+          <p>一介のラーメン店主に過ぎない彼が、これほど大量の「人骨」を個人で調達し続けられたとは到底考えられない。押収された店主のメモには、ある巨大なグループ企業の名前が繰り返し記されていたという。</p>
+          <p>店主の歪んだ愛と狂気の裏で、その弱みに付け込み、彼を怪物へと仕立て上げながら人骨ビジネスで私腹を肥やす「巨大な黒幕」がいるのではないか……?</p>
+          <p>澱みのスープの背後に潜む本当の闇は、まだ暴かれていない。</p>
         </div>
       </div>
       <div class="epil-credit">ご協力ありがとうございました</div>
-      <div style="display: flex; flex-direction: column; gap: 10px; max-width: 220px; margin: 0 auto;">
-        <button class="end-btn" onclick="resetGame()">もう一度プレイする</button>
+      <div style="display: flex; flex-direction: column; gap: 10px; max-width: 260px; margin: 0 auto;">
+        <button class="end-btn" onclick="startExtraScenario()" style="background: rgba(255,255,255,0.15); border-color: #fff; font-weight: bold; color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.15);">🔍 さらなる謎を調査する</button>
         <a id="share-clear-x" href="https://x.com/intent/tweet?text=〇ンニク〇んこつラーメンをクリアしたよ！&url=http://localhost:4321/" target="_blank" class="end-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #000; border-color: #333; box-shadow: 0 0 10px rgba(255,255,255,0.1); color: #fff; font-size: 13px;">
           <span>𝕏 で結果をシェア</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ EXTRA INTRO OVERLAY (クリア後ナレーション) ══════════ -->
+  <div id="extra-intro-overlay" style="position: fixed; inset: 0; background: #04040a; z-index: 30000; display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-family: var(--font); padding: 30px; box-sizing: border-box; text-align: center;">
+    <div style="max-width: 460px; width: 100%; animation: fadeIn 1.5s ease; line-height: 2.0; font-size: 14px; color: #d0d0e0; letter-spacing: 0.5px; margin-bottom: 40px; text-align: left;">
+      <p style="margin-bottom: 24px; text-shadow: 0 0 10px rgba(255,255,255,0.1);">数日後……。</p>
+      <p style="margin-bottom: 24px;">「〇ンニク〇んこつラーメン」を巡る猟奇的な事件の興奮が冷めやらぬ中、</p>
+      <p>私のスマートフォンに、見慣れない番号から一件の新規メッセージが届いた。</p>
+    </div>
+    <button class="end-btn" onclick="proceedToExtraStory()" style="max-width: 240px; cursor: pointer; padding: 12px 24px; border-radius: 24px; border: 1px solid #fff; background: rgba(255,255,255,0.1); color: #fff; font-weight: bold; font-size: 13px; transition: all 0.2s;">📩 メッセージを確認する</button>
+  </div>
+
+  <!-- ══════════ TRUE END (完全解決トゥルーエンド) ══════════ -->
+  <div id="true-end-overlay" role="region" aria-label="真のエンディング" style="position: fixed; inset: 0; background: #000; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: flex-start; color: #fff; font-family: var(--font); padding: 40px 20px; box-sizing: border-box; overflow-y: auto;">
+    <style>
+      @keyframes pulseGreen {
+        0% { opacity: 0.4; }
+        50% { opacity: 1; }
+        100% { opacity: 0.4; }
+      }
+      .live-dot-green {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #00ff66;
+        display: inline-block;
+        margin-right: 8px;
+        animation: pulseGreen 1s infinite;
+      }
+    </style>
+    <div class="end-content" style="max-width: 480px; width: 100%; text-align: center; animation: fadeIn 2s ease; margin: 0 auto;">
+      <div style="font-family: var(--font); font-weight: 900; font-size: 24px; color: #00ff66; letter-spacing: 4px; text-shadow: 0 0 15px rgba(0, 255, 102, 0.4); margin-bottom: 5px;">🏆 COMPLETE</div>
+      <div style="font-family: var(--font); font-weight: bold; font-size: 13px; color: #888; letter-spacing: 2px; margin-bottom: 25px;">- TRUE END -</div>
+
+      <!-- 実績バッジ -->
+      <div style="display: inline-flex; align-items: center; gap: 10px; background: rgba(0, 255, 102, 0.1); border: 1px solid rgba(0, 255, 102, 0.25); padding: 8px 16px; border-radius: 20px; margin-bottom: 25px; font-size: 12px; color: #00ff66; font-weight: bold;">
+        🏅 獲得実績: 澱みの根絶（完全解決）
+      </div>
+
+      <!-- ニュース報道画像 -->
+      <div style="width: 100%; border: 1px solid rgba(0,255,102,0.2); border-radius: 8px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 5px 25px rgba(0,255,102,0.15);">
+        <img src="/assets/img/true_end_news.png" alt="True End News" style="width: 100%; height: auto; display: block;">
+      </div>
+
+      <div class="end-label" style="color: #00ff66; text-shadow: 0 0 10px rgba(0,255,102,0.5); font-size: 13px; font-weight: bold; margin-bottom: 20px; letter-spacing: 2px;">
+        TRUE END: 澱みの根絶
+      </div>
+      <div class="epil-player" style="background: rgba(10,25,15,0.85); border: 1px solid rgba(0,255,102,0.3); border-radius: 12px; overflow: hidden; box-shadow: 0 0 30px rgba(0,255,102,0.15); margin-bottom: 30px;">
+        <div class="epil-player-bar" style="background: rgba(0,255,102,0.1); border-bottom: 1px solid rgba(0,255,102,0.15); padding: 8px 12px; display: flex; align-items: center; font-size: 11px; font-weight: bold; color: #00ff66;">
+          <span class="live-dot-green"></span>
+          東都ニュースWeb 速報 — 白菊ホールディングス一斉捜索
+        </div>
+        <div class="epil-player-body" style="font-size: 13px; line-height: 1.8; text-align: left; padding: 16px;">
+          <p style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:12px">2024年11月20日 ニュース速報</p>
+          <p>匿名から提供された膨大な闇取引データと指示メールの証拠に基づき、警視庁は本日、大手グループ「白菊ホールディングス」の一斉捜索に踏み切った。</p>
+          <p>代表の白菊栄治容疑者をはじめとする同社幹部ら複数の容疑者が、死体遺棄および死体損壊の疑いで逮捕された。</p>
+          <p>&nbsp;</p>
+          <p>同社は火葬場から組織的に遺体を回収・横流しし、グループ会社「白菊フードシステム」を通じて飲食店へのスープ出汁材料として卸売していたほか、通販部門のヘルスケア事業で販売していたカルシウムサプリ「白菊の恵み」にも、人骨を粉末にして混入させていた疑いが持たれている。</p>
+          <p>この歴史的な猟奇ビジネスは、一般市民の匿名告発によって全容が暴かれた。</p>
+          <p>押収された店主の日記には、愛する妻を失った深い喪失感と、その弱みに付け込んだ白菊ホールディングスによって彼が少しずつ「怪物」へと仕立て上げられていく悲痛な過程が綴られていた。すべての発端は、あまりにも歪んだ愛の形だったのかもしれない。</p>
+          <p>&nbsp;</p>
+          <p style="color: #00ff66; font-weight: bold; margin-bottom: 4px;">【タベアルキ太郎からのメッセージ】</p>
+          <p>「本当に、本当にありがとうございました！あなたが白菊ホールディングスの闇を暴いてくれたおかげで、彼らも逮捕され、俺たちの安全も完全に守られました。あなたの調査の執念と正義感に、心から感謝します！」</p>
+        </div>
+      </div>
+      <div class="epil-credit" style="color: #888; font-size: 12px; margin-bottom: 25px; letter-spacing: 1px;">事件は完全に解決しました</div>
+      <div style="font-size:12px; color:rgba(255,255,255,0.45); margin-bottom:20px; font-style:italic; line-height:1.7;">
+        愛する者をスープに溶かした店主と、それをビジネスに変えた黒幕。<br>
+        彼らを狂気へと駆り立てた「澱みの起源」を、もう一度見つめ直しますか？
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px; max-width: 240px; margin: 0 auto;">
+        <button class="end-btn" onclick="restartGamePreservingUnlocks()" style="cursor: pointer; padding: 12px; border-radius: 24px; border: 1px solid rgba(0,255,102,0.4); background: rgba(0,255,102,0.1); color: #fff; font-weight: bold; font-size: 13px; transition: all 0.2s;">最初からプレイする</button>
+        <a id="share-true-x" href="https://x.com/intent/tweet?text=白菊ホールディングスの巨大な闇を暴き、『〇ンニク〇んこつラーメン』の真の解決を達成した！&url=http://localhost:4321/" target="_blank" class="end-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #000; border: 1px solid #333; box-shadow: 0 0 10px rgba(255,255,255,0.1); color: #fff; font-size: 13px; cursor: pointer; padding: 12px; border-radius: 24px; font-weight: bold;">
+          <span>𝕏 で真実をシェア</span>
         </a>
       </div>
     </div>
@@ -304,6 +413,14 @@
   <!-- ══════════ BAD END (バッドエンド) ══════════ -->
   <div id="bad-end-overlay" data-nosnippet role="region" aria-label="バッドエンド">
     <div class="end-content">
+      <div style="font-family: var(--font); font-weight: 900; font-size: 24px; color: #ff3333; letter-spacing: 4px; text-shadow: 0 0 15px rgba(255, 51, 51, 0.4); margin-bottom: 5px;">💀 GAME OVER</div>
+      <div style="font-family: var(--font); font-weight: bold; font-size: 13px; color: #aaa; letter-spacing: 2px; margin-bottom: 25px;">- BAD END -</div>
+
+      <!-- 実績バッジ -->
+      <div style="display: inline-flex; align-items: center; gap: 10px; background: rgba(255, 51, 51, 0.1); border: 1px solid rgba(255, 51, 51, 0.25); padding: 8px 16px; border-radius: 20px; margin-bottom: 25px; font-size: 12px; color: #ff3333; font-weight: bold;">
+        🏅 獲得実績: 澱みに融ける（ゲームオーバー）
+      </div>
+
       <div class="end-label"
         style="color: #ff3333; text-shadow: 0 0 10px rgba(255,0,0,0.5); font-size: 13px; font-weight: bold; margin-bottom: 20px; letter-spacing: 2px;">
         BAD END: 新たなダシ
@@ -342,8 +459,8 @@
         <div class="bad-sub" style="margin-bottom: 20px; font-size: 14px; color: rgba(255,0,0,0.6);">— あなたも、お友達も。</div>
       </div>
       <div style="display: flex; flex-direction: column; gap: 10px; max-width: 220px; margin: 0 auto;">
-        <button class="end-btn" onclick="resetGame()"
-          style="background: rgba(255, 0, 0, 0.15); border-color: rgba(255, 0, 0, 0.4); box-shadow: 0 0 15px rgba(255, 0, 0, 0.2); transition: background 0.2s;">最初からやり直す</button>
+        <button class="end-btn" onclick="retryFromBadEnd()"
+          style="background: rgba(255, 0, 0, 0.15); border-color: rgba(255, 0, 0, 0.4); box-shadow: 0 0 15px rgba(255, 0, 0, 0.2); transition: background 0.2s; font-size: 13px; font-weight: bold;">直前からやり直す（リトライ）</button>
         <a id="share-bad-x" href="https://x.com/intent/tweet?text=〇ンニク〇んこつラーメンで闇に飲まれた……&url=http://localhost:4321/" target="_blank" class="end-btn"
           style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #000; border-color: #ff3333; box-shadow: 0 0 15px rgba(255, 0, 0, 0.2); color: #fff; font-size: 13px;">
           <span>𝕏 で結果をシェア</span>
@@ -519,6 +636,171 @@
     style="position: fixed; inset: 0; background: #000; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 20px; color: #fff; opacity: 0; transition: opacity 1.5s ease;">
     <div class="preloader-spinner" style="border-top-color: #ff3b30;"></div>
     <div style="font-size: 14px; letter-spacing: 2px; color: #aaa;">シャットダウンしています...</div>
+  </div>
+
+  <!-- ══════════ STEAM ACHIEVEMENT TOAST (Steam風実績トースト) ══════════ -->
+  <style>
+    #steam-achievement-toast {
+      position: fixed;
+      bottom: 24px;
+      right: -320px;
+      width: 290px;
+      background: #171a21;
+      border: 1px solid #3d4450;
+      border-left: 5px solid #66c0f4;
+      border-radius: 4px;
+      padding: 12px 16px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      z-index: 20000;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      transition: right 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+      font-family: var(--font);
+      color: #c6d4df;
+      opacity: 0;
+    }
+    #steam-achievement-toast.show {
+      right: 24px;
+      opacity: 1;
+    }
+    .steam-toast-icon {
+      font-size: 28px;
+      filter: drop-shadow(0 0 5px rgba(255,196,25,0.4));
+    }
+    .steam-toast-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .steam-toast-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #66c0f4;
+      font-weight: bold;
+    }
+    .steam-toast-name {
+      font-size: 14px;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    /* 実績閲覧モーダルのスタイル */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: #04040a;
+      z-index: 99999 !important;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      font-family: var(--font);
+    }
+    .modal-box {
+      position: relative;
+      max-width: 460px;
+      width: 100%;
+      background: #171a21;
+      border: 1px solid #3d4450;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+      color: #c6d4df;
+      animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: #66c0f4;
+      font-size: 22px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .modal-close:hover {
+      color: #fff;
+      transform: scale(1.15);
+    }
+    .achievement-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .achievement-item.locked {
+      opacity: 0.55;
+      background: rgba(0,0,0,0.25);
+    }
+    .achievement-item-icon {
+      font-size: 28px;
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.1);
+      flex-shrink: 0;
+    }
+    .achievement-item.locked .achievement-item-icon {
+      background: rgba(0,0,0,0.4);
+      border-color: rgba(255,255,255,0.05);
+    }
+    .achievement-item-info {
+      flex: 1;
+      text-align: left;
+    }
+    .achievement-item-name {
+      font-size: 13.5px;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+    .achievement-item.locked .achievement-item-name {
+      color: rgba(255,255,255,0.4);
+    }
+    .achievement-item-desc {
+      font-size: 11.5px;
+      color: #8a8a9f;
+      line-height: 1.4;
+    }
+  </style>
+
+  <div id="steam-achievement-toast">
+    <div class="steam-toast-icon">🏆</div>
+    <div class="steam-toast-content">
+      <div class="steam-toast-title">実績解除！</div>
+      <div class="steam-toast-name" id="steam-achievement-name">最初の一歩</div>
+    </div>
+  </div>
+
+  <!-- 実績閲覧モーダル -->
+  <div id="achievements-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 460px; background: #171a21; border: 1px solid #3d4450; color: #c6d4df; font-family: var(--font);">
+      <button class="modal-close" onclick="closeAchievementsModal()" style="color: #66c0f4;">✕</button>
+      <h3 style="color:#66c0f4; border-bottom:1px solid #3d4450; padding-bottom:10px; margin-bottom:20px; font-size:15px; font-weight:bold; letter-spacing:1px; text-align:center; display:flex; align-items:center; justify-content:center; gap:8px;">
+        🏆 獲得実績一覧
+      </h3>
+      <div id="achievements-list" style="display:flex; flex-direction:column; gap:12px; max-height:350px; overflow-y:auto; padding-right:5px;">
+        <!-- JSで動的に実績要素を生成 -->
+      </div>
+    </div>
   </div>
 
   <script src="assets/js/os-core.js"></script>

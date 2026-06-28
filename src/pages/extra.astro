@@ -1,0 +1,6 @@
+﻿---
+// src/pages/extra.astro
+// Using a Vite raw import allows Astro/Vite to track templates/index.html as a dependency.
+import htmlContent from '../templates/index.html?raw';
+---
+<Fragment set:html={htmlContent} />
