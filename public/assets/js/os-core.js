@@ -929,6 +929,30 @@ function renderNextPlayerMessage() {
     setTimeout(triggerClear, 3500);
     return;
   }
+
+  // --- extraモード: taroチャット完了後のブラウザ誘導 ---
+  if (activePlayerThread === 'taro' && playerChatIndex === 27) {
+    setTimeout(() => {
+      showToast('🌐', 'ブラウザ', '白菊ホールディングスの公式サイトを自分のブラウザで調べてみよう');
+      // 自分のスマホのブラウザアイコンにバッジを表示
+      const browserIcon = document.querySelector('#player-apps .app-icon:nth-child(2) .app-icon-img');
+      if (browserIcon) {
+        const badge = document.createElement('div');
+        badge.className = 'app-badge';
+        badge.id = 'badge-player-browser';
+        badge.style.cssText = 'position:absolute;top:-4px;right:-4px;background:#ff3b30;color:#fff;font-size:10px;font-weight:bold;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:10;';
+        badge.textContent = '!';
+        const iconWrapper = browserIcon.closest('.app-icon');
+        if (iconWrapper) {
+          iconWrapper.style.position = 'relative';
+          if (!document.getElementById('badge-player-browser')) {
+            iconWrapper.appendChild(badge);
+          }
+        }
+      }
+    }, 1500);
+    return;
+  }
   if (activePlayerThread === 'friend' && playerChatIndex === 31) {
     setTimeout(() => {
       const div = document.createElement('div');
@@ -957,6 +981,12 @@ function renderNextPlayerMessage() {
       if (playerChatIndex === 13 && !gameState.flags.firstAddressSent) return;
       if (playerChatIndex === 19) return;
       if (playerChatIndex === 27) return; // バッドエンド進行前で停止
+    }
+    if (activePlayerThread === 'taro') {
+      // taroスレッドはidx 27以降（friendのバッドエンドメッセージ）に侵入しない
+      if (playerChatIndex >= 27) return;
+      // 次のメッセージがtaroスレッド以外なら停止
+      if (nextMsg.thread !== 'taro') return;
     }
 
     const delay = nextMsg.sender === 'recv' ? 2200 : 1400;
@@ -1047,7 +1077,7 @@ const PLAYER_CHAT_SCENARIO = [
   { thread: 'taro', sender: 'recv', text: 'タベアルキ太郎です。この度は本当にありがとうございました！警察での事情聴取も終わり、スマホも手元に戻ってきました。ケンからあなたの連絡先を聞いて、直接お礼を伝えたくてメッセージしました。' },
   { thread: 'taro', sender: 'sent', text: '無事で本当によかったです！店主も無事逮捕されたみたいですね。' },
   { thread: 'taro', sender: 'recv', text: 'ありがとうございます。ただ……実は気になることがあって。私が拉致されていた際、店主が「サイトの店舗情報の住所のところから、俺の日誌（管理者ページ）に入れる」と独り言を言っていました。ただ、ログイン用のパスコードが分かりません。' },
-  { thread: 'taro', sender: 'recv', text: '店主は「パスコードは、仕入れ元である白菊ホールディングスの創業した西暦（4桁の数字）だ」とも言っていました。白菊グループのサイト（shirakiku.html）から創業年を調べれば、日誌を開けるはずです。極秘データが残っているかもしれないので、調べてみてくれないでしょうか？' },
+  { thread: 'taro', sender: 'recv', text: '店主は「パスコードは、仕入れ元である白菊ホールディングスの創業した西暦（4桁の数字）だ」とも言っていました。白菊グループのサイトから創業年を調べれば、日誌を開けるはずです。極秘データが残っているかもしれないので、調べてみてくれないでしょうか？' },
   { thread: 'taro', sender: 'sent', text: 'そうなんですか！調べてみます！' },
 
   // --- バッドエンド用：充電切れ後（インデックス 27〜30）---
