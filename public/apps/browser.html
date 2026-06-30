@@ -345,6 +345,11 @@
         </div>
       </div>
     </div>
+    <!-- footer -->
+    <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #222; text-align: center; font-size: 10px; color: #555; line-height: 1.5;">
+      <p>© TubeTuber. All Rights Reserved.</p>
+      <p style="margin-top: 4px; font-size: 9px; color: rgba(255, 255, 255, 0.2);">※このウェブサイトはフィクションです。登場する人物・団体・名称等は架空であり、実在のものとは関係ありません。</p>
+    </footer>
   </div>
 
   <!-- ページ: 白菊ホールディングス (shirakiku.html をiframeで表示) -->
@@ -370,6 +375,11 @@
       <p>業者の代表は取材に対し「すべての火葬は適正に行われた」と関与を否定している。警察は業者の取引記録や帳簿の精査を急いでいる。</p>
       <p>白菊ホールは台東区音無町を中心に3か所の式場を運営しており、地域の葬儀シェアの約15%を担っているとされる。関係者への取材を続ける。</p>
     </div>
+    <!-- footer -->
+    <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center; font-size: 10px; color: var(--muted); line-height: 1.5;">
+      <p>© 東都ニュース社. All Rights Reserved.</p>
+      <p style="margin-top: 4px; font-size: 9px; color: rgba(255, 255, 255, 0.25);">※このウェブサイトはフィクションです。登場する人物・団体・名称等は架空であり、実在のものとは関係ありません。</p>
+    </footer>
   </div>
 
   <!-- ページ: ラーメン店公式HP -->
@@ -427,6 +437,12 @@
           🚃 JR鶯谷駅 徒歩8分
         </p>
       </div>
+
+      <!-- footer -->
+      <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center; font-size: 10px; color: var(--muted); line-height: 1.5;">
+        <p>© 2023 <span id="footer-store-name">〇ンニク〇んこつラーメン</span>. All Rights Reserved.</p>
+        <p style="margin-top: 4px; font-size: 9px; color: rgba(255, 255, 255, 0.25);">※このウェブサイトはフィクションです。登場する人物・団体・名称等は架空であり、実在のものとは関係ありません。</p>
+      </footer>
 
     </div>
   </div>
@@ -571,6 +587,10 @@
     document.getElementById('menu-2').innerHTML = `<span class="glitch-text">ジンニクじんこつラーメン（大）</span>`;
     document.getElementById('soup-desc').innerHTML = `特製じんこつ`;
     document.getElementById('store-tagline').textContent = 'since 2023.06 ｜ 特別なスープをどうぞ';
+    const footerStoreName = document.getElementById('footer-store-name');
+    if (footerStoreName) {
+      footerStoreName.innerHTML = `<span class="glitch-text">ジンニクじんこつラーメン</span>`;
+    }
   }
 
 
@@ -680,6 +700,10 @@
       corrupt(document.getElementById('menu-2'), '〇ンニク〇んこつラーメン（大）', 'ジンニクじんこつラーメン（大）');
       corrupt(document.getElementById('soup-desc'), '秘伝の骨', '特製じんこつ');
       document.getElementById('store-tagline').textContent = 'since 2023.06 ｜ 特別なスープをどうぞ';
+      const footerStoreName = document.getElementById('footer-store-name');
+      if (footerStoreName) {
+        corrupt(footerStoreName, '〇ンニク〇んこつラーメン', 'ジンニクじんこつラーメン');
+      }
     }, 600);
   }
 
